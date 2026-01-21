@@ -2,7 +2,6 @@ interface User {
   name: string;
   email: string;
   role: string;
-  // Ajoutez d'autres champs si besoin
 }
 
 interface Vehicule {
@@ -28,7 +27,6 @@ interface Vehicule {
   forRent?: boolean;
   status?: string;
   disponible?: boolean;
-  // Ajoutez d'autres champs
 }
 
 interface ReservationData {
@@ -38,35 +36,20 @@ interface ReservationData {
   options: string[];
 }
 
-const API_CONFIG = {
-  BASE_URL: 'http://localhost:5000/api',
-  getHeaders() {
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-    };
-    const token = localStorage.getItem('token');
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-    return headers;
-  },
-  getFormDataHeaders() {
-    const headers: HeadersInit = {};
-    const token = localStorage.getItem('token');
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-    return headers;
-  },
-};
-
 class MobilityAPI {
   token: string | null;
   user: User | null;
 
   constructor() {
-    this.token = localStorage.getItem('token');
-    this.user = JSON.parse(localStorage.getItem('user') || 'null');
+    // NE PAS accéder à localStorage dans le constructeur
+    this.token = null;
+    this.user = null;
+    
+    // Initialiser uniquement si on est côté client
+    if (typeof window !== 'undefined') {
+      this.token = localStorage.getItem('token');
+      this.user = JSON.parse(localStorage.getItem('user') || 'null');
+    }
   }
 
   private async handleResponse(response: Response): Promise<any> {
@@ -77,17 +60,57 @@ class MobilityAPI {
     return response.json();
   }
 
+  private getHeaders(): HeadersInit {
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    
+    // Vérifier si on est côté client avant d'accéder à localStorage
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('token');
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+    } else if (this.token) {
+      // Utiliser le token stocké en mémoire pour SSR
+      headers['Authorization'] = `Bearer ${this.token}`;
+    }
+    
+    return headers;
+  }
+
+  private getFormDataHeaders(): HeadersInit {
+    const headers: HeadersInit = {};
+    
+    // Vérifier si on est côté client avant d'accéder à localStorage
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('token');
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+    } else if (this.token) {
+      // Utiliser le token stocké en mémoire pour SSR
+      headers['Authorization'] = `Bearer ${this.token}`;
+    }
+    
+    return headers;
+  }
+
   async login(email: string, password: string): Promise<{ token: string; user: User }> {
-    const response = await fetch(`${API_CONFIG.BASE_URL}/auth/login`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/auth/login`, {
       method: 'POST',
-      headers: API_CONFIG.getHeaders(),
+      headers: this.getHeaders(),
       body: JSON.stringify({ email, password }),
     });
     const data = await this.handleResponse(response);
     if (data.token) {
       this.setToken(data.token);
       this.user = data.user;
-      localStorage.setItem('user', JSON.stringify(data.user));
+      
+      // Stocker uniquement si on est côté client
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('user', JSON.stringify(data.user));
+      }
     }
     return data;
   }
@@ -99,72 +122,84 @@ class MobilityAPI {
     formData.append('password', userData.password);
     formData.append('role', userData.role);
 
-    const response = await fetch(`${API_CONFIG.BASE_URL}/auth/register`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/auth/register`, {
       method: 'POST',
       body: formData,
-      headers: API_CONFIG.getFormDataHeaders(),
+      headers: this.getFormDataHeaders(),
     });
     const data = await this.handleResponse(response);
     if (data.token) {
       this.setToken(data.token);
       this.user = data.user;
-      localStorage.setItem('user', JSON.stringify(data.user));
+      
+      // Stocker uniquement si on est côté client
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('user', JSON.stringify(data.user));
+      }
     }
     return data;
   }
 
   logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    // Supprimer uniquement si on est côté client
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    }
     this.token = null;
     this.user = null;
   }
 
   setToken(token: string) {
     this.token = token;
-    localStorage.setItem('token', token);
+    
+    // Stocker uniquement si on est côté client
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('token', token);
+    }
   }
 
   async getVehicules(filters: Record<string, any> = {}): Promise<Vehicule[]> {
     const queryParams = new URLSearchParams(filters).toString();
-    const url = `${API_CONFIG.BASE_URL}/vehicules${queryParams ? `?${queryParams}` : ''}`;
-    const response = await fetch(url, { headers: API_CONFIG.getHeaders() });
+    const url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/vehicules${queryParams ? `?${queryParams}` : ''}`;
+    const response = await fetch(url, { headers: this.getHeaders() });
     return this.handleResponse(response);
   }
 
   async getVehiculeById(id: string): Promise<Vehicule> {
-    const response = await fetch(`${API_CONFIG.BASE_URL}/vehicules/${id}`, { headers: API_CONFIG.getHeaders() });
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/vehicules/${id}`, { headers: this.getHeaders() });
     return this.handleResponse(response);
   }
 
   async getMarques(): Promise<{ name: string }[]> {
-    const response = await fetch(`${API_CONFIG.BASE_URL}/marques`, { headers: API_CONFIG.getHeaders() });
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/marques`, { headers: this.getHeaders() });
     return this.handleResponse(response);
   }
 
   async createReservation(reservationData: ReservationData): Promise<any> {
-    const response = await fetch(`${API_CONFIG.BASE_URL}/reservations`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/reservations`, {
       method: 'POST',
-      headers: API_CONFIG.getHeaders(),
+      headers: this.getHeaders(),
       body: JSON.stringify(reservationData),
     });
     return this.handleResponse(response);
   }
 
   async getCurrentUser(): Promise<User> {
-    const response = await fetch(`${API_CONFIG.BASE_URL}/auth/users/me`, { headers: API_CONFIG.getHeaders() });
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/auth/users/me`, { headers: this.getHeaders() });
     return this.handleResponse(response);
   }
 
   async getParkings(): Promise<any[]> {
-    const response = await fetch(`${API_CONFIG.BASE_URL}/parkings`, { headers: API_CONFIG.getHeaders() });
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/parkings`, { headers: this.getHeaders() });
     return this.handleResponse(response);
   }
 
   async getStats(): Promise<{ totalVehicules: number; totalParkings: number }> {
-    const response = await fetch(`${API_CONFIG.BASE_URL}/vehicules/parking/stats`, { headers: API_CONFIG.getHeaders() });
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/vehicules/parking/stats`, { headers: this.getHeaders() });
     return this.handleResponse(response);
   }
 }
 
+// Exportez une instance, pas la classe
 export const mobilityAPI = new MobilityAPI();
