@@ -97,7 +97,7 @@ class MobilityAPI {
   }
 
   async login(email: string, password: string): Promise<{ token: string; user: User }> {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/auth/login`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/auth/login`, {
       method: 'POST',
       headers: this.getHeaders(),
       body: JSON.stringify({ email, password }),
@@ -122,7 +122,7 @@ class MobilityAPI {
     formData.append('password', userData.password);
     formData.append('role', userData.role);
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/auth/register`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/auth/register`, {
       method: 'POST',
       body: formData,
       headers: this.getFormDataHeaders(),
@@ -161,23 +161,23 @@ class MobilityAPI {
 
   async getVehicules(filters: Record<string, any> = {}): Promise<Vehicule[]> {
     const queryParams = new URLSearchParams(filters).toString();
-    const url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/vehicules${queryParams ? `?${queryParams}` : ''}`;
+    const url = `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/vehicules${queryParams ? `?${queryParams}` : ''}`;
     const response = await fetch(url, { headers: this.getHeaders() });
     return this.handleResponse(response);
   }
 
   async getVehiculeById(id: string): Promise<Vehicule> {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/vehicules/${id}`, { headers: this.getHeaders() });
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/vehicules/${id}`, { headers: this.getHeaders() });
     return this.handleResponse(response);
   }
 
   async getMarques(): Promise<{ name: string }[]> {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/marques`, { headers: this.getHeaders() });
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/marques`, { headers: this.getHeaders() });
     return this.handleResponse(response);
   }
 
   async createReservation(reservationData: ReservationData): Promise<any> {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/reservations`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/reservations`, {
       method: 'POST',
       headers: this.getHeaders(),
       body: JSON.stringify(reservationData),
@@ -186,17 +186,17 @@ class MobilityAPI {
   }
 
   async getCurrentUser(): Promise<User> {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/auth/users/me`, { headers: this.getHeaders() });
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/auth/users/me`, { headers: this.getHeaders() });
     return this.handleResponse(response);
   }
 
   async getParkings(): Promise<any[]> {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/parkings`, { headers: this.getHeaders() });
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/parkings`, { headers: this.getHeaders() });
     return this.handleResponse(response);
   }
 
   async getStats(): Promise<{ totalVehicules: number; totalParkings: number }> {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/vehicules/parking/stats`, { headers: this.getHeaders() });
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/vehicules/parking/stats`, { headers: this.getHeaders() });
     return this.handleResponse(response);
   }
 }
