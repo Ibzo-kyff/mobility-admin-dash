@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useEffect, useState, useRef } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/navigation';
@@ -13,7 +12,8 @@ import {
   faMobileAlt, faMapMarkerAlt, faPhone, faEnvelope, faChevronRight
 } from '@fortawesome/free-solid-svg-icons';
 import { faHeart, faStar as faStarRegular } from '@fortawesome/free-regular-svg-icons';
-import { mobilityAPI } from '../../services/mobility-api';
+// IMPORTANT: NE PAS importer mobilityAPI directement ici
+// import { mobilityAPI } from '../../services/mobility-api';
 import Image from 'next/image';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -38,6 +38,9 @@ const Home: React.FC = () => {
   const [activeSection, setActiveSection] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  
+  // Ajoutez cet état pour mobilityAPI
+  const [mobilityAPI, setMobilityAPI] = useState<any>(null);
 
   // Three.js scene reference
   const sceneRef = useRef<THREE.Scene | null>(null);
@@ -45,38 +48,24 @@ const Home: React.FC = () => {
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const particlesRef = useRef<THREE.Points | null>(null);
 
-  // Définition UNIQUE de checkAuth
-  const checkAuth = async () => {
-    try {
-      // Vérifier si on est côté client (browser)
-      if (typeof window !== 'undefined') {
-        const token = localStorage.getItem('token');
-        if (token) {
-          const currentUser = await mobilityAPI.getCurrentUser();
-          setUser(currentUser);
-        }
-      }
-    } catch (error) {
-      setUser(null);
-    }
-  };
-
-  // Définition de handleLogout
-  const handleLogout = () => {
-    if (typeof window !== 'undefined') {
-      mobilityAPI.logout();
-    }
-    setUser(null);
-    showToast('Déconnexion réussie', 'success');
-  };
-
   useEffect(() => {
     setIsClient(true);
   }, []);
 
+  // Charger mobilityAPI uniquement côté client
+  useEffect(() => {
+    if (isClient) {
+      import('../../services/mobility-api').then((module) => {
+        setMobilityAPI(module.mobilityAPI);
+      }).catch((error) => {
+        console.error('Failed to load mobilityAPI:', error);
+      });
+    }
+  }, [isClient]);
+
   useEffect(() => {
     // Ne pas initialiser Three.js côté serveur
-    if (!isClient) return;
+    if (!isClient || !mobilityAPI) return;
 
     initializeThreeJS();
     animateThreeJS();
@@ -93,9 +82,35 @@ const Home: React.FC = () => {
         rendererRef.current.dispose();
       }
     };
-  }, [isClient]);
+  }, [isClient, mobilityAPI]);
 
-  // Les autres fonctions...
+  // Définition UNIQUE de checkAuth
+  const checkAuth = async () => {
+    if (!mobilityAPI) return;
+    
+    try {
+      // Vérifier si on est côté client (browser)
+      if (typeof window !== 'undefined') {
+        const token = localStorage.getItem('token');
+        if (token) {
+          const currentUser = await mobilityAPI.getCurrentUser();
+          setUser(currentUser);
+        }
+      }
+    } catch (error) {
+      setUser(null);
+    }
+  };
+
+  // Définition de handleLogout
+  const handleLogout = () => {
+    if (typeof window !== 'undefined' && mobilityAPI) {
+      mobilityAPI.logout();
+    }
+    setUser(null);
+    showToast('Déconnexion réussie', 'success');
+  };
+
   const initializeThreeJS = () => {
     if (!threeContainerRef.current) return;
     
@@ -164,6 +179,8 @@ const Home: React.FC = () => {
   };
 
   const loadInitialData = async () => {
+    if (!mobilityAPI) return;
+    
     setShowLoadingOverlay(true);
     try {
       await loadFeaturedCar();
@@ -179,6 +196,8 @@ const Home: React.FC = () => {
   };
 
   const loadFeaturedCar = async () => {
+    if (!mobilityAPI) return;
+    
     const vehicules = await mobilityAPI.getVehicules({ limit: 1 });
     if (vehicules.length > 0) {
       setFeaturedCar(vehicules[0]);
@@ -186,7 +205,8 @@ const Home: React.FC = () => {
   };
 
   const loadVehicles = async (filters: Record<string, any> = {}) => {
-    if (isLoading) return;
+    if (!mobilityAPI || isLoading) return;
+    
     setIsLoading(true);
     setShowLoadingOverlay(true);
     try {
@@ -214,11 +234,15 @@ const Home: React.FC = () => {
   };
 
   const loadMarques = async () => {
+    if (!mobilityAPI) return;
+    
     const data = await mobilityAPI.getMarques();
     setMarques(data);
   };
 
   const loadStats = async () => {
+    if (!mobilityAPI) return;
+    
     const data = await mobilityAPI.getStats();
     setStats(data);
   };
@@ -236,6 +260,8 @@ const Home: React.FC = () => {
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!mobilityAPI) return;
+    
     const formData = new FormData(e.currentTarget);
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
@@ -255,6 +281,8 @@ const Home: React.FC = () => {
 
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!mobilityAPI) return;
+    
     const formData = new FormData(e.currentTarget);
     const userData = {
       name: formData.get('name') as string,
@@ -277,6 +305,8 @@ const Home: React.FC = () => {
   };
 
   const handleReserve = async (vehiculeId: string) => {
+    if (!mobilityAPI) return;
+    
     try {
       if (!mobilityAPI.token) {
         setShowAuthModal(true);
@@ -295,6 +325,8 @@ const Home: React.FC = () => {
 
   const submitReservation = async (e: React.FormEvent<HTMLFormElement>, vehiculeId: string) => {
     e.preventDefault();
+    if (!mobilityAPI) return;
+    
     const formData = new FormData(e.currentTarget);
     const reservationData = {
       vehiculeId,
@@ -383,6 +415,7 @@ const Home: React.FC = () => {
     const carburant = vehicule?.fuelType || vehicule?.carburant || 'Essence';
     const transmission = vehicule?.transmission || 'Automatique';
     const places = vehicule?.places || 5;
+
 
     return (
       <div className="car-card max-w-md mx-auto">
