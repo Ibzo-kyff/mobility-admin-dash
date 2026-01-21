@@ -37,6 +37,7 @@ const Home: React.FC = () => {
   const [featuredCar, setFeaturedCar] = useState<any>(null);
   const [activeSection, setActiveSection] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   // Three.js scene reference
   const sceneRef = useRef<THREE.Scene | null>(null);
@@ -44,7 +45,39 @@ const Home: React.FC = () => {
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const particlesRef = useRef<THREE.Points | null>(null);
 
+  // Définition UNIQUE de checkAuth
+  const checkAuth = async () => {
+    try {
+      // Vérifier si on est côté client (browser)
+      if (typeof window !== 'undefined') {
+        const token = localStorage.getItem('token');
+        if (token) {
+          const currentUser = await mobilityAPI.getCurrentUser();
+          setUser(currentUser);
+        }
+      }
+    } catch (error) {
+      setUser(null);
+    }
+  };
+
+  // Définition de handleLogout
+  const handleLogout = () => {
+    if (typeof window !== 'undefined') {
+      mobilityAPI.logout();
+    }
+    setUser(null);
+    showToast('Déconnexion réussie', 'success');
+  };
+
   useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    // Ne pas initialiser Three.js côté serveur
+    if (!isClient) return;
+
     initializeThreeJS();
     animateThreeJS();
     loadInitialData();
@@ -60,8 +93,9 @@ const Home: React.FC = () => {
         rendererRef.current.dispose();
       }
     };
-  }, []);
+  }, [isClient]);
 
+  // Les autres fonctions...
   const initializeThreeJS = () => {
     if (!threeContainerRef.current) return;
     
@@ -128,21 +162,6 @@ const Home: React.FC = () => {
       rendererRef.current.render(sceneRef.current, cameraRef.current);
     }
   };
-
-  const checkAuth = async () => {
-  try {
-    // Vérifier si on est côté client (browser)
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('token');
-      if (token) {
-        const currentUser = await mobilityAPI.getCurrentUser();
-        setUser(currentUser);
-      }
-    }
-  } catch (error) {
-    setUser(null);
-  }
-};
 
   const loadInitialData = async () => {
     setShowLoadingOverlay(true);
@@ -255,12 +274,6 @@ const Home: React.FC = () => {
     } finally {
       setShowLoadingOverlay(false);
     }
-  };
-
-  const handleLogout = () => {
-    mobilityAPI.logout();
-    setUser(null);
-    showToast('Déconnexion réussie', 'success');
   };
 
   const handleReserve = async (vehiculeId: string) => {
