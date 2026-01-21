@@ -130,16 +130,19 @@ const Home: React.FC = () => {
   };
 
   const checkAuth = async () => {
-    try {
+  try {
+    // Vérifier si on est côté client (browser)
+    if (typeof window !== 'undefined') {
       const token = localStorage.getItem('token');
       if (token) {
         const currentUser = await mobilityAPI.getCurrentUser();
         setUser(currentUser);
       }
-    } catch (error) {
-      setUser(null);
     }
-  };
+  } catch (error) {
+    setUser(null);
+  }
+};
 
   const loadInitialData = async () => {
     setShowLoadingOverlay(true);
