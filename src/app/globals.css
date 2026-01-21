@@ -1,0 +1,208 @@
+/* global.css - Version corrigée pour Tailwind CSS v4 */
+@import "tailwindcss";
+
+/* Désactivation complète du mode sombre */
+@theme {
+  --color-background: #ffffff;
+  --color-foreground: #171717;
+  --font-sans: ui-sans-serif, system-ui, sans-serif, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  --color-orange-600: #FD6A00;
+  --color-orange-700: #E55A00;
+  --color-orange-500: #FF8C42;
+  --color-orange-400: #FFA75E;
+  --color-orange-300: #FFC085;
+  --color-orange-200: #FFD9AD;
+  --color-orange-100: #FFF2E6;
+  --color-orange-50: #FFF9F0;
+}
+
+/* Styles de base */
+:root {
+  color-scheme: light only;
+}
+
+body {
+  background: #ffffff !important;
+  color: #171717 !important;
+  font-family: var(--font-sans);
+}
+
+/* Désactivation des classes dark */
+.dark, [class*="dark:"] {
+  background-color: transparent !important;
+  color: inherit !important;
+}
+
+/* Styles personnalisés pour Mobility */
+@layer utilities {
+  .gradient-text {
+    color: #FD6A00;
+  }
+  
+  .btn-orange {
+    background: #FD6A00;
+    color: white;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-orange:hover {
+    background: #E55A00;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(253, 106, 0, 0.2);
+  }
+  
+  .car-card {
+    background: white;
+    border-radius: 20px;
+    border: 1px solid #E9ECEF;
+    transition: all 0.4s ease;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  }
+  
+  .car-card:hover {
+    transform: translateY(-10px);
+    border-color: #FF8C42;
+    box-shadow: 0 20px 40px rgba(253, 106, 0, 0.15);
+  }
+  
+  .car-image-container {
+    height: 200px;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  @media (max-width: 768px) {
+    .car-image-container {
+      height: 160px;
+    }
+  }
+  
+  .feature-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(253, 106, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FD6A00;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    border: 1px solid #E9ECEF;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
+  }
+  
+  .section {
+    min-height: 100vh;
+    width: 100%;
+    padding: 6rem 2rem;
+    position: relative;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+  
+  .section-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    z-index: 10;
+    position: relative;
+  }
+  
+  .floating-element {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.1;
+    filter: blur(40px);
+    z-index: 0;
+  }
+  
+  .morph-shape {
+    position: absolute;
+    z-index: 0;
+    transition: all 1.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+  }
+  
+  .car-animation {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+    100% { transform: translateY(0px); }
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  
+  .loading {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(253, 106, 0, 0.3);
+    border-radius: 50%;
+    border-top-color: #FD6A00;
+    animation: spin 1s ease-in-out infinite;
+  }
+  
+  .bg-light {
+    background-color: #F8F9FA;
+  }
+  
+  .nav-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: rgba(253, 106, 0, 0.2);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  
+  .nav-dot.active {
+    background-color: #FD6A00;
+    transform: scale(1.3);
+    box-shadow: 0 0 10px rgba(253, 106, 0, 0.5);
+  }
+  
+  .nav-dot:hover {
+    background-color: #FD6A00;
+    transform: scale(1.2);
+  }
+  
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: rgba(253, 106, 0, 0.05);
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #FD6A00;
+    border-radius: 4px;
+  }
+  
+  /* Animation classes */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  
+  .fade-in.active {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
