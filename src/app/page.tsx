@@ -24,9 +24,6 @@ const Home: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [allVehicles, setAllVehicles] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [authTab, setAuthTab] = useState<'login' | 'register'>('login');
-  const [authRole, setAuthRole] = useState('CLIENT');
   const [showReservationModal, setShowReservationModal] = useState(false);
   const [reservationVehicule, setReservationVehicule] = useState<any>(null);
   const [showLoadingOverlay, setShowLoadingOverlay] = useState(false);
@@ -258,59 +255,12 @@ const Home: React.FC = () => {
     loadVehicles(filters);
   };
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!mobilityAPI) return;
-    
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
-    setShowLoadingOverlay(true);
-    try {
-      await mobilityAPI.login(email, password);
-      showToast('Connexion réussie!', 'success');
-      setShowAuthModal(false);
-      await checkAuth();
-      e.currentTarget.reset();
-    } catch (error: any) {
-      showToast(error.message || 'Erreur de connexion', 'error');
-    } finally {
-      setShowLoadingOverlay(false);
-    }
-  };
-
-  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!mobilityAPI) return;
-    
-    const formData = new FormData(e.currentTarget);
-    const userData = {
-      name: formData.get('name') as string,
-      email: formData.get('email') as string,
-      password: formData.get('password') as string,
-      role: formData.get('role') as string,
-    };
-    setShowLoadingOverlay(true);
-    try {
-      await mobilityAPI.register(userData);
-      showToast('Inscription réussie!', 'success');
-      setShowAuthModal(false);
-      await checkAuth();
-      e.currentTarget.reset();
-    } catch (error: any) {
-      showToast(error.message || "Erreur d'inscription", 'error');
-    } finally {
-      setShowLoadingOverlay(false);
-    }
-  };
-
   const handleReserve = async (vehiculeId: string) => {
     if (!mobilityAPI) return;
     
     try {
       if (!mobilityAPI.token) {
-        setShowAuthModal(true);
-        setAuthTab('login');
+        router.push('/login');
         showToast('Veuillez vous connecter pour réserver', 'info');
         return;
       }
@@ -822,13 +772,13 @@ const VehicleCard = ({ vehicule }: { vehicule: any }) => {
             {!user ? (
               <div className="flex items-center gap-3">
                 <button
-                  onClick={() => { setShowAuthModal(true); setAuthTab('login'); }}
+                  onClick={() => router.push('/auth')}
                   className="px-6 py-2 bg-gray-100 text-gray-700 font-semibold rounded-full hover:bg-gray-200 transition-colors"
                 >
                   Connexion
                 </button>
                 <button
-                  onClick={() => { setShowAuthModal(true); setAuthTab('register'); }}
+                  onClick={() => router.push('/auth')}
                   className="px-6 py-2 bg-orange-600 text-white font-semibold rounded-full hover:bg-orange-700 transition-colors"
                 >
                   S&apos;inscrire
@@ -881,13 +831,13 @@ const VehicleCard = ({ vehicule }: { vehicule: any }) => {
               {!user ? (
                 <div className="flex flex-col gap-3 mt-4">
                   <button
-                    onClick={() => { setShowAuthModal(true); setAuthTab('login'); setIsMobileMenuOpen(false); }}
+                    onClick={() => { router.push('/login'); setIsMobileMenuOpen(false); }}
                     className="px-6 py-2 bg-gray-100 text-gray-700 font-semibold rounded-full hover:bg-gray-200 transition-colors"
                   >
                     Connexion
                   </button>
                   <button
-                    onClick={() => { setShowAuthModal(true); setAuthTab('register'); setIsMobileMenuOpen(false); }}
+                    onClick={() => { router.push('/register'); setIsMobileMenuOpen(false); }}
                     className="px-6 py-2 bg-orange-600 text-white font-semibold rounded-full hover:bg-orange-700 transition-colors"
                   >
                     S&apos;inscrire
@@ -952,6 +902,7 @@ const VehicleCard = ({ vehicule }: { vehicule: any }) => {
         ))}
       </div>
 
+<<<<<<< Updated upstream
       {/* Auth Modal */}
       {showAuthModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-1001 p-4">
@@ -1055,6 +1006,8 @@ const VehicleCard = ({ vehicule }: { vehicule: any }) => {
       )}
 
       {/* Reservation Modal */}
+=======
+>>>>>>> Stashed changes
       {showReservationModal && reservationVehicule && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-1001 p-4">
           <div className="bg-white rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
@@ -1213,7 +1166,7 @@ const VehicleCard = ({ vehicule }: { vehicule: any }) => {
                 <h4 className="font-bold text-2xl mb-2 text-gray-800">Pour les partenaires parking</h4>
                 <p className="text-gray-600">Créez un compte, ajoutez vos véhicules et gérez vos réservations facilement.</p>
               </div>
-              <button onClick={() => { setShowAuthModal(true); setAuthTab('register'); setAuthRole('PARKING'); }} className="px-8 py-3 bg-orange-600 text-white font-semibold rounded-full hover:bg-orange-700 transition-colors whitespace-nowrap">
+              <button onClick={() => router.push('/register?role=PARKING')} className="px-8 py-3 bg-orange-600 text-white font-semibold rounded-full hover:bg-orange-700 transition-colors whitespace-nowrap">
                 Devenir partenaire
               </button>
             </div>
@@ -1400,6 +1353,7 @@ const VehicleCard = ({ vehicule }: { vehicule: any }) => {
           </div>
         </div>
       </section>
+<<<<<<< Updated upstream
 
       {/* CTA Section */}
       <section id="cta" className="section">
@@ -1420,6 +1374,37 @@ const VehicleCard = ({ vehicule }: { vehicule: any }) => {
                 <FontAwesomeIcon icon={faMobileAlt} className="mr-2" />
                 Télécharger l&apos;app
               </button>
+=======
+<section id="cta" className="section">
+  <div className="section-content">
+    <div className="text-center">
+      <h2 className="section-title font-bold mb-8 text-5xl">
+        Prêt à <span className="gradient-text">rouler</span> avec nous ?
+      </h2>
+      <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-12">
+        Rejoignez des milliers d&apos;utilisateurs qui ont simplifié leur mobilité. Téléchargez l&apos;application ou inscrivez-vous dès maintenant.
+      </p>
+      
+      <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
+        <button onClick={() => router.push('/register')} className="px-10 py-5 bg-orange-600 text-white font-semibold rounded-2xl hover:bg-orange-700 transition-all duration-300 transform hover:-translate-y-2 text-lg shadow-lg hover:shadow-xl hover:shadow-orange-200">
+          S&apos;inscrire gratuitement
+        </button>
+        <button className="px-10 py-5 bg-white text-gray-800 font-semibold rounded-2xl border-2 border-gray-300 hover:border-orange-500 hover:text-orange-600 transition-all duration-300 text-lg">
+          <FontAwesomeIcon icon={faMobileAlt} className="mr-2" />
+          Télécharger l&apos;app
+        </button>
+      </div>
+      
+      <div className="car-card p-8 max-w-3xl mx-auto mb-20">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {ctaFeatures.map((feature, index) => (
+            <div key={index} className="text-center">
+              <div className="feature-icon mx-auto">
+                <FontAwesomeIcon icon={feature.icon} />
+              </div>
+              <h4 className="font-bold text-xl mb-2 text-gray-800">{feature.title}</h4>
+              <p className="text-gray-600">{feature.description}</p>
+>>>>>>> Stashed changes
             </div>
             
             <div className="car-card p-8 max-w-3xl mx-auto">
