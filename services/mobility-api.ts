@@ -1,4 +1,5 @@
 // mobility-api.ts
+
 interface User {
   id: number;
   email: string;
@@ -43,25 +44,13 @@ interface Vehicule {
   id: string;
   marqueRef?: { name: string };
   marque?: string;
-  model?: string;
   modele?: string;
-  year?: number;
   annee?: number;
-  categorie?: string;
-  mileage?: number;
-  kilometrage?: number;
   prix?: number;
-  prixJour?: number;
-  prixAchat?: number;
-  fuelType?: string;
-  carburant?: string;
-  transmission?: string;
-  places?: number;
   photos?: string[];
   forSale?: boolean;
   forRent?: boolean;
   status?: string;
-  disponible?: boolean;
 }
 
 interface ReservationData {
@@ -90,221 +79,132 @@ interface ApiError {
   details?: string;
 }
 
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api';
+
 class MobilityAPI {
-  private token: string | null;
-  private refreshToken: string | null;
-  private user: User | null;
+  private token: string | null = null;
+  private refreshToken: string | null = null;
+  private user: User | null = null;
 
   constructor() {
-    this.token = null;
-    this.refreshToken = null;
-    this.user = null;
-    
     if (typeof window !== 'undefined') {
       this.token = localStorage.getItem('accessToken');
       this.refreshToken = localStorage.getItem('refreshToken');
-      
       const userStr = localStorage.getItem('user');
-      try {
-        this.user = userStr ? JSON.parse(userStr) : null;
-      } catch {
-        this.user = null;
-      }
+      this.user = userStr ? JSON.parse(userStr) : null;
     }
   }
 
   private async handleResponse<T>(response: Response): Promise<T> {
     const contentType = response.headers.get('content-type');
-    
+
     if (!response.ok) {
-      let errorMessage = `Erreur ${response.status}`;
-      let errorDetails = '';
-      
+      let message = `Erreur ${response.status}`;
+      let details = '';
+
       if (contentType?.includes('application/json')) {
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
-          errorDetails = errorData.details || '';
-        } catch {
-          // Si le JSON est invalide, on garde le message d'erreur par défaut
-        }
+        const error = await response.json();
+        message = error.message || message;
+        details = error.details || '';
       }
-      
-      const error: ApiError = { message: errorMessage };
-      if (errorDetails) error.details = errorDetails;
-      throw error;
+
+      throw { message, details } as ApiError;
     }
-    
-    if (contentType?.includes('application/json')) {
-      return response.json();
-    }
-    
-    // Pour les réponses non-JSON (comme du texte simple)
-    return response.text() as unknown as T;
+
+    return contentType?.includes('application/json')
+      ? response.json()
+      : (response.text() as unknown as T);
   }
 
-  private getHeaders(includeAuth: boolean = true): HeadersInit {
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-    };
-    
-    if (includeAuth && this.token) {
-      headers['Authorization'] = `Bearer ${this.token}`;
+  private getHeaders(auth = true): HeadersInit {
+    const headers: HeadersInit = { 'Content-Type': 'application/json' };
+    if (auth && this.token) {
+      headers.Authorization = `Bearer ${this.token}`;
     }
-    
     return headers;
   }
 
   private saveToStorage() {
-    if (typeof window !== 'undefined') {
-      if (this.token) localStorage.setItem('accessToken', this.token);
-      if (this.refreshToken) localStorage.setItem('refreshToken', this.refreshToken);
-      if (this.user) localStorage.setItem('user', JSON.stringify(this.user));
-    }
+    if (!this.token || typeof window === 'undefined') return;
+    localStorage.setItem('accessToken', this.token);
+    if (this.refreshToken)
+      localStorage.setItem('refreshToken', this.refreshToken);
+    if (this.user) localStorage.setItem('user', JSON.stringify(this.user));
   }
 
-<<<<<<< Updated upstream
-  async login(email: string, password: string): Promise<{ token: string; user: User }> {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/auth/login`, {
+  private clearStorage() {
+    if (typeof window === 'undefined') return;
+    localStorage.clear();
+  }
+
+  /* ================= AUTH ================= */
+
+  async login(email: string, password: string): Promise<LoginResponse> {
+    const response = await fetch(`${API_URL}/auth/login`, {
       method: 'POST',
-      headers: this.getHeaders(),
+      headers: this.getHeaders(false),
       body: JSON.stringify({ email, password }),
     });
-    const data = await this.handleResponse(response);
-    if (data.token) {
-      this.setToken(data.token);
-      this.user = data.user;
-      
-      // Stocker uniquement si on est côté client
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('user', JSON.stringify(data.user));
-      }
-=======
-  private clearStorage() {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('user');
->>>>>>> Stashed changes
-    }
-  }
 
-<<<<<<< Updated upstream
-  async register(userData: { name: string; email: string; password: string; role: string }): Promise<{ token: string; user: User }> {
-    const formData = new FormData();
-    formData.append('name', userData.name);
-    formData.append('email', userData.email);
-    formData.append('password', userData.password);
-    formData.append('role', userData.role);
+    const data = await this.handleResponse<LoginResponse>(response);
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/auth/register`, {
-      method: 'POST',
-      body: formData,
-      headers: this.getFormDataHeaders(),
-    });
-    const data = await this.handleResponse(response);
-    if (data.token) {
-      this.setToken(data.token);
-      this.user = data.user;
-=======
-  async login(email: string, password: string): Promise<LoginResponse> {
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/auth/login`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password }),
-        }
-      );
->>>>>>> Stashed changes
-      
-      const data: LoginResponse = await this.handleResponse(response);
-      
-      // Stocker les tokens
-      this.token = data.accessToken;
-      this.refreshToken = data.refreshToken;
-      
-      // Créer l'objet user
-      this.user = {
-        id: data.id,
-        email: email,
-        phone: '', // Le backend ne renvoie pas le phone dans la réponse login
-        nom: data.nom,
-        prenom: data.prenom,
-        role: data.role,
-        status: 'APPROVED', // Par défaut après login réussi
-        emailVerified: data.emailVerified,
-        parkingId: data.parkingId || null,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        accessToken: data.accessToken
-      };
-      
-      this.saveToStorage();
-      
-      return data;
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
-    }
+    this.token = data.accessToken;
+    this.refreshToken = data.refreshToken;
+
+    this.user = {
+      id: data.id,
+      email,
+      phone: '',
+      nom: data.nom,
+      prenom: data.prenom,
+      role: data.role,
+      status: 'APPROVED',
+      emailVerified: data.emailVerified,
+      parkingId: data.parkingId ?? null,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      accessToken: data.accessToken,
+    };
+
+    this.saveToStorage();
+    return data;
   }
 
   async register(userData: RegisterData): Promise<RegisterResponse> {
-    try {
-      // Format des données pour correspondre au backend
-      const backendData = {
-        nom: userData.nom,
-        prenom: userData.prenom,
-        email: userData.email,
-        phone: userData.phone,
-        password: userData.password,
-        address: userData.address || '',
-        role: userData.role,
-        status: userData.status || 'PENDING',
-        emailVerified: userData.emailVerified || false,
-        isOnline: userData.isOnline || false,
-        connectionCount: userData.connectionCount || 0
-      };
-      
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/auth/register`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(backendData),
-        }
-      );
-      
-      const data: RegisterResponse = await this.handleResponse(response);
-      
-      // Stocker les tokens
-      this.token = data.accessToken;
-      this.refreshToken = data.refreshToken;
-      
-      // Créer l'objet user partiel (l'ID sera récupéré par getCurrentUser)
-      this.user = {
-        id: 0, // Temporaire, sera mis à jour par getCurrentUser
-        email: data.email,
-        phone: userData.phone,
-        nom: data.nom,
-        prenom: data.prenom,
-        role: data.role,
-        status: userData.status || 'PENDING',
-        emailVerified: data.emailVerified,
-        address: userData.address,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        accessToken: data.accessToken
-      };
-      
-      this.saveToStorage();
-      
-      return data;
-    } catch (error) {
-      console.error('Register error:', error);
-      throw error;
-    }
+    const response = await fetch(`${API_URL}/auth/register`, {
+      method: 'POST',
+      headers: this.getHeaders(false),
+      body: JSON.stringify({
+        ...userData,
+        status: userData.status ?? 'PENDING',
+        emailVerified: userData.emailVerified ?? false,
+        isOnline: userData.isOnline ?? false,
+        connectionCount: userData.connectionCount ?? 0,
+      }),
+    });
+
+    const data = await this.handleResponse<RegisterResponse>(response);
+
+    this.token = data.accessToken;
+    this.refreshToken = data.refreshToken;
+
+    this.user = {
+      id: 0,
+      email: data.email,
+      phone: userData.phone,
+      nom: data.nom,
+      prenom: data.prenom,
+      role: data.role,
+      status: 'PENDING',
+      emailVerified: data.emailVerified,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      accessToken: data.accessToken,
+    };
+
+    this.saveToStorage();
+    return data;
   }
 
   logout() {
@@ -314,327 +214,64 @@ class MobilityAPI {
     this.clearStorage();
   }
 
-  setToken(token: string) {
-    this.token = token;
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('accessToken', token);
-    }
-  }
-
-  async refreshAccessToken(): Promise<{ accessToken: string; refreshToken: string }> {
-    if (!this.refreshToken) {
-      throw new Error('No refresh token available');
-    }
-    
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/auth/refresh-token`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ refreshToken: this.refreshToken }),
-        }
-      );
-      
-      const data = await this.handleResponse<{ accessToken: string; refreshToken: string }>(response);
-      
-      this.token = data.accessToken;
-      this.refreshToken = data.refreshToken;
-      this.saveToStorage();
-      
-      return data;
-    } catch (error) {
-      this.logout(); // Déconnexion si le refresh token est invalide
-      throw error;
-    }
-  }
+  /* ================= DATA ================= */
 
   async getCurrentUser(): Promise<User> {
-    if (!this.token) {
-      throw new Error('Non authentifié. Veuillez vous connecter.');
-    }
-    
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/auth/users/me`,
-        {
-          headers: this.getHeaders(),
-        }
-      );
-      
-      // Vérifier si le token a expiré
-      if (response.status === 401) {
-        try {
-          // Essayer de rafraîchir le token
-          await this.refreshAccessToken();
-          // Réessayer la requête avec le nouveau token
-          const retryResponse = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/auth/users/me`,
-            {
-              headers: this.getHeaders(),
-            }
-          );
-          
-          const userData = await this.handleResponse<User & { accessToken?: string }>(retryResponse);
-          
-          // Mettre à jour l'utilisateur avec les données du serveur
-          this.user = {
-            ...userData,
-            accessToken: this.token
-          };
-          
-          this.saveToStorage();
-          
-          return this.user;
-        } catch (refreshError) {
-          this.logout();
-          throw new Error('Session expirée. Veuillez vous reconnecter.');
-        }
-      }
-      
-      const userData = await this.handleResponse<User & { accessToken?: string }>(response);
-      
-      // Mettre à jour l'utilisateur avec les données du serveur
-      this.user = {
-        ...userData,
-        accessToken: this.token
-      };
-      
-      this.saveToStorage();
-      
-      return this.user;
-    } catch (error) {
-      console.error('Get current user error:', error);
-      throw error;
-    }
-  }
-
-  async getVehicules(filters: Record<string, any> = {}): Promise<Vehicule[]> {
-    const queryParams = new URLSearchParams(filters).toString();
-<<<<<<< Updated upstream
-    const url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/vehicules${queryParams ? `?${queryParams}` : ''}`;
-    const response = await fetch(url, { headers: this.getHeaders() });
-    return this.handleResponse(response);
-  }
-
-  async getVehiculeById(id: string): Promise<Vehicule> {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/vehicules/${id}`, { headers: this.getHeaders() });
-    return this.handleResponse(response);
-  }
-
-  async getMarques(): Promise<{ name: string }[]> {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/marques`, { headers: this.getHeaders() });
-    return this.handleResponse(response);
-  }
-
-  async createReservation(reservationData: ReservationData): Promise<any> {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/reservations`, {
-      method: 'POST',
+    const response = await fetch(`${API_URL}/auth/users/me`, {
       headers: this.getHeaders(),
-      body: JSON.stringify(reservationData),
     });
-    return this.handleResponse(response);
-  }
 
-  async getCurrentUser(): Promise<User> {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/auth/users/me`, { headers: this.getHeaders() });
-=======
-    const url = `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/vehicules${queryParams ? `?${queryParams}` : ''}`;
-    
-    const response = await fetch(url, { 
-      headers: this.getHeaders() 
-    });
-    
-    return this.handleResponse<Vehicule[]>(response);
-  }
-
-  async getVehiculeById(id: string): Promise<Vehicule> {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/vehicules/${id}`,
-      { 
-        headers: this.getHeaders() 
-      }
-    );
-    
-    return this.handleResponse<Vehicule>(response);
-  }
-
-  async getMarques(): Promise<{ name: string }[]> {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/marques`,
-      { 
-        headers: this.getHeaders() 
-      }
-    );
-    
-    return this.handleResponse<{ name: string }[]>(response);
-  }
-
-  async createReservation(reservationData: ReservationData): Promise<any> {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/reservations`,
-      {
-        method: 'POST',
-        headers: this.getHeaders(),
-        body: JSON.stringify(reservationData),
-      }
-    );
-    
->>>>>>> Stashed changes
-    return this.handleResponse(response);
-  }
-
-  async getParkings(): Promise<any[]> {
-<<<<<<< Updated upstream
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/parkings`, { headers: this.getHeaders() });
-    return this.handleResponse(response);
-  }
-
-  async getStats(): Promise<{ totalVehicules: number; totalParkings: number }> {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/vehicules/parking/stats`, { headers: this.getHeaders() });
-    return this.handleResponse(response);
-=======
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/parkings`,
-      { 
-        headers: this.getHeaders() 
-      }
-    );
-    
-    return this.handleResponse<any[]>(response);
-  }
-
-  async getStats(): Promise<{ totalVehicules: number; totalParkings: number }> {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/vehicules/parking/stats`,
-      { 
-        headers: this.getHeaders() 
-      }
-    );
-    
-    return this.handleResponse<{ totalVehicules: number; totalParkings: number }>(response);
-  }
-
-  async forgotPassword(email: string): Promise<{ message: string }> {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/auth/forgot-password`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      }
-    );
-    
-    return this.handleResponse<{ message: string }>(response);
-  }
-
-  async resetPassword(email: string, otp: string, newPassword: string): Promise<{ message: string }> {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/auth/reset-password`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, otp, password: newPassword }),
-      }
-    );
-    
-    return this.handleResponse<{ message: string }>(response);
-  }
-
-  async verifyEmailWithOTP(email: string, otp: string): Promise<{ message: string }> {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/auth/verify-email-otp`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, otp }),
-      }
-    );
-    
-    return this.handleResponse<{ message: string }>(response);
-  }
-
-  async sendVerificationEmail(): Promise<{ message: string }> {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/auth/send-verification-email`,
-      {
-        method: 'POST',
-        headers: this.getHeaders(),
-      }
-    );
-    
-    return this.handleResponse<{ message: string }>(response);
-  }
-
-  async updateUserProfile(userId: number, data: Partial<User>): Promise<User> {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/auth/users/${userId}`,
-      {
-        method: 'PUT',
-        headers: this.getHeaders(),
-        body: JSON.stringify(data),
-      }
-    );
-    
-    const updatedUser = await this.handleResponse<User>(response);
-    
-    // Mettre à jour l'utilisateur local si c'est l'utilisateur courant
-    if (this.user && this.user.id === userId) {
-      this.user = { ...this.user, ...updatedUser };
-      this.saveToStorage();
-    }
-    
-    return updatedUser;
-  }
-
-  async updateCurrentUser(data: Partial<User>): Promise<User> {
-    if (!this.user) {
-      throw new Error('Non authentifié');
-    }
-    
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/auth/users/me`,
-      {
-        method: 'PUT',
-        headers: this.getHeaders(),
-        body: JSON.stringify(data),
-      }
-    );
-    
-    const updatedUser = await this.handleResponse<User>(response);
-    
-    // Mettre à jour l'utilisateur local
-    this.user = { ...this.user, ...updatedUser };
+    const user = await this.handleResponse<User>(response);
+    this.user = { ...user, accessToken: this.token ?? undefined };
     this.saveToStorage();
-    
-    return updatedUser;
-  }
-
-  // Méthodes utilitaires
-  isAuthenticated(): boolean {
-    return !!this.token;
-  }
-
-  getCurrentUserSync(): User | null {
     return this.user;
   }
 
-  getToken(): string | null {
-    return this.token;
+  async getVehicules(filters: Record<string, any> = {}): Promise<Vehicule[]> {
+    const query = new URLSearchParams(filters).toString();
+    const response = await fetch(
+      `${API_URL}/vehicules${query ? `?${query}` : ''}`,
+      { headers: this.getHeaders() }
+    );
+    return this.handleResponse(response);
   }
 
-  async checkAuthStatus(): Promise<boolean> {
-    if (!this.token) return false;
-    
-    try {
-      await this.getCurrentUser();
-      return true;
-    } catch {
-      return false;
-    }
->>>>>>> Stashed changes
+  async getVehiculeById(id: string): Promise<Vehicule> {
+    const response = await fetch(`${API_URL}/vehicules/${id}`, {
+      headers: this.getHeaders(),
+    });
+    return this.handleResponse(response);
+  }
+
+  async getMarques(): Promise<{ name: string }[]> {
+    const response = await fetch(`${API_URL}/marques`, {
+      headers: this.getHeaders(),
+    });
+    return this.handleResponse(response);
+  }
+
+  async createReservation(data: ReservationData) {
+    const response = await fetch(`${API_URL}/reservations`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify(data),
+    });
+    return this.handleResponse(response);
+  }
+
+  /* ================= UTILS ================= */
+
+  isAuthenticated() {
+    return !!this.token;
+  }
+
+  getCurrentUserSync() {
+    return this.user;
+  }
+
+  getToken() {
+    return this.token;
   }
 }
 
-// Exportez une instance singleton
 export const mobilityAPI = new MobilityAPI();
