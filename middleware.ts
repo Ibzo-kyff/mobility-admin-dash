@@ -1,3 +1,4 @@
+// middleware.ts - Version corrigée
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
@@ -5,8 +6,8 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get('token')?.value;
   const { pathname } = request.nextUrl;
 
-  // Routes protégées
-  const protectedRoutes = ['/dashboard', '/profile', '/reservations'];
+  // Routes protégées - AJOUTER '/reserve' ici
+  const protectedRoutes = ['/dashboard', '/profile', '/reservations', '/reserve'];
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
 
   // Routes d'authentification

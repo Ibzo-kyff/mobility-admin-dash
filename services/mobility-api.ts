@@ -163,50 +163,14 @@ class MobilityAPI {
     }
   }
 
-<<<<<<< Updated upstream
-  async login(email: string, password: string): Promise<{ token: string; user: User }> {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/auth/login`, {
-      method: 'POST',
-      headers: this.getHeaders(),
-      body: JSON.stringify({ email, password }),
-    });
-    const data = await this.handleResponse(response);
-    if (data.token) {
-      this.setToken(data.token);
-      this.user = data.user;
-      
-      // Stocker uniquement si on est côté client
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('user', JSON.stringify(data.user));
-      }
-=======
   private clearStorage() {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');
->>>>>>> Stashed changes
     }
   }
 
-<<<<<<< Updated upstream
-  async register(userData: { name: string; email: string; password: string; role: string }): Promise<{ token: string; user: User }> {
-    const formData = new FormData();
-    formData.append('name', userData.name);
-    formData.append('email', userData.email);
-    formData.append('password', userData.password);
-    formData.append('role', userData.role);
-
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/auth/register`, {
-      method: 'POST',
-      body: formData,
-      headers: this.getFormDataHeaders(),
-    });
-    const data = await this.handleResponse(response);
-    if (data.token) {
-      this.setToken(data.token);
-      this.user = data.user;
-=======
   async login(email: string, password: string): Promise<LoginResponse> {
     try {
       const response = await fetch(
@@ -217,7 +181,6 @@ class MobilityAPI {
           body: JSON.stringify({ email, password }),
         }
       );
->>>>>>> Stashed changes
       
       const data: LoginResponse = await this.handleResponse(response);
       
@@ -411,34 +374,6 @@ class MobilityAPI {
 
   async getVehicules(filters: Record<string, any> = {}): Promise<Vehicule[]> {
     const queryParams = new URLSearchParams(filters).toString();
-<<<<<<< Updated upstream
-    const url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/vehicules${queryParams ? `?${queryParams}` : ''}`;
-    const response = await fetch(url, { headers: this.getHeaders() });
-    return this.handleResponse(response);
-  }
-
-  async getVehiculeById(id: string): Promise<Vehicule> {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/vehicules/${id}`, { headers: this.getHeaders() });
-    return this.handleResponse(response);
-  }
-
-  async getMarques(): Promise<{ name: string }[]> {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/marques`, { headers: this.getHeaders() });
-    return this.handleResponse(response);
-  }
-
-  async createReservation(reservationData: ReservationData): Promise<any> {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/reservations`, {
-      method: 'POST',
-      headers: this.getHeaders(),
-      body: JSON.stringify(reservationData),
-    });
-    return this.handleResponse(response);
-  }
-
-  async getCurrentUser(): Promise<User> {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/auth/users/me`, { headers: this.getHeaders() });
-=======
     const url = `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/vehicules${queryParams ? `?${queryParams}` : ''}`;
     
     const response = await fetch(url, { 
@@ -480,20 +415,10 @@ class MobilityAPI {
       }
     );
     
->>>>>>> Stashed changes
     return this.handleResponse(response);
   }
 
   async getParkings(): Promise<any[]> {
-<<<<<<< Updated upstream
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/parkings`, { headers: this.getHeaders() });
-    return this.handleResponse(response);
-  }
-
-  async getStats(): Promise<{ totalVehicules: number; totalParkings: number }> {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/vehicules/parking/stats`, { headers: this.getHeaders() });
-    return this.handleResponse(response);
-=======
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/parkings`,
       { 
@@ -632,7 +557,58 @@ class MobilityAPI {
     } catch {
       return false;
     }
->>>>>>> Stashed changes
+  }
+
+  // Méthode pour la compatibilité avec votre code existant
+  async loginOld(email: string, password: string): Promise<{ token: string; user: User }> {
+    const data = await this.login(email, password);
+    return {
+      token: data.accessToken,
+      user: {
+        id: data.id,
+        email: email,
+        phone: '',
+        nom: data.nom,
+        prenom: data.prenom,
+        role: data.role,
+        status: 'APPROVED',
+        emailVerified: data.emailVerified,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        accessToken: data.accessToken
+      }
+    };
+  }
+
+  // Méthode pour la compatibilité avec votre code existant
+  async registerOld(userData: { name: string; email: string; password: string; role: string }): Promise<{ token: string; user: User }> {
+    const [nom, prenom] = userData.name.split(' ');
+    const registerData: RegisterData = {
+      nom: nom || '',
+      prenom: prenom || '',
+      email: userData.email,
+      phone: '', // Vous devrez ajouter le téléphone si nécessaire
+      password: userData.password,
+      role: userData.role as 'CLIENT' | 'PARKING' | 'ADMIN'
+    };
+    
+    const data = await this.register(registerData);
+    return {
+      token: data.accessToken,
+      user: {
+        id: 0,
+        email: data.email,
+        phone: '',
+        nom: data.nom,
+        prenom: data.prenom,
+        role: data.role,
+        status: 'PENDING',
+        emailVerified: data.emailVerified,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        accessToken: data.accessToken
+      }
+    };
   }
 }
 
