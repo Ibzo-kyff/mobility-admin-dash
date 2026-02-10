@@ -9,11 +9,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faTimes, faBars, faPlayCircle, faSearch, faCar, faCalendarCheck, faRoad, faFilter, faFileContract,
   faShieldAlt, faStar, faStarHalfAlt, faGasPump, faCogs, faUsers, faCheckCircle, faLock, faHeadset,
-  faMobileAlt, faMapMarkerAlt, faPhone, faEnvelope, faChevronRight
+  faMobileAlt
 } from '@fortawesome/free-solid-svg-icons';
 import { faHeart, faStar as faStarRegular } from '@fortawesome/free-regular-svg-icons';
-// IMPORTANT: NE PAS importer mobilityAPI directement ici
-// import { mobilityAPI } from '../../services/mobility-api';
 import Image from 'next/image';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -24,11 +22,6 @@ const Home: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [allVehicles, setAllVehicles] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [authTab, setAuthTab] = useState<'login' | 'register'>('login');
-  const [authRole, setAuthRole] = useState('CLIENT');
-  const [showReservationModal, setShowReservationModal] = useState(false);
-  const [reservationVehicule, setReservationVehicule] = useState<any>(null);
   const [showLoadingOverlay, setShowLoadingOverlay] = useState(false);
   const [toasts, setToasts] = useState<{ id: number; message: string; type: string }[]>([]);
   const [user, setUser] = useState<any>(null);
@@ -38,11 +31,9 @@ const Home: React.FC = () => {
   const [activeSection, setActiveSection] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
-  
-  // Ajoutez cet état pour mobilityAPI
+
   const [mobilityAPI, setMobilityAPI] = useState<any>(null);
 
-  // Three.js scene reference
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -52,7 +43,6 @@ const Home: React.FC = () => {
     setIsClient(true);
   }, []);
 
-  // Charger mobilityAPI uniquement côté client
   useEffect(() => {
     if (isClient) {
       import('../../services/mobility-api').then((module) => {
@@ -64,9 +54,7 @@ const Home: React.FC = () => {
   }, [isClient]);
 
   useEffect(() => {
-    // Ne pas initialiser Three.js côté serveur
     if (!isClient || !mobilityAPI) return;
-
     initializeThreeJS();
     animateThreeJS();
     loadInitialData();
@@ -74,7 +62,6 @@ const Home: React.FC = () => {
     initScrollAnimations();
     window.addEventListener('scroll', updateActiveDot);
     window.addEventListener('resize', onWindowResize);
-
     return () => {
       window.removeEventListener('scroll', updateActiveDot);
       window.removeEventListener('resize', onWindowResize);
@@ -84,12 +71,9 @@ const Home: React.FC = () => {
     };
   }, [isClient, mobilityAPI]);
 
-  // Définition UNIQUE de checkAuth
   const checkAuth = async () => {
     if (!mobilityAPI) return;
-    
     try {
-      // Vérifier si on est côté client (browser)
       if (typeof window !== 'undefined') {
         const token = localStorage.getItem('token');
         if (token) {
@@ -102,7 +86,6 @@ const Home: React.FC = () => {
     }
   };
 
-  // Définition de handleLogout
   const handleLogout = () => {
     if (typeof window !== 'undefined' && mobilityAPI) {
       mobilityAPI.logout();
@@ -113,22 +96,17 @@ const Home: React.FC = () => {
 
   const initializeThreeJS = () => {
     if (!threeContainerRef.current) return;
-    
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setClearColor(0xffffff, 0);
     threeContainerRef.current.appendChild(renderer.domElement);
-
-    // Create particles
     const particleCount = 200;
     const particlesGeometry = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
-
     for (let i = 0; i < particleCount * 3; i += 3) {
       positions[i] = (Math.random() - 0.5) * 100;
       positions[i + 1] = (Math.random() - 0.5) * 100;
@@ -137,22 +115,17 @@ const Home: React.FC = () => {
       colors[i + 1] = 0.42; // G
       colors[i + 2] = 0.0; // B
     }
-
     particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
     const particlesMaterial = new THREE.PointsMaterial({
       size: 0.15,
       vertexColors: true,
       transparent: true,
       opacity: 0.3,
     });
-
     const particles = new THREE.Points(particlesGeometry, particlesMaterial);
     scene.add(particles);
     camera.position.z = 5;
-
-    // Store references
     sceneRef.current = scene;
     cameraRef.current = camera;
     rendererRef.current = renderer;
@@ -180,7 +153,6 @@ const Home: React.FC = () => {
 
   const loadInitialData = async () => {
     if (!mobilityAPI) return;
-    
     setShowLoadingOverlay(true);
     try {
       await loadFeaturedCar();
@@ -197,7 +169,6 @@ const Home: React.FC = () => {
 
   const loadFeaturedCar = async () => {
     if (!mobilityAPI) return;
-    
     const vehicules = await mobilityAPI.getVehicules({ limit: 1 });
     if (vehicules.length > 0) {
       setFeaturedCar(vehicules[0]);
@@ -206,7 +177,6 @@ const Home: React.FC = () => {
 
   const loadVehicles = async (filters: Record<string, any> = {}) => {
     if (!mobilityAPI || isLoading) return;
-    
     setIsLoading(true);
     setShowLoadingOverlay(true);
     try {
@@ -235,14 +205,12 @@ const Home: React.FC = () => {
 
   const loadMarques = async () => {
     if (!mobilityAPI) return;
-    
     const data = await mobilityAPI.getMarques();
     setMarques(data);
   };
 
   const loadStats = async () => {
     if (!mobilityAPI) return;
-    
     const data = await mobilityAPI.getStats();
     setStats(data);
   };
@@ -258,91 +226,19 @@ const Home: React.FC = () => {
     loadVehicles(filters);
   };
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!mobilityAPI) return;
-    
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
-    setShowLoadingOverlay(true);
-    try {
-      await mobilityAPI.login(email, password);
-      showToast('Connexion réussie!', 'success');
-      setShowAuthModal(false);
-      await checkAuth();
-      e.currentTarget.reset();
-    } catch (error: any) {
-      showToast(error.message || 'Erreur de connexion', 'error');
-    } finally {
-      setShowLoadingOverlay(false);
-    }
-  };
-
-  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!mobilityAPI) return;
-    
-    const formData = new FormData(e.currentTarget);
-    const userData = {
-      name: formData.get('name') as string,
-      email: formData.get('email') as string,
-      password: formData.get('password') as string,
-      role: formData.get('role') as string,
-    };
-    setShowLoadingOverlay(true);
-    try {
-      await mobilityAPI.register(userData);
-      showToast('Inscription réussie!', 'success');
-      setShowAuthModal(false);
-      await checkAuth();
-      e.currentTarget.reset();
-    } catch (error: any) {
-      showToast(error.message || "Erreur d'inscription", 'error');
-    } finally {
-      setShowLoadingOverlay(false);
-    }
-  };
-
   const handleReserve = async (vehiculeId: string) => {
     if (!mobilityAPI) return;
-    
     try {
       if (!mobilityAPI.token) {
-        setShowAuthModal(true);
-        setAuthTab('login');
+        router.push('/auth');
         showToast('Veuillez vous connecter pour réserver', 'info');
         return;
       }
-      const vehicule = await mobilityAPI.getVehiculeById(vehiculeId);
-      setReservationVehicule(vehicule);
-      setShowReservationModal(true);
+      // Pour les utilisateurs connectés, rediriger vers la page de réservation
+      router.push(`/reserve/${vehiculeId}`);
     } catch (error) {
       console.error('Error handling reservation:', error);
       showToast('Erreur lors de la réservation', 'error');
-    }
-  };
-
-  const submitReservation = async (e: React.FormEvent<HTMLFormElement>, vehiculeId: string) => {
-    e.preventDefault();
-    if (!mobilityAPI) return;
-    
-    const formData = new FormData(e.currentTarget);
-    const reservationData = {
-      vehiculeId,
-      dateDebut: formData.get('dateDebut') as string,
-      dateFin: formData.get('dateFin') as string,
-      options: formData.getAll('options[]') as string[],
-    };
-    setShowLoadingOverlay(true);
-    try {
-      await mobilityAPI.createReservation(reservationData);
-      showToast('Réservation confirmée!', 'success');
-      setShowReservationModal(false);
-    } catch (error: any) {
-      showToast(error.message || 'Erreur lors de la réservation', 'error');
-    } finally {
-      setShowLoadingOverlay(false);
     }
   };
 
@@ -371,7 +267,6 @@ const Home: React.FC = () => {
   };
 
   const initScrollAnimations = () => {
-    // Fade-in animations
     document.querySelectorAll('.fade-in').forEach((el) => {
       gsap.fromTo(
         el,
@@ -384,9 +279,7 @@ const Home: React.FC = () => {
         }
       );
     });
-
-    // Section content animations
-    document.querySelectorAll('.section').forEach((section, i) => {
+    document.querySelectorAll('.section').forEach((section) => {
       const content = section.querySelector('.section-content');
       if (content) {
         gsap.fromTo(
@@ -415,7 +308,6 @@ const Home: React.FC = () => {
     const carburant = vehicule?.fuelType || vehicule?.carburant || 'Essence';
     const transmission = vehicule?.transmission || 'Automatique';
     const places = vehicule?.places || 5;
-
     return (
       <div className="car-card max-w-md mx-auto">
         <div className="car-image-container relative h-64 overflow-hidden rounded-lg">
@@ -451,9 +343,9 @@ const Home: React.FC = () => {
   };
 
   const VehicleCard = ({ vehicule }: { vehicule: any }) => {
-    const photoUrl = vehicule?.photos?.[0] || 
+    const photoUrl = vehicule?.photos?.[0] ||
                      'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1074&q=80';
-    
+  
     const marque = vehicule?.marqueRef?.name || 'Marque inconnue';
     const modele = vehicule?.model || 'Modèle inconnu';
     const annee = vehicule?.year || '';
@@ -462,17 +354,15 @@ const Home: React.FC = () => {
     const carburant = vehicule?.fuelType || 'Essence';
     const transmission = vehicule?.transmission || 'Automatique';
     const places = vehicule?.places || 5;
-
     const type = vehicule?.forSale && !vehicule?.forRent ? 'ACHAT' :
                  vehicule?.forRent && !vehicule?.forSale ? 'LOCATION' : 'LES_DEUX';
-    
+  
     const disponible = vehicule?.status === 'DISPONIBLE';
-
     return (
       <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:border-orange-500 hover:shadow-xl transition-all duration-300">
         <div className="h-48 w-full overflow-hidden relative">
-          <img 
-            src={photoUrl} 
+          <img
+            src={photoUrl}
             alt={`${marque} ${modele}`}
             className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
             onError={(e) => {
@@ -483,7 +373,7 @@ const Home: React.FC = () => {
             {disponible ? 'DISPONIBLE' : 'INDISPONIBLE'}
           </div>
         </div>
-        
+      
         <div className="p-5">
           <div className="flex justify-between items-start mb-3">
             <div>
@@ -494,16 +384,16 @@ const Home: React.FC = () => {
                 {kilometrage ? `${kilometrage.toLocaleString()} km` : 'Neuf'}
               </p>
             </div>
-            
+          
             <span className={`px-2 py-1 text-xs font-semibold rounded ${
-              type === 'ACHAT' ? 'bg-blue-100 text-blue-800' : 
-              type === 'LOCATION' ? 'bg-orange-100 text-orange-800' : 
+              type === 'ACHAT' ? 'bg-blue-100 text-blue-800' :
+              type === 'LOCATION' ? 'bg-orange-100 text-orange-800' :
               'bg-green-100 text-green-800'
             }`}>
               {type === 'ACHAT' ? 'ACHAT' : type === 'LOCATION' ? 'LOCATION' : 'LES DEUX'}
             </span>
           </div>
-          
+        
           <div className="flex items-center gap-3 mb-4 text-sm text-gray-600">
             <div className="flex items-center gap-1">
               <FontAwesomeIcon icon={faGasPump} className="w-4 h-4" />
@@ -518,7 +408,7 @@ const Home: React.FC = () => {
               <span>{places} places</span>
             </div>
           </div>
-          
+        
           <div className="flex justify-between items-center">
             <div>
               <div className="text-xl font-bold text-orange-600">
@@ -531,9 +421,9 @@ const Home: React.FC = () => {
                 </div>
               )}
             </div>
-            
+          
             <div className="flex gap-2">
-              <button 
+              <button
                 onClick={() => handleReserve(vehicule.id)}
                 className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white text-sm font-medium rounded-lg transition-colors"
               >
@@ -548,21 +438,18 @@ const Home: React.FC = () => {
       </div>
     );
   };
-
   const howItWorksSteps = [
     { icon: faSearch, title: "1. Explorez", description: "Parcourez notre large sélection de véhicules. Filtrez par marque, modèle, prix ou type de carburant." },
     { icon: faCar, title: "2. Choisissez", description: "Sélectionnez la voiture qui vous convient. Achetez ou louez en fonction de vos besoins." },
     { icon: faCalendarCheck, title: "3. Réservez", description: "Choisissez vos dates et effectuez le paiement en toute sécurité via notre plateforme." },
     { icon: faRoad, title: "4. Profitez", description: "Récupérez votre véhicule au parking partenaire et profitez de votre trajet en toute sérénité." }
   ];
-
   const features = [
     { icon: faFilter, title: "Recherche avancée", description: "Trouvez le véhicule parfait grâce à nos filtres précis : marque, modèle, prix, carburant, transmission, et plus encore." },
     { icon: faFileContract, title: "Documents vérifiés", description: "Tous nos véhicules ont leurs documents à jour : assurance, carte grise, vignette et contrôle technique." },
     { icon: faShieldAlt, title: "Paiement sécurisé", description: "Transactions 100% sécurisées avec cryptage bancaire. Votre argent est protégé jusqu'à la livraison." },
     { icon: faStar, title: "Garantie incluse", description: "De nombreux véhicules bénéficient d'une garantie supplémentaire pour votre tranquillité d'esprit." }
   ];
-
 const testimonials = [
   {
     initial: "S",
@@ -586,14 +473,11 @@ const testimonials = [
     rating: 5,
   },
 ];
-
-
   const ctaFeatures = [
     { icon: faCheckCircle, title: "Sans engagement", description: "Annulation gratuite jusqu'à 24h avant" },
     { icon: faLock, title: "Paiement sécurisé", description: "Cryptage bancaire de niveau militaire" },
     { icon: faHeadset, title: "Support 24/7", description: "Assistance client en continu" }
   ];
-
   return (
     <>
       <Head>
@@ -610,7 +494,7 @@ const testimonials = [
             --gray: #6C757D;
             --light-gray: #E9ECEF;
           }
-          
+        
           html, body {
             background-color: #FFFFFF !important;
             color: #1A1A1A !important;
@@ -618,23 +502,23 @@ const testimonials = [
             overflow-x: hidden;
             scroll-behavior: smooth;
           }
-          
+        
           .gradient-text {
             color: #FD6A00;
           }
-          
+        
           .btn-orange {
             background: #FD6A00;
             color: white;
             transition: all 0.3s ease;
           }
-          
+        
           .btn-orange:hover {
             background: #E55A00;
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(253, 106, 0, 0.2);
           }
-          
+        
           .car-card {
             background: white;
             border-radius: 20px;
@@ -643,13 +527,13 @@ const testimonials = [
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
           }
-          
+        
           .car-card:hover {
             transform: translateY(-10px);
             border-color: #FF8C42;
             box-shadow: 0 20px 40px rgba(253, 106, 0, 0.15);
           }
-          
+        
           .car-image-container {
             height: 200px;
             width: 100%;
@@ -657,13 +541,13 @@ const testimonials = [
             position: relative;
             border-radius: 15px 15px 0 0;
           }
-          
+        
           @media (max-width: 768px) {
             .car-image-container {
               height: 160px;
             }
           }
-          
+        
           .feature-icon {
             width: 60px;
             height: 60px;
@@ -676,7 +560,7 @@ const testimonials = [
             font-size: 1.5rem;
             margin-bottom: 1rem;
           }
-          
+        
           .stat-card {
             background: white;
             border-radius: 16px;
@@ -684,7 +568,7 @@ const testimonials = [
             border: 1px solid #E9ECEF;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
           }
-          
+        
           .section {
             min-height: 100vh;
             width: 100%;
@@ -694,7 +578,7 @@ const testimonials = [
             align-items: center;
             overflow: hidden;
           }
-          
+        
           .section-content {
             max-width: 1200px;
             margin: 0 auto;
@@ -702,23 +586,23 @@ const testimonials = [
             z-index: 10;
             position: relative;
           }
-          
+        
           .section-title {
             font-size: 2.5rem;
           }
-          
+        
           @media (min-width: 768px) {
             .section-title {
               font-size: 3.5rem;
             }
           }
-          
+        
           @media (min-width: 1024px) {
             .section-title {
               font-size: 4.5rem;
             }
           }
-          
+        
           .floating-element {
             position: absolute;
             border-radius: 50%;
@@ -726,27 +610,27 @@ const testimonials = [
             filter: blur(40px);
             z-index: 0;
           }
-          
+        
           .morph-shape {
             position: absolute;
             z-index: 0;
             transition: all 1.5s cubic-bezier(0.165, 0.84, 0.44, 1);
           }
-          
+        
           .car-animation {
             animation: float 6s ease-in-out infinite;
           }
-          
+        
           @keyframes float {
             0% { transform: translateY(0px); }
             50% { transform: translateY(-20px); }
             100% { transform: translateY(0px); }
           }
-          
+        
           @keyframes spin {
             to { transform: rotate(360deg); }
           }
-          
+        
           .loading {
             display: inline-block;
             width: 50px;
@@ -756,11 +640,11 @@ const testimonials = [
             border-top-color: #FD6A00;
             animation: spin 1s ease-in-out infinite;
           }
-          
+        
           .bg-light {
             background-color: #F8F9FA;
           }
-          
+        
           .nav-dot {
             width: 12px;
             height: 12px;
@@ -770,36 +654,36 @@ const testimonials = [
             transition: all 0.3s ease;
             position: relative;
           }
-          
+        
           .nav-dot.active {
             background-color: #FD6A00;
             transform: scale(1.3);
             box-shadow: 0 0 10px rgba(253, 106, 0, 0.5);
           }
-          
+        
           .nav-dot:hover {
             background-color: #FD6A00;
             transform: scale(1.2);
           }
-          
+        
           ::-webkit-scrollbar {
             width: 8px;
           }
-          
+        
           ::-webkit-scrollbar-track {
             background: rgba(253, 106, 0, 0.05);
           }
-          
+        
           ::-webkit-scrollbar-thumb {
             background: #FD6A00;
             border-radius: 4px;
           }
-          
+        
           .fade-in {
             opacity: 0;
             transform: translateY(30px);
           }
-          
+        
           .fade-in.active {
             opacity: 1;
             transform: translateY(0);
@@ -811,14 +695,12 @@ footer {
   padding-top: 2rem;
   background: transparent;
 }
-
 .section {
   position: relative;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
 }
-
 .section-content {
   flex: 1;
   display: flex;
@@ -826,14 +708,13 @@ footer {
 }
         `}</style>
       </Head>
-
       {/* Header */}
       <header className="fixed top-0 w-full z-1000 bg-white/95 backdrop-blur-md border-b border-gray-200 py-4 px-8">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="logo">
             <img src="/images/logo.jpg" alt="Mobility Logo" className="h-12 w-auto" />
           </div>
-          
+        
           <nav className="hidden md:flex items-center gap-8">
             <a href="#how-it-works" className="text-gray-700 hover:text-orange-600 font-medium transition-colors">
               Comment ça marche
@@ -847,17 +728,16 @@ footer {
             <a href="#testimonials" className="text-gray-700 hover:text-orange-600 font-medium transition-colors">
               Avis
             </a>
-
             {!user ? (
               <div className="flex items-center gap-3">
                 <button
-                  onClick={() => { setShowAuthModal(true); setAuthTab('login'); }}
+                  onClick={() => router.push('/auth')}
                   className="px-6 py-2 bg-gray-100 text-gray-700 font-semibold rounded-full hover:bg-gray-200 transition-colors"
                 >
                   Connexion
                 </button>
                 <button
-                  onClick={() => { setShowAuthModal(true); setAuthTab('register'); }}
+                  onClick={() => router.push('/auth')}
                   className="px-6 py-2 bg-orange-600 text-white font-semibold rounded-full hover:bg-orange-700 transition-colors"
                 >
                   S&apos;inscrire
@@ -880,7 +760,6 @@ footer {
               </div>
             )}
           </nav>
-
           <button
             className="md:hidden text-gray-700"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -888,7 +767,6 @@ footer {
             <FontAwesomeIcon icon={isMobileMenuOpen ? faTimes : faBars} className="text-2xl" />
           </button>
         </div>
-
         {isMobileMenuOpen && (
           <div className="md:hidden mt-4 pb-4">
             <div className="flex flex-col gap-4">
@@ -904,17 +782,17 @@ footer {
               <a href="#testimonials" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 hover:text-orange-600 font-medium py-2">
                 Avis
               </a>
-              
+            
               {!user ? (
                 <div className="flex flex-col gap-3 mt-4">
                   <button
-                    onClick={() => { setShowAuthModal(true); setAuthTab('login'); setIsMobileMenuOpen(false); }}
+                    onClick={() => { router.push('/auth'); setIsMobileMenuOpen(false); }}
                     className="px-6 py-2 bg-gray-100 text-gray-700 font-semibold rounded-full hover:bg-gray-200 transition-colors"
                   >
                     Connexion
                   </button>
                   <button
-                    onClick={() => { setShowAuthModal(true); setAuthTab('register'); setIsMobileMenuOpen(false); }}
+                    onClick={() => { router.push('/auth'); setIsMobileMenuOpen(false); }}
                     className="px-6 py-2 bg-orange-600 text-white font-semibold rounded-full hover:bg-orange-700 transition-colors"
                   >
                     S&apos;inscrire
@@ -940,9 +818,7 @@ footer {
           </div>
         )}
       </header>
-
       <div id="three-container" ref={threeContainerRef} className="fixed inset-0 z-1 pointer-events-none" />
-
       <div className="hidden md:flex fixed right-8 top-1/2 transform -translate-y-1/2 z-100 flex-col gap-6">
         {['hero', 'how-it-works', 'vehicles', 'features', 'testimonials', 'cta'].map((section, index) => (
           <button
@@ -953,13 +829,11 @@ footer {
           />
         ))}
       </div>
-
       {showLoadingOverlay && (
         <div className="fixed inset-0 bg-white bg-opacity-80 flex items-center justify-center z-50">
           <div className="loading"></div>
         </div>
       )}
-
       <div className="fixed bottom-8 right-8 z-1002 space-y-2">
         {toasts.map((toast) => (
           <div
@@ -974,170 +848,6 @@ footer {
           </div>
         ))}
       </div>
-
-      {showAuthModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-1001 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-2xl font-bold">Connexion / Inscription</h3>
-              <button onClick={() => setShowAuthModal(false)} className="text-gray-500 hover:text-gray-700">
-                <FontAwesomeIcon icon={faTimes} className="text-xl" />
-              </button>
-            </div>
-
-            <div className="flex border-b mb-6">
-              <button
-                className={`flex-1 py-3 font-medium ${
-                  authTab === 'login' 
-                    ? 'border-b-2 border-orange-600 text-orange-600' 
-                    : 'text-gray-500'
-                }`}
-                onClick={() => setAuthTab('login')}
-              >
-                Connexion
-              </button>
-              <button
-                className={`flex-1 py-3 font-medium ${
-                  authTab === 'register' 
-                    ? 'border-b-2 border-orange-600 text-orange-600' 
-                    : 'text-gray-500'
-                }`}
-                onClick={() => setAuthTab('register')}
-              >
-                Inscription
-              </button>
-            </div>
-
-            {authTab === 'login' && (
-              <form onSubmit={handleLogin} className="space-y-4">
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Email"
-                  className="w-full p-3 border border-gray-300 rounded-lg"
-                  required
-                />
-                <input
-                  type="password"
-                  name="password"
-                  placeholder="Mot de passe"
-                  className="w-full p-3 border border-gray-300 rounded-lg"
-                  required
-                />
-                <button
-                  type="submit"
-                  className="w-full py-3 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 transition-colors"
-                >
-                  Se connecter
-                </button>
-              </form>
-            )}
-
-            {authTab === 'register' && (
-              <form onSubmit={handleRegister} className="space-y-4">
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Nom complet"
-                  className="w-full p-3 border border-gray-300 rounded-lg"
-                  required
-                />
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Email"
-                  className="w-full p-3 border border-gray-300 rounded-lg"
-                  required
-                />
-                <input
-                  type="password"
-                  name="password"
-                  placeholder="Mot de passe"
-                  className="w-full p-3 border border-gray-300 rounded-lg"
-                  required
-                />
-                <select
-                  name="role"
-                  defaultValue={authRole}
-                  className="w-full p-3 border border-gray-300 rounded-lg"
-                >
-                  <option value="CLIENT">Client</option>
-                  <option value="PARKING">Parking partenaire</option>
-                </select>
-                <button
-                  type="submit"
-                  className="w-full py-3 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 transition-colors"
-                >
-                  S&apos;inscrire
-                </button>
-              </form>
-            )}
-          </div>
-        </div>
-      )}
-
-      {showReservationModal && reservationVehicule && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-1001 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <button 
-              onClick={() => setShowReservationModal(false)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-            >
-              <FontAwesomeIcon icon={faTimes} />
-            </button>
-            
-            <h3 className="text-2xl font-bold mb-6">
-              Réserver {reservationVehicule.marqueRef?.name || reservationVehicule.marque} {reservationVehicule.model || reservationVehicule.modele}
-            </h3>
-            
-            <div className="mb-6">
-              <img
-                src={reservationVehicule.photos?.[0] || 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1074&q=80'}
-                alt="Véhicule"
-                className="w-full h-48 object-cover rounded-lg mb-4"
-              />
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="text-3xl font-bold text-orange-600">
-                    {reservationVehicule.prix || reservationVehicule.prixJour} CFA
-                    <span className="text-gray-500 text-lg">/jour</span>
-                  </p>
-                  <p className="text-gray-600">Frais inclus: Assurance, Entretien</p>
-                </div>
-              </div>
-            </div>
-            
-            <form onSubmit={(e) => submitReservation(e, reservationVehicule.id)}>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-gray-700 mb-2">Dates de location</label>
-                  <div className="grid grid-cols-2 gap-4">
-                    <input type="date" name="dateDebut" className="w-full p-3 border border-gray-300 rounded-lg" required />
-                    <input type="date" name="dateFin" className="w-full p-3 border border-gray-300 rounded-lg" required />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-gray-700 mb-2">Options supplémentaires</label>
-                  <div className="space-y-2">
-                    <label className="flex items-center">
-                      <input type="checkbox" name="options[]" value="assurance_complete" className="mr-2" />
-                      <span>Assurance complète (+1 500 CFA/jour)</span>
-                    </label>
-                    <label className="flex items-center">
-                      <input type="checkbox" name="options[]" value="siège_bébé" className="mr-2" />
-                      <span>Siège bébé (+500 CFA/jour)</span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-              <button type="submit" className="w-full mt-8 py-4 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 transition-colors">
-                Confirmer la réservation
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
       <section id="hero" className="section bg-light">
         <div className="section-content">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
@@ -1151,7 +861,7 @@ footer {
                 Une expérience simple, fluide et sécurisée.
               </p>
               <div className="flex flex-wrap gap-4 mb-16">
-                <button 
+                <button
                   onClick={() => scrollToSection('vehicles')}
                   className="px-8 py-4 btn-orange font-semibold rounded-full text-lg"
                 >
@@ -1162,7 +872,7 @@ footer {
                   Voir la démo
                 </button>
               </div>
-              
+            
               <div className="grid grid-cols-3 gap-8">
                 <div>
                   <h3 className="text-3xl font-bold gradient-text">{stats?.totalVehicules ?? '500'}+</h3>
@@ -1178,7 +888,7 @@ footer {
                 </div>
               </div>
             </div>
-            
+          
             <div className="lg:w-1/2 relative">
               <div className="relative z-10 car-animation">
                 {featuredCar ? renderFeaturedCar(featuredCar) : (
@@ -1191,16 +901,15 @@ footer {
                   </div>
                 )}
               </div>
-              
+            
               <div className="morph-shape w-96 h-96 bg-gradient-to-r from-orange-100 to-orange-50 rounded-full top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
             </div>
           </div>
         </div>
-        
+      
         <div className="floating-element w-64 h-64 bg-orange-200 top-20 left-10"></div>
         <div className="floating-element w-96 h-96 bg-orange-100 bottom-20 right-10"></div>
       </section>
-
       <section id="how-it-works" className="section">
         <div className="section-content">
           <div className="text-center mb-16">
@@ -1211,7 +920,7 @@ footer {
               Mobility simplifie la réservation, l'achat et la location de véhicules en 4 étapes simples.
             </p>
           </div>
-          
+        
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {howItWorksSteps.map((step, index) => (
               <div key={index} className="stat-card fade-in text-center">
@@ -1223,21 +932,20 @@ footer {
               </div>
             ))}
           </div>
-          
+        
           <div className="mt-20 text-center">
             <div className="inline-flex flex-col lg:flex-row items-center gap-8 p-8 bg-orange-50 rounded-2xl border border-orange-100 max-w-4xl mx-auto">
               <div className="text-left">
                 <h4 className="font-bold text-2xl mb-2 text-gray-800">Pour les partenaires parking</h4>
                 <p className="text-gray-600">Créez un compte, ajoutez vos véhicules et gérez vos réservations facilement.</p>
               </div>
-              <button onClick={() => { setShowAuthModal(true); setAuthTab('register'); setAuthRole('PARKING'); }} className="px-8 py-3 bg-orange-600 text-white font-semibold rounded-full hover:bg-orange-700 transition-colors whitespace-nowrap">
+              <button onClick={() => router.push('/auth?role=PARKING')} className="px-8 py-3 bg-orange-600 text-white font-semibold rounded-full hover:bg-orange-700 transition-colors whitespace-nowrap">
                 Devenir partenaire
               </button>
             </div>
           </div>
         </div>
       </section>
-
       <section id="vehicles" className="section bg-light">
         <div className="section-content">
           <div className="text-center mb-16">
@@ -1248,7 +956,6 @@ footer {
               Des voitures pour tous les goûts et tous les budgets, disponibles à l'achat ou à la location.
             </p>
           </div>
-
           <form onSubmit={applyFilters} className="mb-12">
             <div className="flex flex-wrap gap-4 justify-center">
               <select name="marque" className="p-3 border border-gray-300 rounded-lg bg-white">
@@ -1279,8 +986,7 @@ footer {
               </button>
             </div>
           </form>
-          
-
+        
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {isLoading ? (
               <div className="col-span-full text-center py-12">
@@ -1299,10 +1005,9 @@ footer {
               ))
             )}
           </div>
-
           {allVehicles.length > 0 && allVehicles.length % 6 === 0 && !isLoading && (
             <div className="text-center mt-12">
-              <button 
+              <button
                 onClick={loadMoreVehicles}
                 className="px-8 py-4 bg-orange-600 text-white font-semibold rounded-full hover:bg-orange-700 transition-colors text-lg"
               >
@@ -1313,7 +1018,6 @@ footer {
           )}
         </div>
       </section>
-
       <section id="features" className="section">
         <div className="section-content">
           <div className="text-center mb-16">
@@ -1324,7 +1028,7 @@ footer {
               Découvrez les avantages qui font de Mobility la plateforme de réservation préférée.
             </p>
           </div>
-          
+        
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="order-2 lg:order-1">
               <div className="relative">
@@ -1333,14 +1037,14 @@ footer {
                     <img src="https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1025&q=80" alt="Volkswagen Golf" className="car-image w-full h-full object-cover" />
                   </div>
                 </div>
-                
+              
                 <div className="absolute -top-4 -right-4 bg-white p-4 rounded-xl shadow-lg border border-gray-200">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-orange-600">4.9/5</div>
                     <div className="text-gray-600 text-sm">Satisfaction</div>
                   </div>
                 </div>
-                
+              
                 <div className="absolute -bottom-4 -left-4 bg-white p-4 rounded-xl shadow-lg border border-gray-200">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-orange-600">24h</div>
@@ -1349,7 +1053,7 @@ footer {
                 </div>
               </div>
             </div>
-            
+          
             <div className="order-1 lg:order-2">
               <div className="space-y-8">
                 {features.map((feature, index) => (
@@ -1368,7 +1072,6 @@ footer {
           </div>
         </div>
       </section>
-
       <section id="testimonials" className="section bg-light">
         <div className="section-content">
           <div className="text-center mb-16">
@@ -1379,7 +1082,7 @@ footer {
               Découvrez les expériences de nos utilisateurs et partenaires parking.
             </p>
           </div>
-          
+        
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
               <div key={index} className="car-card p-8 fade-in">
@@ -1397,10 +1100,10 @@ footer {
                 </p>
                 <div className="flex text-orange-400">
                   {[...Array(5)].map((_, i) => (
-                    <FontAwesomeIcon 
-                      key={i} 
-                      icon={i < Math.floor(testimonial.rating) ? faStar : 
-                            i === Math.floor(testimonial.rating) && testimonial.rating % 1 !== 0 ? faStarHalfAlt : faStarRegular} 
+                    <FontAwesomeIcon
+                      key={i}
+                      icon={i < Math.floor(testimonial.rating) ? faStar :
+                            i === Math.floor(testimonial.rating) && testimonial.rating % 1 !== 0 ? faStarHalfAlt : faStarRegular}
                     />
                   ))}
                 </div>
@@ -1409,8 +1112,6 @@ footer {
           </div>
         </div>
       </section>
-
-      // Section CTA (modifier uniquement la partie footer)
 <section id="cta" className="section">
   <div className="section-content">
     <div className="text-center">
@@ -1420,9 +1121,9 @@ footer {
       <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-12">
         Rejoignez des milliers d&apos;utilisateurs qui ont simplifié leur mobilité. Téléchargez l&apos;application ou inscrivez-vous dès maintenant.
       </p>
-      
+    
       <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
-        <button onClick={() => { setShowAuthModal(true); setAuthTab('register'); }} className="px-10 py-5 bg-orange-600 text-white font-semibold rounded-2xl hover:bg-orange-700 transition-all duration-300 transform hover:-translate-y-2 text-lg shadow-lg hover:shadow-xl hover:shadow-orange-200">
+        <button onClick={() => router.push('/auth')} className="px-10 py-5 bg-orange-600 text-white font-semibold rounded-2xl hover:bg-orange-700 transition-all duration-300 transform hover:-translate-y-2 text-lg shadow-lg hover:shadow-xl hover:shadow-orange-200">
           S&apos;inscrire gratuitement
         </button>
         <button className="px-10 py-5 bg-white text-gray-800 font-semibold rounded-2xl border-2 border-gray-300 hover:border-orange-500 hover:text-orange-600 transition-all duration-300 text-lg">
@@ -1430,7 +1131,7 @@ footer {
           Télécharger l&apos;app
         </button>
       </div>
-      
+    
       <div className="car-card p-8 max-w-3xl mx-auto mb-20">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {ctaFeatures.map((feature, index) => (
@@ -1445,12 +1146,12 @@ footer {
         </div>
       </div>
     </div>
-    
+  
     {/* Footer corrigé - position relative */}
     <footer className="relative mt-20 pt-8 border-t border-gray-200">
       <div className="max-w-6xl mx-auto px-4">
-       
-        
+     
+      
         {/* Deuxième ligne - copyright */}
         <div className="text-center pt-6 border-t border-gray-100">
           <p className="text-gray-500 text-sm">
@@ -1464,5 +1165,4 @@ footer {
     </>
   );
 };
-
 export default Home;
