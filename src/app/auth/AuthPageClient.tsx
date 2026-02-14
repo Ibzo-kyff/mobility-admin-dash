@@ -37,7 +37,7 @@ const AuthPageClient: React.FC = () => {
   });
 
   useEffect(() => {
-    import('../../../services/mobility-api').then((module) => {
+    import('../../services/mobility-api').then((module) => {
       setMobilityAPI(module.mobilityAPI);
     });
     const tab = searchParams.get('tab') as 'login' | 'register';
