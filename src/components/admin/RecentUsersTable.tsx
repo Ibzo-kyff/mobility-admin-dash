@@ -1,7 +1,6 @@
-// components/admin/RecentUsersTable.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { mobilityAPI } from '@/services/mobility-api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -14,35 +13,21 @@ import {
 import Link from 'next/link';
 import type { User } from '@/types';
 
-export default function RecentUsersTable() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
+interface Props {
+  users: User[];                    // ← PROP OBLIGATOIRE maintenant
+}
+
+export default function RecentUsersTable({ users: initialUsers }: Props) {
+  const [users, setUsers] = useState<User[]>(initialUsers);
   const [processingId, setProcessingId] = useState<number | null>(null);
-
-  useEffect(() => {
-    loadPendingUsers();
-  }, []);
-
-  const loadPendingUsers = async () => {
-    try {
-      setLoading(true);
-      const allUsers = await mobilityAPI.getAllUsers();
-      const pendingUsers = allUsers
-        .filter((u: User) => u.status === 'PENDING')
-        .slice(0, 5);
-      setUsers(pendingUsers);
-    } catch (error) {
-      console.error('Error loading pending users:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleApprove = async (userId: number) => {
     try {
       setProcessingId(userId);
       await mobilityAPI.updateUserProfile(userId, { status: 'APPROVED' });
-      await loadPendingUsers();
+      
+      // Mise à jour optimiste (supprime de la liste immédiatement)
+      setUsers(prev => prev.filter(u => u.id !== userId));
     } catch (error) {
       console.error('Error approving user:', error);
     } finally {
@@ -54,7 +39,9 @@ export default function RecentUsersTable() {
     try {
       setProcessingId(userId);
       await mobilityAPI.updateUserProfile(userId, { status: 'BLOCKED' });
-      await loadPendingUsers();
+      
+      // Mise à jour optimiste
+      setUsers(prev => prev.filter(u => u.id !== userId));
     } catch (error) {
       console.error('Error rejecting user:', error);
     } finally {
@@ -62,18 +49,10 @@ export default function RecentUsersTable() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center py-8">
-        <FontAwesomeIcon icon={faSpinner} className="animate-spin text-orange-500 text-2xl" />
-      </div>
-    );
-  }
-
   if (users.length === 0) {
     return (
-      <div className="text-center py-8">
-        <p className="text-gray-500">Aucune demande d'approbation en attente</p>
+      <div className="text-center py-12">
+        <p className="text-gray-500 text-lg">Aucune demande d'approbation en attente</p>
       </div>
     );
   }
@@ -147,26 +126,30 @@ export default function RecentUsersTable() {
                 {new Date(user.createdAt).toLocaleDateString('fr-FR')}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <Link
                     href={`/dashboard/admin/users/${user.id}`}
-                    className="text-blue-600 hover:text-blue-900"
+                    className="text-blue-600 hover:text-blue-900 transition"
                   >
                     <FontAwesomeIcon icon={faEye} className="w-4 h-4" />
                   </Link>
+
                   <button
                     onClick={() => handleApprove(user.id)}
                     disabled={processingId === user.id}
-                    className="text-green-600 hover:text-green-900 disabled:opacity-50"
+                    className="text-green-600 hover:text-green-700 transition disabled:opacity-50"
+                    title="Approuver"
                   >
-                    <FontAwesomeIcon icon={faCheck} className="w-4 h-4" />
+                    <FontAwesomeIcon icon={faCheck} className="w-5 h-5" />
                   </button>
+
                   <button
                     onClick={() => handleReject(user.id)}
                     disabled={processingId === user.id}
-                    className="text-red-600 hover:text-red-900 disabled:opacity-50"
+                    className="text-red-600 hover:text-red-700 transition disabled:opacity-50"
+                    title="Rejeter"
                   >
-                    <FontAwesomeIcon icon={faTimesCircle} className="w-4 h-4" />
+                    <FontAwesomeIcon icon={faTimesCircle} className="w-5 h-5" />
                   </button>
                 </div>
               </td>
