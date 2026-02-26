@@ -1,3 +1,4 @@
+//services/mobility-api.ts
 import { setCookie, getCookie, deleteCookie } from 'cookies-next';
 import type { User, Vehicule, LoginResponse, RegisterData, RegisterResponse, ReservationData, ApiError } from '@/types';
 
@@ -624,6 +625,23 @@ class MobilityAPI {
     );
     
     return this.handleResponse<Vehicule>(response);
+  }
+    // ==================== MÉTHODES ADMIN ====================
+
+  async getAdminVehicules(): Promise<any[]> {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/vehicules/admin`,
+      { headers: this.getHeaders() }
+    );
+    return this.handleResponse<any[]>(response);
+  }
+
+  async getAdminReservations(): Promise<any[]> {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/reservations/admin/all`,
+      { headers: this.getHeaders() }
+    );
+    return this.handleResponse<any[]>(response);
   }
 }
 

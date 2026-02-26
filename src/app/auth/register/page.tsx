@@ -23,13 +23,7 @@ export default function RegisterPage() {
   const { register, isLoading } = useAuth();
   
   const [formData, setFormData] = useState({
-    nom: '',
-    prenom: '',
-    email: '',
-    phone: '',
-    address: '',
-    password: '',
-    role: 'CLIENT'
+    nom: '', prenom: '', email: '', phone: '', address: '', password: '', role: 'CLIENT'
   });
   const [showPassword, setShowPassword] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
@@ -43,16 +37,20 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!acceptTerms) {
       setError('Vous devez accepter les conditions d\'utilisation');
       return;
     }
 
     try {
-      await register(formData);
-      // Redirection vers vérification email
-      router.push('/verify-email');
+      const data = await register(formData); // ← on récupère la réponse maintenant
+
+      // Redirection conditionnelle selon le rôle
+      if (formData.role === 'PARKING') {
+        router.push('/auth/pending-approuval'); // Page "en attente d'approbation"
+      } else {
+        router.push('/auth/verify-email'); // CLIENT → vérification email
+      }
     } catch (err: any) {
       setError(err.message || "Erreur lors de l'inscription");
     }
@@ -84,8 +82,8 @@ export default function RegisterPage() {
                 onChange={handleInputChange}
                 className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none"
               >
-                <option value="CLIENT">Client - Je souhaite louer des véhicules</option>
-                <option value="PARKING">Parking partenaire - Je souhaite mettre en location mes véhicules</option>
+                <option value="CLIENT">Client </option>
+                <option value="PARKING">Parking partenaire</option>
               </select>
             </div>
 
@@ -159,7 +157,7 @@ export default function RegisterPage() {
                     name="phone"
                     value={formData.phone}
                     onChange={handleInputChange}
-                    placeholder="06 12 34 56 78"
+                    placeholder="77 77 77 77"
                     className="w-full p-3 pl-10 bg-gray-50 border border-gray-200 rounded-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none"
                     required
                   />
@@ -261,7 +259,7 @@ export default function RegisterPage() {
           <p className="text-center text-sm text-gray-600 mt-6">
             Déjà un compte ?{' '}
             <Link 
-              href="/login"
+              href="/auth/login"
               className="text-orange-600 hover:text-orange-500 font-medium"
             >
               Se connecter

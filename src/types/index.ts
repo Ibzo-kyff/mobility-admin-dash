@@ -1,6 +1,6 @@
 // types/index.ts
 export type UserRole = 'CLIENT' | 'PARKING' | 'ADMIN';
-export type UserStatus = 'PENDING' | 'APPROVED' | 'BLOCKED';
+export type UserStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'BLOCKED';
 
 export interface User {
   id: number;
@@ -9,7 +9,7 @@ export interface User {
   nom: string;
   prenom: string;
   role: 'CLIENT' | 'PARKING' | 'ADMIN';
-  status: 'PENDING' | 'APPROVED' | 'BLOCKED';
+  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'BLOCKED';
   emailVerified: boolean;
   address?: string;
   image?: string;

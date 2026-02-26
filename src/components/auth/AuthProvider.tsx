@@ -2,13 +2,14 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { useRouter, usePathname, } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { mobilityAPI } from '@/services/mobility-api';
+import { getCookie, setCookie, deleteCookie } from 'cookies-next';
 import type { User, AuthState, UserRole } from '@/types';
 
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>;
-  register: (userData: any) => Promise<void>;
+  register: (userData: any) => Promise<any>;
   logout: () => Promise<void>;
   hasRole: (roles: UserRole | UserRole[]) => boolean;
   isVerified: boolean;
@@ -34,8 +35,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     
     const initAuth = async () => {
       try {
-        const token = localStorage.getItem('accessToken');
-        const userStr = localStorage.getItem('user');
+        const token = getCookie('accessToken') as string | undefined;
+        const userStr = getCookie('user') as string | undefined;
         
         if (token && userStr) {
           try {
@@ -58,7 +59,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   user: freshUser,
                   isAuthenticated: true,
                 }));
-                localStorage.setItem('user', JSON.stringify(freshUser));
+                setCookie('user', JSON.stringify(freshUser), {
+                  maxAge: 7 * 24 * 60 * 60,
+                  secure: process.env.NODE_ENV === 'production',
+                  sameSite: 'strict',
+                  path: '/',
+                });
               }
             } catch (refreshError) {
               console.error('Refresh failed:', refreshError);
@@ -103,61 +109,55 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []); // Dépendances vides - NE PAS AJOUTER de dépendances
 
-const login = async (email: string, password: string) => {
-  setState(prev => ({ ...prev, isLoading: true, error: null }));
-
-  try {
-    await mobilityAPI.login(email, password);
-    const user = await mobilityAPI.getCurrentUser();
-
-    setState({
-      user,
-      isAuthenticated: true,
-      isLoading: false,
-      error: null,
-    });
-
-    localStorage.setItem('user', JSON.stringify(user));
-
-    // ✅ Lire callbackUrl proprement côté client
-    const urlParams = new URLSearchParams(window.location.search);
-    const callbackUrl = urlParams.get('callbackUrl');
-
-    if (callbackUrl && callbackUrl.startsWith('/')) {
-      router.replace(callbackUrl);
-    } else {
-      router.replace(getDashboardPath(user.role));
-    }
-
-  } catch (error: any) {
-    setState(prev => ({
-      ...prev,
-      isLoading: false,
-      error: error.message || 'Erreur de connexion',
-    }));
-    throw error;
-  }
-};
-
-
-  const register = async (userData: any) => {
+  const login = async (email: string, password: string) => {
     setState(prev => ({ ...prev, isLoading: true, error: null }));
+
     try {
-      await mobilityAPI.register(userData);
-      
-      setState(prev => ({
-        ...prev,
+      await mobilityAPI.login(email, password);
+      const user = await mobilityAPI.getCurrentUser();
+
+      setState({
+        user,
+        isAuthenticated: true,
         isLoading: false,
-      }));
-      
-      router.push('/auth/verify-email');
-      
+        error: null,
+      });
+
+      setCookie('user', JSON.stringify(user), {
+        maxAge: 7 * 24 * 60 * 60,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        path: '/',
+      });
+
+      // ✅ Lire callbackUrl proprement côté client
+      const urlParams = new URLSearchParams(window.location.search);
+      const callbackUrl = urlParams.get('callbackUrl');
+
+      if (callbackUrl && callbackUrl.startsWith('/')) {
+        router.replace(callbackUrl);
+      } else {
+        router.replace(getDashboardPath(user.role));
+      }
+
     } catch (error: any) {
       setState(prev => ({
         ...prev,
         isLoading: false,
-        error: error.message || 'Erreur d\'inscription',
+        error: error.message || 'Erreur de connexion',
       }));
+      throw error;
+    }
+  };
+
+  const register = async (userData: any) => {
+    setState(prev => ({ ...prev, isLoading: true, error: null }));
+    try {
+      const response = await mobilityAPI.register(userData);
+      setState(prev => ({ ...prev, isLoading: false }));
+      return response;
+    } catch (error: any) {
+      setState(prev => ({ ...prev, isLoading: false, error: error.message }));
       throw error;
     }
   };
@@ -165,9 +165,9 @@ const login = async (email: string, password: string) => {
   const logout = async () => {
     mobilityAPI.logout();
     
-    localStorage.removeItem('user');
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+    deleteCookie('user');
+    deleteCookie('accessToken');
+    deleteCookie('refreshToken');
     
     setState({
       user: null,
@@ -204,7 +204,12 @@ const login = async (email: string, password: string) => {
           ...prev,
           user,
         }));
-        localStorage.setItem('user', JSON.stringify(user));
+        setCookie('user', JSON.stringify(user), {
+          maxAge: 7 * 24 * 60 * 60,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'strict',
+          path: '/',
+        });
       }
     } catch (error) {
       console.error('Error refreshing user:', error);

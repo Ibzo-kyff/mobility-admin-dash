@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';  // ← on garde juste ça
+import { useRouter, useSearchParams } from 'next/navigation';  // ← ajoute useSearchParams pour callbackUrl
 import { useAuth } from '@/components/auth/AuthProvider';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -17,6 +17,7 @@ import Link from 'next/link';
 
 export default function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login, isLoading, error, isAuthenticated, user } = useAuth();
   
   const [formData, setFormData] = useState({
@@ -29,6 +30,12 @@ export default function LoginForm() {
   // Si déjà authentifié, rediriger immédiatement
   useEffect(() => {
     if (isAuthenticated && user) {
+      const callbackUrl = searchParams.get('callbackUrl');
+      if (callbackUrl && callbackUrl.startsWith('/')) {
+        router.replace(callbackUrl);
+        return;
+      }
+      
       const dashboardPath = user.role === 'ADMIN' 
         ? '/dashboard/admin' 
         : user.role === 'PARKING' 
@@ -36,7 +43,7 @@ export default function LoginForm() {
           : '/dashboard/client';
       router.replace(dashboardPath);
     }
-  }, [isAuthenticated, user, router]);
+  }, [isAuthenticated, user, router, searchParams]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
