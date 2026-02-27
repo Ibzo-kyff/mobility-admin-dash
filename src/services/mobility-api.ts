@@ -614,13 +614,21 @@ class MobilityAPI {
     return this.handleResponse(response);
   }
 
-  async updateVehicule(vehicleId: string, data: Partial<Vehicule>): Promise<Vehicule> {
+  async updateVehicule(vehicleId: string, data: Partial<Vehicule> | FormData): Promise<Vehicule> {
+    const isFormData = data instanceof FormData;
+    const headers = this.getHeaders();
+    
+    // Si c'est du FormData, on laisse le navigateur définir le Content-Type avec le boundary
+    if (isFormData && (headers as any)['Content-Type']) {
+      delete (headers as any)['Content-Type'];
+    }
+
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/vehicules/${vehicleId}`,
       {
         method: 'PUT',
-        headers: this.getHeaders(),
-        body: JSON.stringify(data),
+        headers: headers,
+        body: isFormData ? data : JSON.stringify(data),
       }
     );
     

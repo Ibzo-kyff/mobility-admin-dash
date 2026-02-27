@@ -34,6 +34,7 @@ const Home: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [mobilityAPI, setMobilityAPI] = useState<any>(null);
+  const [vehiclesAPI, setVehiclesAPI] = useState<any>(null);
 
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
@@ -46,26 +47,30 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     if (isClient) {
-      import('../services/mobility-api').then((module) => {
-        setMobilityAPI(module.mobilityAPI);
+      Promise.all([
+        import('../services/mobility-api'),
+        import('../services/vehicles-api')
+      ]).then(([mobilityModule, vehiclesModule]) => {
+        setMobilityAPI(mobilityModule.mobilityAPI);
+        setVehiclesAPI(vehiclesModule.vehiclesAPI);
       }).catch((error) => {
-        console.error('Failed to load mobilityAPI:', error);
+        console.error('Failed to load APIs:', error);
       });
     }
   }, [isClient]);
 
   useEffect(() => {
-    if (!isClient || !mobilityAPI) return;
-    
+    if (!isClient || !mobilityAPI || !vehiclesAPI) return;
+
     initializeThreeJS();
     animateThreeJS();
     loadInitialData();
     checkAuth();
     initScrollAnimations();
-    
+
     window.addEventListener('scroll', updateActiveDot);
     window.addEventListener('resize', onWindowResize);
-    
+
     return () => {
       window.removeEventListener('scroll', updateActiveDot);
       window.removeEventListener('resize', onWindowResize);
@@ -73,7 +78,7 @@ const Home: React.FC = () => {
         rendererRef.current.dispose();
       }
     };
-  }, [isClient, mobilityAPI]);
+  }, [isClient, mobilityAPI, vehiclesAPI]);
 
   const checkAuth = async () => {
     if (!mobilityAPI) return;
@@ -103,22 +108,22 @@ const Home: React.FC = () => {
 
   const initializeThreeJS = () => {
     if (!threeContainerRef.current) return;
-    
+
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    
+
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setClearColor(0xffffff, 0);
-    
+
     threeContainerRef.current.appendChild(renderer.domElement);
-    
+
     const particleCount = 200;
     const particlesGeometry = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
-    
+
     for (let i = 0; i < particleCount * 3; i += 3) {
       positions[i] = (Math.random() - 0.5) * 100;
       positions[i + 1] = (Math.random() - 0.5) * 100;
@@ -127,21 +132,21 @@ const Home: React.FC = () => {
       colors[i + 1] = 0.42;
       colors[i + 2] = 0.0;
     }
-    
+
     particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    
+
     const particlesMaterial = new THREE.PointsMaterial({
       size: 0.15,
       vertexColors: true,
       transparent: true,
       opacity: 0.3,
     });
-    
+
     const particles = new THREE.Points(particlesGeometry, particlesMaterial);
     scene.add(particles);
     camera.position.z = 5;
-    
+
     sceneRef.current = scene;
     cameraRef.current = camera;
     rendererRef.current = renderer;
@@ -168,7 +173,7 @@ const Home: React.FC = () => {
   };
 
   const loadInitialData = async () => {
-    if (!mobilityAPI) return;
+    if (!mobilityAPI || !vehiclesAPI) return;
     setShowLoadingOverlay(true);
     try {
       await Promise.all([
@@ -186,9 +191,9 @@ const Home: React.FC = () => {
   };
 
   const loadFeaturedCar = async () => {
-    if (!mobilityAPI) return;
+    if (!vehiclesAPI) return;
     try {
-      const vehicules = await mobilityAPI.getVehicules({ limit: 1 });
+      const vehicules = await vehiclesAPI.getVehicules({ limit: 1 });
       if (vehicules.length > 0) {
         setFeaturedCar(vehicules[0]);
       }
@@ -198,15 +203,15 @@ const Home: React.FC = () => {
   };
 
   const loadVehicles = async (filters: Record<string, any> = {}) => {
-    if (!mobilityAPI || isLoading) return;
+    if (!vehiclesAPI || isLoading) return;
     setIsLoading(true);
     try {
-      const vehicules = await mobilityAPI.getVehicules({ 
-        ...filters, 
-        page: currentPage, 
-        limit: 6 
+      const vehicules = await vehiclesAPI.getVehicules({
+        ...filters,
+        page: currentPage,
+        limit: 6
       });
-      
+
       if (currentPage === 1) {
         setAllVehicles(vehicules);
       } else {
@@ -226,9 +231,9 @@ const Home: React.FC = () => {
   };
 
   const loadMarques = async () => {
-    if (!mobilityAPI) return;
+    if (!vehiclesAPI) return;
     try {
-      const data = await mobilityAPI.getMarques();
+      const data = await vehiclesAPI.getMarques();
       setMarques(data);
     } catch (error) {
       console.error('Error loading marques:', error);
@@ -236,9 +241,9 @@ const Home: React.FC = () => {
   };
 
   const loadStats = async () => {
-    if (!mobilityAPI) return;
+    if (!vehiclesAPI) return;
     try {
-      const data = await mobilityAPI.getStats();
+      const data = await vehiclesAPI.getVehicleStats();
       setStats(data);
     } catch (error) {
       console.error('Error loading stats:', error);
@@ -316,7 +321,7 @@ const Home: React.FC = () => {
     const modele = vehicule?.model || vehicule?.modele || 'Modèle inconnu';
     const annee = vehicule?.year || vehicule?.annee || '';
     const prix = vehicule?.prix || vehicule?.prixJour || 0;
-    
+
     return (
       <div className="car-card max-w-md mx-auto">
         <div className="car-image-container relative h-64 overflow-hidden rounded-lg">
@@ -338,20 +343,20 @@ const Home: React.FC = () => {
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-4">
               <span className="flex items-center gap-2">
-                <FontAwesomeIcon icon={faGasPump} className="text-gray-500" /> 
+                <FontAwesomeIcon icon={faGasPump} className="text-gray-500" />
                 <span className="text-gray-700">{vehicule?.carburant || 'Essence'}</span>
               </span>
               <span className="flex items-center gap-2">
-                <FontAwesomeIcon icon={faCogs} className="text-gray-500" /> 
+                <FontAwesomeIcon icon={faCogs} className="text-gray-500" />
                 <span className="text-gray-700">{vehicule?.transmission || 'Automatique'}</span>
               </span>
               <span className="flex items-center gap-2">
-                <FontAwesomeIcon icon={faUsers} className="text-gray-500" /> 
+                <FontAwesomeIcon icon={faUsers} className="text-gray-500" />
                 <span className="text-gray-700">{vehicule?.places || 5}</span>
               </span>
             </div>
-            <button 
-              onClick={() => handleReserve(vehicule.id)} 
+            <button
+              onClick={() => handleReserve(vehicule.id)}
               className="px-6 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-full transition-colors font-medium"
             >
               Réserver
@@ -385,13 +390,12 @@ const Home: React.FC = () => {
               e.currentTarget.src = 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1074&q=80';
             }}
           />
-          <div className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold ${
-            disponible ? 'bg-green-500' : 'bg-red-500'
-          } text-white`}>
+          <div className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold ${disponible ? 'bg-green-500' : 'bg-red-500'
+            } text-white`}>
             {disponible ? 'DISPONIBLE' : 'INDISPONIBLE'}
           </div>
         </div>
-      
+
         <div className="p-5">
           <div className="flex justify-between items-start mb-3">
             <div>
@@ -406,7 +410,7 @@ const Home: React.FC = () => {
               LOCATION
             </span>
           </div>
-        
+
           <div className="flex items-center gap-3 mb-4 text-sm text-gray-600">
             <div className="flex items-center gap-1">
               <FontAwesomeIcon icon={faGasPump} className="w-4 h-4" />
@@ -421,7 +425,7 @@ const Home: React.FC = () => {
               <span>{places} places</span>
             </div>
           </div>
-        
+
           <div className="flex justify-between items-center">
             <div>
               <div className="text-xl font-bold text-orange-600">
@@ -429,7 +433,7 @@ const Home: React.FC = () => {
                 <span className="text-sm font-normal text-gray-500 ml-1">/jour</span>
               </div>
             </div>
-          
+
             <div className="flex gap-2">
               <button
                 onClick={() => handleReserve(vehicule.id)}
@@ -504,7 +508,7 @@ const Home: React.FC = () => {
           <div className="logo">
             <img src="/images/logo.jpg" alt="Mobility Logo" className="h-12 w-auto" />
           </div>
-        
+
           <nav className="hidden md:flex items-center gap-8">
             <a href="#how-it-works" className="text-gray-700 hover:text-orange-600 font-medium transition-colors">
               Comment ça marche
@@ -518,7 +522,7 @@ const Home: React.FC = () => {
             <a href="#testimonials" className="text-gray-700 hover:text-orange-600 font-medium transition-colors">
               Avis
             </a>
-            
+
             {!user ? (
               <div className="flex items-center gap-3">
                 <Link
@@ -554,7 +558,7 @@ const Home: React.FC = () => {
               </div>
             )}
           </nav>
-          
+
           <button
             className="md:hidden text-gray-700"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -562,7 +566,7 @@ const Home: React.FC = () => {
             <FontAwesomeIcon icon={isMobileMenuOpen ? faTimes : faBars} className="text-2xl" />
           </button>
         </div>
-        
+
         {/* Menu mobile avec routes /auth/ */}
         {isMobileMenuOpen && (
           <div className="md:hidden mt-4 pb-4">
@@ -579,7 +583,7 @@ const Home: React.FC = () => {
               <a href="#testimonials" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 hover:text-orange-600 font-medium py-2">
                 Avis
               </a>
-            
+
               {!user ? (
                 <div className="flex flex-col gap-3 mt-4">
                   <Link
@@ -627,7 +631,7 @@ const Home: React.FC = () => {
 
       {/* Three.js Container */}
       <div id="three-container" ref={threeContainerRef} className="fixed inset-0 z-[1] pointer-events-none" />
-      
+
       {/* Navigation dots */}
       <div className="hidden md:flex fixed right-8 top-1/2 transform -translate-y-1/2 z-[100] flex-col gap-6">
         {['hero', 'how-it-works', 'vehicles', 'features', 'testimonials', 'cta'].map((section, index) => (
@@ -652,11 +656,10 @@ const Home: React.FC = () => {
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`px-6 py-4 rounded-lg shadow-lg text-white transform transition-all duration-300 ${
-              toast.type === 'success' ? 'bg-green-500' :
-              toast.type === 'error' ? 'bg-red-500' :
-              toast.type === 'info' ? 'bg-blue-500' : 'bg-gray-800'
-            }`}
+            className={`px-6 py-4 rounded-lg shadow-lg text-white transform transition-all duration-300 ${toast.type === 'success' ? 'bg-green-500' :
+                toast.type === 'error' ? 'bg-red-500' :
+                  toast.type === 'info' ? 'bg-blue-500' : 'bg-gray-800'
+              }`}
           >
             {toast.message}
           </div>
@@ -689,7 +692,7 @@ const Home: React.FC = () => {
                   Voir la démo
                 </button>
               </div>
-            
+
               <div className="grid grid-cols-3 gap-8">
                 <div>
                   <h3 className="text-3xl font-bold gradient-text">{stats?.totalVehicules ?? '500'}+</h3>
@@ -705,7 +708,7 @@ const Home: React.FC = () => {
                 </div>
               </div>
             </div>
-          
+
             <div className="lg:w-1/2 relative">
               <div className="relative z-10 car-animation">
                 {featuredCar ? renderFeaturedCar(featuredCar) : (
@@ -732,7 +735,7 @@ const Home: React.FC = () => {
               Mobility simplifie la réservation de véhicules en 4 étapes simples.
             </p>
           </div>
-        
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {howItWorksSteps.map((step, index) => (
               <div key={index} className="stat-card fade-in text-center">
@@ -744,15 +747,15 @@ const Home: React.FC = () => {
               </div>
             ))}
           </div>
-        
+
           <div className="mt-20 text-center">
             <div className="inline-flex flex-col lg:flex-row items-center gap-8 p-8 bg-orange-50 rounded-2xl border border-orange-100 max-w-4xl mx-auto">
               <div className="text-left">
                 <h4 className="font-bold text-2xl mb-2 text-gray-800">Pour les partenaires parking</h4>
                 <p className="text-gray-600">Créez un compte, ajoutez vos véhicules et gérez vos réservations facilement.</p>
               </div>
-              <Link 
-                href="/auth/register?role=PARKING" 
+              <Link
+                href="/auth/register?role=PARKING"
                 className="px-8 py-3 bg-orange-600 text-white font-semibold rounded-full hover:bg-orange-700 transition-colors whitespace-nowrap"
               >
                 Devenir partenaire
@@ -773,7 +776,7 @@ const Home: React.FC = () => {
               Des voitures pour tous les goûts et tous les budgets.
             </p>
           </div>
-          
+
           <form onSubmit={applyFilters} className="mb-12">
             <div className="flex flex-wrap gap-4 justify-center">
               <select name="marque" className="p-3 border border-gray-300 rounded-lg bg-white">
@@ -803,7 +806,7 @@ const Home: React.FC = () => {
               </button>
             </div>
           </form>
-        
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {isLoading ? (
               <div className="col-span-full text-center py-12">
@@ -822,7 +825,7 @@ const Home: React.FC = () => {
               ))
             )}
           </div>
-          
+
           {allVehicles.length > 0 && allVehicles.length % 6 === 0 && !isLoading && (
             <div className="text-center mt-12">
               <button
@@ -848,16 +851,16 @@ const Home: React.FC = () => {
               Découvrez les avantages qui font de Mobility la plateforme de réservation préférée.
             </p>
           </div>
-        
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="order-2 lg:order-1">
               <div className="relative">
                 <div className="car-card p-1">
                   <div className="car-image-container rounded-xl">
-                    <img 
-                      src="https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1025&q=80" 
-                      alt="Volkswagen Golf" 
-                      className="w-full h-full object-cover" 
+                    <img
+                      src="https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1025&q=80"
+                      alt="Volkswagen Golf"
+                      className="w-full h-full object-cover"
                     />
                   </div>
                 </div>
@@ -875,7 +878,7 @@ const Home: React.FC = () => {
                 </div>
               </div>
             </div>
-          
+
             <div className="order-1 lg:order-2">
               <div className="space-y-8">
                 {features.map((feature, index) => (
@@ -906,7 +909,7 @@ const Home: React.FC = () => {
               Découvrez les expériences de nos utilisateurs.
             </p>
           </div>
-        
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
               <div key={index} className="car-card p-8 fade-in">
@@ -927,7 +930,7 @@ const Home: React.FC = () => {
                     <FontAwesomeIcon
                       key={i}
                       icon={i < Math.floor(testimonial.rating) ? faStar :
-                            i === Math.floor(testimonial.rating) && testimonial.rating % 1 !== 0 ? faStarHalfAlt : faStarRegular}
+                        i === Math.floor(testimonial.rating) && testimonial.rating % 1 !== 0 ? faStarHalfAlt : faStarRegular}
                     />
                   ))}
                 </div>
@@ -945,10 +948,10 @@ const Home: React.FC = () => {
               Prêt à <span className="gradient-text">rouler</span> avec nous ?
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-12">
-              Rejoignez des milliers d'utilisateurs qui ont simplifié leur mobilité. 
+              Rejoignez des milliers d'utilisateurs qui ont simplifié leur mobilité.
               Téléchargez l'application ou inscrivez-vous dès maintenant.
             </p>
-          
+
             <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
               <Link
                 href="/auth/register"
@@ -962,7 +965,7 @@ const Home: React.FC = () => {
                 Télécharger l'app
               </button>
             </div>
-          
+
             <div className="car-card p-8 max-w-3xl mx-auto mb-20">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {ctaFeatures.map((feature, index) => (
@@ -977,7 +980,7 @@ const Home: React.FC = () => {
               </div>
             </div>
           </div>
-        
+
           <footer className="relative mt-20 pt-8 border-t border-gray-200">
             <div className="text-center pt-6">
               <p className="text-gray-500 text-sm">
