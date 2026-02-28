@@ -42,30 +42,7 @@ export interface RegisterResponse {
   emailVerified: boolean;
 }
 
-export interface Vehicule {
-  id: string;
-  marqueRef?: { name: string };
-  marque?: string;
-  model?: string;
-  modele?: string;
-  year?: number;
-  annee?: number;
-  categorie?: string;
-  mileage?: number;
-  kilometrage?: number;
-  prix?: number;
-  prixJour?: number;
-  prixAchat?: number;
-  fuelType?: string;
-  carburant?: string;
-  transmission?: string;
-  places?: number;
-  photos?: string[];
-  forSale?: boolean;
-  forRent?: boolean;
-  status?: string;
-  disponible?: boolean;
-}
+export * from './vehicle';
 
 export interface ReservationData {
   vehiculeId: string;
@@ -88,10 +65,7 @@ export interface RegisterData {
   connectionCount?: number;
 }
 
-export interface ApiError {
-  message: string;
-  details?: string;
-}
+
 export interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
