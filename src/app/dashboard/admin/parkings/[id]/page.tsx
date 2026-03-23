@@ -700,41 +700,21 @@ export default function ParkingDetailPage({ params }: { params: Promise<{ id: st
   const router = useRouter();
 
   useEffect(() => {
-    console.log("🔍 [Page] Contenu du module mobility-api:", mobilityApiModule);
-    console.log("🔍 [Page] mobilityAPI exporté:", mobilityApiModule.mobilityAPI);
-    
-    const api = mobilityApiModule.mobilityAPI;
-    
-    if (!api) {
-      console.error("❌ [Page] mobilityAPI est undefined");
-      setError("Erreur de chargement de l'API");
-      setLoading(false);
-      return;
-    }
-
-    console.log("✅ [Page] mobilityAPI est défini", api);
-    console.log("✅ [Page] isAuthenticated existe?", typeof api.isAuthenticated === 'function');
-
     const fetchParking = async () => {
       try {
-        if (typeof api.isAuthenticated === 'function' && !api.isAuthenticated()) {
-          console.log("🔍 [Page] Non authentifié, redirection vers login");
+        const api = mobilityApiModule.mobilityAPI;
+        
+        if (!api) {
+          throw new Error("API non disponible");
+        }
+
+        if (!api.isAuthenticated()) {
           router.push('/auth/login?callbackUrl=' + encodeURIComponent(window.location.pathname));
           return;
         }
 
         const { id } = await params;
-        console.log("🔍 [Page] Fetching parking ID:", id);
-        
-        if (typeof api.getParkingById !== 'function') {
-          console.error("❌ [Page] getParkingById n'est pas une fonction");
-          setError("Erreur API - méthode getParkingById manquante");
-          setLoading(false);
-          return;
-        }
-
         const data = await api.getParkingById(parseInt(id));
-        console.log("🔍 [Page] Parking data reçue:", data);
         
         if (!data) {
           setError("Parking introuvable");
@@ -742,21 +722,17 @@ export default function ParkingDetailPage({ params }: { params: Promise<{ id: st
           setParking(data);
           
           try {
-            if (typeof api.getAdminReservations === 'function') {
-              console.log("🔍 [Page] Chargement des réservations...");
-              const allReservations = await api.getAdminReservations();
-              const parkingReservations = allReservations.filter(
-                (r: any) => r.vehicle?.parkingId === parseInt(id)
-              );
-              console.log("🔍 [Page] Réservations trouvées:", parkingReservations.length);
-              setReservations(parkingReservations);
-            }
+            const allReservations = await api.getAdminReservations();
+            const parkingReservations = allReservations.filter(
+              (r: any) => r.vehicle?.parkingId === parseInt(id)
+            );
+            setReservations(parkingReservations);
           } catch (resError) {
-            console.error("❌ [Page] Erreur chargement réservations:", resError);
+            console.error("Erreur chargement réservations:", resError);
           }
         }
       } catch (err: any) {
-        console.error("❌ [Page] Erreur détaillée:", err);
+        console.error("Erreur:", err);
         
         if (err.message?.includes('401') || err.message?.includes('Non authentifié')) {
           router.push('/auth/login?callbackUrl=' + encodeURIComponent(window.location.pathname));
@@ -776,16 +752,31 @@ export default function ParkingDetailPage({ params }: { params: Promise<{ id: st
     setLoadingVehicle(true);
     setVehicleError(null);
     try {
-      if (typeof api.getVehiculeById !== 'function') {
-        throw new Error("Méthode getVehiculeById non disponible");
-      }
-      const vehicle = await api.getVehiculeById(vehicleId.toString());
-      if (vehicle) {
-        setSelectedVehicle(vehicle);
+      const vehicleData = await api.getVehiculeById(vehicleId.toString());
+      if (vehicleData) {
+        const convertedVehicle: Vehicle = {
+          id: typeof vehicleData.id === 'string' ? parseInt(vehicleData.id) : vehicleData.id,
+          prix: typeof vehicleData.prix === 'number' ? vehicleData.prix : 0,
+          description: vehicleData.description || "",
+          photos: Array.isArray(vehicleData.photos) ? vehicleData.photos : [],
+          garantie: typeof vehicleData.garantie === 'boolean' ? vehicleData.garantie : false,
+          dureeGarantie: typeof vehicleData.dureeGarantie === 'number' ? vehicleData.dureeGarantie : 0,
+          chauffeur: typeof vehicleData.chauffeur === 'boolean' ? vehicleData.chauffeur : false,
+          status: vehicleData.status || "DISPONIBLE",
+          fuelType: vehicleData.fuelType || "",
+          mileage: typeof vehicleData.mileage === 'number' ? vehicleData.mileage : 0,
+          model: vehicleData.model || "",
+          year: vehicleData.year || null,
+          transmission: vehicleData.transmission || "",
+          forRent: typeof vehicleData.forRent === 'boolean' ? vehicleData.forRent : false,
+          forSale: typeof vehicleData.forSale === 'boolean' ? vehicleData.forSale : false,
+        };
+        setSelectedVehicle(convertedVehicle);
       } else {
         setVehicleError("Impossible de charger les détails du véhicule.");
       }
     } catch (error) {
+      console.error("Erreur chargement véhicule:", error);
       setVehicleError("Erreur lors du chargement.");
     } finally {
       setLoadingVehicle(false);
@@ -797,8 +788,6 @@ export default function ParkingDetailPage({ params }: { params: Promise<{ id: st
     const api = mobilityApiModule.mobilityAPI;
     const newStatus = parking.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
     try {
-      // Utiliser la même méthode updateParkingInfo que pour la modification
-      // mais seulement avec le champ status
       await api.updateParkingInfo(parking.id, { status: newStatus });
       const { id } = await params;
       const updated = await api.getParkingById(parseInt(id));

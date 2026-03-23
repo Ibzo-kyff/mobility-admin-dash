@@ -22,13 +22,16 @@ export default async function EditParkingPage({ params, searchParams }: PageProp
         <h2 className="text-2xl font-bold text-gray-800">Parking introuvable</h2>
         <Link
           href="/dashboard/admin/parkings"
-          className="mt-6 inline-block bg-orange-600 text-white px-6 py-2 rounded-lg"
+          className="mt-6 inline-block bg-orange-600 text-white px-6 py-2 rounded-lg hover:bg-orange-700 transition"
         >
           Retour à la liste
         </Link>
       </div>
     );
   }
+
+  // Récupérer l'ID du parking avant la fonction server action
+  const parkingId = parking.id;
 
   async function updateParking(formData: FormData) {
     "use server";
@@ -41,7 +44,7 @@ export default async function EditParkingPage({ params, searchParams }: PageProp
     const phone = formData.get("phone") as string;
     const description = formData.get("description") as string;
 
-    const success = await updateParkingInfo(parking.id, {
+    const success = await updateParkingInfo(parkingId, {
       name,
       address,
       city,
@@ -52,11 +55,10 @@ export default async function EditParkingPage({ params, searchParams }: PageProp
     });
 
     if (success) {
-      revalidatePath(`/dashboard/admin/parkings/${parking.id}`);
-      redirect(`/dashboard/admin/parkings/${parking.id}`);
+      revalidatePath(`/dashboard/admin/parkings/${parkingId}`);
+      redirect(`/dashboard/admin/parkings/${parkingId}`);
     } else {
-      // Rediriger vers la même page avec un paramètre d'erreur
-      redirect(`/dashboard/admin/parkings/${parking.id}/edit?error=1`);
+      redirect(`/dashboard/admin/parkings/${parkingId}/edit?error=1`);
     }
   }
 
@@ -65,14 +67,14 @@ export default async function EditParkingPage({ params, searchParams }: PageProp
       <div className="mb-6">
         <Link
           href={`/dashboard/admin/parkings/${parking.id}`}
-          className="inline-flex items-center gap-2 text-gray-600 hover:text-orange-600 mb-4"
+          className="inline-flex items-center gap-2 text-gray-600 hover:text-orange-600 mb-4 transition"
         >
           <ArrowLeft size={18} /> Retour au détail
         </Link>
         <h1 className="text-3xl font-bold text-gray-800">Modifier le parking</h1>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-lg p-8 max-w-2xl">
+      <div className="bg-white rounded-2xl shadow-lg p-8 max-w-2xl mx-auto">
         <form action={updateParking} className="space-y-6">
           {/* Affichage de l'erreur */}
           {error && (
@@ -92,7 +94,7 @@ export default async function EditParkingPage({ params, searchParams }: PageProp
                 name="name"
                 defaultValue={parking.name}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
               />
             </div>
 
@@ -107,7 +109,7 @@ export default async function EditParkingPage({ params, searchParams }: PageProp
                 defaultValue={parking.capacity}
                 required
                 min="1"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
               />
             </div>
 
@@ -121,7 +123,7 @@ export default async function EditParkingPage({ params, searchParams }: PageProp
                 name="address"
                 defaultValue={parking.address}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
               />
             </div>
 
@@ -135,7 +137,7 @@ export default async function EditParkingPage({ params, searchParams }: PageProp
                 name="city"
                 defaultValue={parking.city || ""}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
               />
             </div>
 
@@ -148,7 +150,7 @@ export default async function EditParkingPage({ params, searchParams }: PageProp
                 id="email"
                 name="email"
                 defaultValue={parking.email || ""}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
               />
             </div>
 
@@ -161,7 +163,7 @@ export default async function EditParkingPage({ params, searchParams }: PageProp
                 id="phone"
                 name="phone"
                 defaultValue={parking.phone || ""}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
               />
             </div>
 
@@ -174,7 +176,7 @@ export default async function EditParkingPage({ params, searchParams }: PageProp
                 name="description"
                 rows={4}
                 defaultValue={parking.description || ""}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
               />
             </div>
           </div>
@@ -182,13 +184,13 @@ export default async function EditParkingPage({ params, searchParams }: PageProp
           <div className="flex justify-end gap-4 pt-4">
             <Link
               href={`/dashboard/admin/parkings/${parking.id}`}
-              className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+              className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
             >
               Annuler
             </Link>
             <button
               type="submit"
-              className="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 flex items-center gap-2"
+              className="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition flex items-center gap-2"
             >
               <Save size={18} /> Enregistrer
             </button>

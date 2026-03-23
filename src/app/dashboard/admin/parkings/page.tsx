@@ -63,24 +63,21 @@ export default function ParkingsPage() {
     description: "",
     hoursOfOperation: "05:00 - 00:00",
     logo: "",
-    status: "ACTIVE",
-    userId: "", // ID du gestionnaire sélectionné
+    status: "ACTIVE" as "ACTIVE" | "INACTIVE",
+    userId: "",
   });
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Vérifier que l'utilisateur est authentifié
         if (!mobilityAPI.isAuthenticated()) {
           console.log("Non authentifié, redirection...");
           return;
         }
 
-        // Charger les parkings
         const parkingsData = await fetchParkingData();
         setParkings(parkingsData);
         
-        // Charger les utilisateurs (gestionnaires)
         await fetchUsers();
       } catch (err) {
         setError("Erreur lors du chargement des données");
@@ -95,18 +92,8 @@ export default function ParkingsPage() {
   const fetchUsers = async () => {
     setLoadingUsers(true);
     try {
-      console.log("Récupération des utilisateurs...");
-      // Vérifier que le token est présent
-      const token = mobilityAPI.getToken();
-      console.log("Token présent:", !!token);
-      
-      // Récupérer tous les utilisateurs via l'API
       const allUsers = await mobilityAPI.getAllUsers();
-      console.log("Utilisateurs reçus:", allUsers);
-      
-      // Filtrer pour ne garder que ceux avec le rôle "PARKING"
       const parkingUsers = allUsers.filter((user: User) => user.role === "PARKING");
-      console.log("Gestionnaires trouvés:", parkingUsers.length);
       setUsers(parkingUsers);
     } catch (error) {
       console.error("Erreur lors du chargement des utilisateurs:", error);
@@ -144,7 +131,7 @@ export default function ParkingsPage() {
 
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setNewParking(prev => ({ ...prev, [name]: value }));
+    setNewParking(prev => ({ ...prev, [name]: value as "ACTIVE" | "INACTIVE" }));
   };
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -157,23 +144,19 @@ export default function ParkingsPage() {
     const file = e.target.files?.[0];
     if (file) {
       setSelectedFile(file);
-      // Créer une URL de prévisualisation
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
-      // Mettre à jour l'URL du logo (temporairement)
       setNewParking(prev => ({ ...prev, logo: url }));
     }
   };
 
-  // Fonction d'upload d'image vers un service de stockage
+  // Fonction d'upload d'image
   const uploadImage = async (file: File): Promise<string> => {
     setUploadingImage(true);
     try {
-      // Créer un FormData pour l'upload
       const formData = new FormData();
       formData.append('file', file);
 
-      // Appel à votre API d'upload (à adapter selon votre backend)
       const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
@@ -184,7 +167,7 @@ export default function ParkingsPage() {
       }
 
       const data = await response.json();
-      return data.url; // L'URL de l'image uploadée
+      return data.url;
     } catch (error) {
       console.error("Erreur upload:", error);
       throw error;
@@ -204,9 +187,7 @@ export default function ParkingsPage() {
       }
 
       const token = mobilityAPI.getToken();
-      console.log("Token pour création:", !!token);
       
-      // Si un fichier est sélectionné, on l'upload d'abord
       let logoUrl = newParking.logo;
       if (selectedFile) {
         try {
@@ -216,30 +197,24 @@ export default function ParkingsPage() {
         }
       }
       
-      // Préparer les données
       const parkingData = {
         name: newParking.name,
         address: newParking.address,
         city: newParking.city,
         capacity: newParking.capacity,
-        email: newParking.email || null,
-        phone: newParking.phone || null,
-        description: newParking.description || null,
+        email: newParking.email || undefined,
+        phone: newParking.phone || undefined,
+        description: newParking.description || undefined,
         hoursOfOperation: newParking.hoursOfOperation,
-        logo: logoUrl || null,
+        logo: logoUrl || undefined,
         status: newParking.status,
         userId: parseInt(newParking.userId),
       };
       
-      console.log("Données envoyées avec logo:", parkingData.logo);
-      
       const createdParking = await createParking(parkingData, token || undefined);
-      
-      console.log("Parking créé avec logo:", createdParking.logo);
       
       setParkings(prev => [...prev, createdParking]);
       
-      // Réinitialiser le formulaire
       setIsModalOpen(false);
       setNewParking({
         name: "",
@@ -280,7 +255,6 @@ export default function ParkingsPage() {
     </span>
   );
 
-  // Composant Logo amélioré avec meilleure gestion des erreurs d'image
   const Logo = ({ src, name }: { src?: string | null; name: string }) => {
     const [imageError, setImageError] = useState(false);
     
@@ -632,7 +606,7 @@ export default function ParkingsPage() {
                   </select>
                 </div>
 
-                {/* Gestionnaire (liste des utilisateurs PARKING) */}
+                {/* Gestionnaire */}
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Gestionnaire *
@@ -659,7 +633,7 @@ export default function ParkingsPage() {
                   </select>
                 </div>
 
-                {/* Upload du logo */}
+                {/* Logo */}
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Logo du parking
@@ -685,7 +659,6 @@ export default function ParkingsPage() {
                     )}
                   </div>
                   
-                  {/* Aperçu de l'image */}
                   {(previewUrl || newParking.logo) && (
                     <div className="mt-4">
                       <p className="text-sm text-gray-500 mb-2">Aperçu :</p>
