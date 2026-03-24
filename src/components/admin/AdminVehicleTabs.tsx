@@ -289,12 +289,25 @@ export default function AdminVehicleTabs() {
 
   const loadMyParking = async () => {
     try {
+      // Vérifier d'abord le rôle de l'utilisateur
+      const userStr = getCookie('user') as string | null;
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          // Si c'est un administrateur, on ne tente pas de charger "son" parking (car il en gère plusieurs)
+          if (user.role === 'ADMIN') return;
+        } catch (parseError) {
+          console.error("Erreur parse user cookie:", parseError);
+        }
+      }
+
       const data = await vehiclesAPI.getMyParking();
       if (data && data.id) {
         setAddParkingId(data.id.toString());
       }
     } catch (e) {
-      console.error("Erreur récup mon parking:", e);
+      // Ne loguer l'erreur que si ce n'est pas un 404 attendu pour certains rôles
+      console.warn("Info: Pas de parking personnel trouvé pour cet utilisateur.");
     }
   };
 
@@ -742,7 +755,7 @@ export default function AdminVehicleTabs() {
   const filteredVehicles = vehicles.filter(v => {
     const brand = (v.marque || v.marqueRef?.name || '').toLowerCase();
     const model = (v.model || v.modele || '').toLowerCase();
-    const parkingName = (v.parking?.name || '').toLowerCase();
+    const parkingName = (v.parking?.name || (v.parking?.user ? `${v.parking.user.prenom} ${v.parking.user.nom}` : '')).toLowerCase();
     const matchesSearch =
       brand.includes(searchTerm.toLowerCase()) ||
       model.includes(searchTerm.toLowerCase()) ||
@@ -1724,7 +1737,7 @@ export default function AdminVehicleTabs() {
                     <FontAwesomeIcon icon={faMapMarkerAlt} />
                   </div>
                   <div>
-                    <p className="font-black text-orange-900">{selectedVehicle.parking.name || 'Parking'}</p>
+                    <p className="font-black text-orange-900">{selectedVehicle.parking.name || (selectedVehicle.parking.user ? `${selectedVehicle.parking.user.prenom} ${selectedVehicle.parking.user.nom}` : 'Parking privé')}</p>
                     <p className="text-xs text-orange-700">{selectedVehicle.parking.address || 'Adresse non spécifiée'}</p>
                   </div>
                 </div>

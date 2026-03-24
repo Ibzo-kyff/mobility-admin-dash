@@ -7,7 +7,7 @@ import { faCar } from '@fortawesome/free-solid-svg-icons';
 export default function AdminVehiclesPage() {
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+      <div className="flex justify-between items-center ">
         <div>
           <h1 className="text-2xl font-black text-slate-900 tracking-tight">Gestion des Véhicules</h1>
           <p className="text-slate-400 font-bold text-xs uppercase tracking-widest mt-1">Consultez, validez et gérez tous les véhicules inscrits sur la plateforme</p>

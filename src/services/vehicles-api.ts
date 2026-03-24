@@ -4,7 +4,15 @@ import type { Vehicule, ApiError } from '@/types';
 class VehiclesAPI {
     private get token(): string | null {
         if (typeof window !== 'undefined') {
-            return getCookie('accessToken') as string | null;
+            const cookieToken = getCookie('accessToken') as string | null;
+            if (cookieToken) return cookieToken;
+
+            // Fallback sur le localStorage si le cookie est absent (certains navigateurs ou config)
+            try {
+                return localStorage.getItem('accessToken');
+            } catch (e) {
+                return null;
+            }
         }
         return null;
     }
