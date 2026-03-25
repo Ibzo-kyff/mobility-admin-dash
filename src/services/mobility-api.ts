@@ -10,10 +10,10 @@ class MobilityAPI {
   constructor() {
     // Chargement depuis les cookies (uniquement côté client)
     if (typeof window !== 'undefined') {
-      this.token = getCookie('accessToken') as string | null;
-      this.refreshToken = getCookie('refreshToken') as string | null;
+      this.token = getCookie('accessToken') as string | null || localStorage.getItem('accessToken');
+      this.refreshToken = getCookie('refreshToken') as string | null || localStorage.getItem('refreshToken');
 
-      const userStr = getCookie('user') as string | null;
+      const userStr = getCookie('user') as string | null || localStorage.getItem('user');
       try {
         this.user = userStr ? JSON.parse(userStr) : null;
       } catch {
@@ -589,13 +589,14 @@ class MobilityAPI {
     return this.handleResponse<any[]>(response);
   }
 
-  async updateReservationStatus(reservationId: string, status: string): Promise<any> {
+  async updateReservationStatus(reservationId: string, status: string, reason?: string): Promise<any> {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api';
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/reservations/${reservationId}/status`,
+      `${baseUrl}/reservations/${reservationId}/status`,
       {
         method: 'PUT',
         headers: this.getHeaders(),
-        body: JSON.stringify({ status }),
+        body: JSON.stringify(reason ? { status, reason } : { status }),
       }
     );
     
@@ -650,6 +651,18 @@ class MobilityAPI {
       { headers: this.getHeaders() }
     );
     return this.handleResponse<any[]>(response);
+  }
+
+  async updateReservation(id: number | string, data: any): Promise<any> {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/reservations/admin/${id}`,
+      {
+        method: 'PUT',
+        headers: this.getHeaders(),
+        body: JSON.stringify(data),
+      }
+    );
+    return this.handleResponse(response);
   }
 }
 

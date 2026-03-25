@@ -109,48 +109,56 @@ const Home: React.FC = () => {
   const initializeThreeJS = () => {
     if (!threeContainerRef.current) return;
 
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    try {
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, failIfMajorPerformanceCaveat: true });
 
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setClearColor(0xffffff, 0);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setClearColor(0xffffff, 0);
 
-    threeContainerRef.current.appendChild(renderer.domElement);
+      threeContainerRef.current.appendChild(renderer.domElement);
 
-    const particleCount = 200;
-    const particlesGeometry = new THREE.BufferGeometry();
-    const positions = new Float32Array(particleCount * 3);
-    const colors = new Float32Array(particleCount * 3);
+      const particleCount = 200;
+      const particlesGeometry = new THREE.BufferGeometry();
+      const positions = new Float32Array(particleCount * 3);
+      const colors = new Float32Array(particleCount * 3);
 
-    for (let i = 0; i < particleCount * 3; i += 3) {
-      positions[i] = (Math.random() - 0.5) * 100;
-      positions[i + 1] = (Math.random() - 0.5) * 100;
-      positions[i + 2] = (Math.random() - 0.5) * 100;
-      colors[i] = 0.99;
-      colors[i + 1] = 0.42;
-      colors[i + 2] = 0.0;
+      for (let i = 0; i < particleCount * 3; i += 3) {
+        positions[i] = (Math.random() - 0.5) * 100;
+        positions[i + 1] = (Math.random() - 0.5) * 100;
+        positions[i + 2] = (Math.random() - 0.5) * 100;
+        colors[i] = 0.99;
+        colors[i + 1] = 0.42;
+        colors[i + 2] = 0.0;
+      }
+
+      particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+      const particlesMaterial = new THREE.PointsMaterial({
+        size: 0.15,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.3,
+      });
+
+      const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+      scene.add(particles);
+      camera.position.z = 5;
+
+      sceneRef.current = scene;
+      cameraRef.current = camera;
+      rendererRef.current = renderer;
+      particlesRef.current = particles;
+    } catch (e) {
+      console.warn("WebGL non supporté ou désactivé sur ce navigateur. L'animation d'arrière-plan sera désactivée.");
+      // Nettoyage si possible
+      if (threeContainerRef.current) {
+        threeContainerRef.current.style.display = 'none';
+      }
     }
-
-    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-    const particlesMaterial = new THREE.PointsMaterial({
-      size: 0.15,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.3,
-    });
-
-    const particles = new THREE.Points(particlesGeometry, particlesMaterial);
-    scene.add(particles);
-    camera.position.z = 5;
-
-    sceneRef.current = scene;
-    cameraRef.current = camera;
-    rendererRef.current = renderer;
-    particlesRef.current = particles;
   };
 
   const onWindowResize = () => {
@@ -657,8 +665,8 @@ const Home: React.FC = () => {
           <div
             key={toast.id}
             className={`px-6 py-4 rounded-lg shadow-lg text-white transform transition-all duration-300 ${toast.type === 'success' ? 'bg-green-500' :
-                toast.type === 'error' ? 'bg-red-500' :
-                  toast.type === 'info' ? 'bg-blue-500' : 'bg-gray-800'
+              toast.type === 'error' ? 'bg-red-500' :
+                toast.type === 'info' ? 'bg-blue-500' : 'bg-gray-800'
               }`}
           >
             {toast.message}

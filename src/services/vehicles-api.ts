@@ -4,7 +4,15 @@ import type { Vehicule, ApiError } from '@/types';
 class VehiclesAPI {
     private get token(): string | null {
         if (typeof window !== 'undefined') {
-            return getCookie('accessToken') as string | null;
+            const cookieToken = getCookie('accessToken') as string | null;
+            if (cookieToken) return cookieToken;
+
+            // Fallback sur le localStorage si le cookie est absent (certains navigateurs ou config)
+            try {
+                return localStorage.getItem('accessToken');
+            } catch (e) {
+                return null;
+            }
         }
         return null;
     }
@@ -28,7 +36,7 @@ class VehiclesAPI {
             if (contentType?.includes('application/json')) {
                 try {
                     const errorData = await response.json();
-                    errorMessage = errorData.message || errorMessage;
+                    errorMessage = errorData.error || errorData.message || errorMessage;
                     errorDetails = errorData.details || '';
                 } catch { }
             }
@@ -60,6 +68,22 @@ class VehiclesAPI {
     async getVehiculeById(id: string): Promise<Vehicule> {
         const response = await fetch(`${this.baseUrl}/vehicules/${id}`, {
             headers: this.getHeaders(),
+        });
+        return this.handleResponse<Vehicule>(response);
+    }
+
+    async createVehicule(data: Partial<Vehicule> | FormData): Promise<Vehicule> {
+        const isFormData = data instanceof FormData;
+        const headers: any = this.getHeaders();
+
+        if (isFormData) {
+            delete headers['Content-Type'];
+        }
+
+        const response = await fetch(`${this.baseUrl}/vehicules`, {
+            method: 'POST',
+            headers: headers,
+            body: isFormData ? data : JSON.stringify(data),
         });
         return this.handleResponse<Vehicule>(response);
     }
@@ -109,6 +133,13 @@ class VehiclesAPI {
             headers: this.getHeaders(),
         });
         return this.handleResponse<{ totalVehicules: number; totalParkings: number }>(response);
+    }
+    async getMyParking(): Promise<any> {
+        const response = await fetch(`${this.baseUrl}/parkings/me`, {
+            method: 'GET',
+            headers: this.getHeaders(),
+        });
+        return this.handleResponse(response);
     }
 }
 
