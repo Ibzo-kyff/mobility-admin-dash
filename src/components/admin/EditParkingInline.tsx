@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { updateParkingInfo } from "@/libs/Parcking-api";
+import { updateParkingInfo } from "@/services/Parcking-api";
 import { X, Save, Edit } from "lucide-react";
 
 interface Parking {

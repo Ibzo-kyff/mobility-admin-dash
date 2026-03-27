@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   fetchParkingData,
-  createParking,
-} from "@/libs/Parcking-api";
+} from "@/services/Parcking-api";
 import { mobilityAPI } from "@/services/mobility-api";
 import {
   Eye,
@@ -21,7 +20,7 @@ import {
   Upload,
   Loader2,
 } from "lucide-react";
-import type { Parking } from "@/libs/Parcking-api";
+import type { Parking } from "@/services/Parcking-api";
 
 // Interface pour les utilisateurs
 interface User {
@@ -31,6 +30,8 @@ interface User {
   email: string;
   role: string;
 }
+
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://parkapp-pi.vercel.app/api";
 
 export default function ParkingsPage() {
   const [parkings, setParkings] = useState<Parking[]>([]);
@@ -48,7 +49,6 @@ export default function ParkingsPage() {
   const [addError, setAddError] = useState<string | null>(null);
 
   // État pour l'upload de fichier
-  const [uploadingImage, setUploadingImage] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
 
@@ -146,33 +146,6 @@ export default function ParkingsPage() {
       setSelectedFile(file);
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
-      setNewParking(prev => ({ ...prev, logo: url }));
-    }
-  };
-
-  // Fonction d'upload d'image
-  const uploadImage = async (file: File): Promise<string> => {
-    setUploadingImage(true);
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Erreur lors de l'upload de l'image");
-      }
-
-      const data = await response.json();
-      return data.url;
-    } catch (error) {
-      console.error("Erreur upload:", error);
-      throw error;
-    } finally {
-      setUploadingImage(false);
     }
   };
 
@@ -188,30 +161,39 @@ export default function ParkingsPage() {
 
       const token = mobilityAPI.getToken();
       
-      let logoUrl = newParking.logo;
+      // Créer FormData pour l'envoi multipart/form-data
+      const formData = new FormData();
+      formData.append("name", newParking.name);
+      formData.append("address", newParking.address);
+      formData.append("city", newParking.city);
+      formData.append("capacity", String(newParking.capacity));
+      formData.append("email", newParking.email || "");
+      formData.append("phone", newParking.phone || "");
+      formData.append("description", newParking.description || "");
+      formData.append("hoursOfOperation", newParking.hoursOfOperation);
+      formData.append("status", newParking.status);
+      formData.append("userId", newParking.userId);
+      
+      // Ajouter le logo si un fichier est sélectionné
       if (selectedFile) {
-        try {
-          logoUrl = await uploadImage(selectedFile);
-        } catch (uploadError) {
-          throw new Error("Erreur lors de l'upload du logo");
-        }
+        formData.append("logo", selectedFile);
       }
       
-      const parkingData = {
-        name: newParking.name,
-        address: newParking.address,
-        city: newParking.city,
-        capacity: newParking.capacity,
-        email: newParking.email || undefined,
-        phone: newParking.phone || undefined,
-        description: newParking.description || undefined,
-        hoursOfOperation: newParking.hoursOfOperation,
-        logo: logoUrl || undefined,
-        status: newParking.status,
-        userId: parseInt(newParking.userId),
-      };
-      
-      const createdParking = await createParking(parkingData, token || undefined);
+      // Envoyer la requête avec FormData (multipart/form-data)
+      const response = await fetch(`${BASE_URL}/parkings`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(`Erreur ${response.status}: ${errorData}`);
+      }
+
+      const createdParking = await response.json();
       
       setParkings(prev => [...prev, createdParking]);
       
@@ -377,7 +359,7 @@ export default function ParkingsPage() {
                 <tr key={parking.id} className="border-t hover:bg-gray-50 transition">
                   <td className="p-4">
                     <Logo src={parking.logo} name={parking.name} />
-                  </td>
+                   </td>
                   <td className="p-4 font-semibold text-gray-700">{parking.name}</td>
                   <td className="p-4 text-gray-600">{parking.address}</td>
                   <td className="p-4 text-gray-600">{parking.capacity}</td>
@@ -651,12 +633,6 @@ export default function ParkingsPage() {
                         Choisir une image
                       </div>
                     </label>
-                    {uploadingImage && (
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <Loader2 size={18} className="animate-spin" />
-                        Upload en cours...
-                      </div>
-                    )}
                   </div>
                   
                   {(previewUrl || newParking.logo) && (
@@ -701,7 +677,7 @@ export default function ParkingsPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={isAdding || !newParking.userId || uploadingImage}
+                  disabled={isAdding || !newParking.userId}
                   className="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 flex items-center gap-2"
                 >
                   {isAdding ? (

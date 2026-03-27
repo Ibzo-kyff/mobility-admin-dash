@@ -1,4 +1,4 @@
-import { getParkingById, updateParkingInfo } from "@/libs/Parcking-api";
+import { getParkingById, updateParkingInfo } from "@/services/Parcking-api";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import Link from "next/link";
