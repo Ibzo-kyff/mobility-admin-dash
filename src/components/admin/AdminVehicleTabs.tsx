@@ -57,7 +57,7 @@ import {
 import { faClock as faClockRegular } from '@fortawesome/free-regular-svg-icons';
 import { vehiclesAPI } from '@/services/vehicles-api';
 import { mobilityAPI } from '@/services/mobility-api';
-import type { Vehicule, Parking } from '@/types';
+import type { Vehicule, Parking, ReservationData } from '@/types';
 import Image from 'next/image';
 import { getCookie } from 'cookies-next';
 
@@ -102,7 +102,6 @@ export default function AdminVehicleTabs() {
   const [calculatedPrice, setCalculatedPrice] = useState<number>(0);
   const [currentReservation, setCurrentReservation] = useState<any>(null);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-  const [showDateTimePicker, setShowDateTimePicker] = useState<'start' | 'end' | null>(null);
 
   // Edit State
   const [isEditing, setIsEditing] = useState(false);
@@ -593,6 +592,11 @@ export default function AdminVehicleTabs() {
   // Fonctions de réservation
   const calculateDurationAndPrice = (start: Date, end: Date) => {
     const diffMs = end.getTime() - start.getTime();
+    if (diffMs <= 0) {
+      setSelectedDays(0);
+      setCalculatedPrice(0);
+      return { diffDays: 0, diffHours: 0 };
+    }
     const diffHours = diffMs / (1000 * 60 * 60);
     const diffDays = Math.ceil(diffHours / 24);
     setSelectedDays(diffDays);
@@ -601,6 +605,19 @@ export default function AdminVehicleTabs() {
       setCalculatedPrice(diffDays * dailyPrice);
     }
     return { diffDays, diffHours };
+  };
+
+  useEffect(() => {
+    if (reservationType === 'LOCATION' && startDateTime && endDateTime) {
+      calculateDurationAndPrice(startDateTime, endDateTime);
+    }
+  }, [startDateTime, endDateTime, reservationType, selectedVehicle]);
+
+  const formatForDateTimeLocal = (date: Date | null) => {
+    if (!date) return '';
+    const d = new Date(date);
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    return d.toISOString().slice(0, 16);
   };
 
   const selectReservationType = (type: 'LOCATION' | 'ACHAT') => {
@@ -711,8 +728,22 @@ export default function AdminVehicleTabs() {
     setIsProcessingPayment(true);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Préparer les données pour l'API - Basé sur les logs de l'application mobile qui fonctionne
+      const reservationData = {
+        vehicleId: Number(selectedVehicle.id),
+        dateDebut: currentReservation.dateDebut || new Date().toISOString(),
+        dateFin: currentReservation.dateFin || new Date().toISOString(),
+        type: currentReservation.type,
+        motifLocation: currentReservation.motifLocation,
+        localisation: currentReservation.localisation,
+        conditionsAcceptees: currentReservation.conditionsAcceptees || true,
+        paymentMethod: paymentMethod,
+        montant: currentReservation.montant
+      };
 
+      console.log('📤 Envoi réservation:', reservationData);
+      await mobilityAPI.createReservation(reservationData as any);
+      
       const message = paymentMethod === 'ESPECES'
         ? 'Votre réservation est confirmée !\n\nLe parking vous contactera bientôt pour organiser le paiement en espèces et la remise du véhicule.'
         : 'Votre réservation et paiement sont confirmés !';
@@ -730,7 +761,14 @@ export default function AdminVehicleTabs() {
 
     } catch (error: any) {
       console.error('Erreur lors du traitement:', error);
-      showNotification('error', "Échec de l'opération", error.message || 'Une erreur est survenue lors de la confirmation.');
+      console.error('Détails complets:', {
+        message: error.message,
+        details: error.details,
+        status: error.status,
+        stack: error.stack
+      });
+      const errorMessage = error.details || error.message || 'Une erreur est survenue lors de la confirmation.';
+      showNotification('error', "Échec de l'opération", errorMessage);
     } finally {
       setIsProcessingPayment(false);
     }
@@ -1884,18 +1922,24 @@ export default function AdminVehicleTabs() {
 
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <div>
-                      <p className="text-[10px] font-bold text-slate-500 mb-2">Début</p>
-                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                        <p className="font-bold">{startDateTime?.toLocaleDateString('fr-FR')}</p>
-                        <p className="text-xs text-slate-500">{startDateTime?.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</p>
-                      </div>
+                      <label className="text-[10px] font-bold text-slate-500 mb-2 block uppercase tracking-widest">Date de début</label>
+                      <input
+                        title="Date de début"
+                        type="datetime-local"
+                        value={formatForDateTimeLocal(startDateTime)}
+                        onChange={(e) => setStartDateTime(new Date(e.target.value))}
+                        className="w-full p-3 bg-slate-50 rounded-xl border border-slate-200 font-bold focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+                      />
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold text-slate-500 mb-2">Fin</p>
-                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                        <p className="font-bold">{endDateTime?.toLocaleDateString('fr-FR')}</p>
-                        <p className="text-xs text-slate-500">{endDateTime?.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</p>
-                      </div>
+                      <label className="text-[10px] font-bold text-slate-500 mb-2 block uppercase tracking-widest">Date de fin</label>
+                      <input
+                        title="Date de fin"
+                        type="datetime-local"
+                        value={formatForDateTimeLocal(endDateTime)}
+                        onChange={(e) => setEndDateTime(new Date(e.target.value))}
+                        className="w-full p-3 bg-slate-50 rounded-xl border border-slate-200 font-bold focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+                      />
                     </div>
                   </div>
 

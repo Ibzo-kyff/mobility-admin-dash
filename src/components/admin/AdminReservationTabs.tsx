@@ -69,7 +69,7 @@ export interface Reservation {
   dateFin: string | null;
   motifLocation?: string | null;
   localisation?: 'BAMAKO' | 'HORS_BAMAKO' | null;
-  commission?: number; // Pour la gestion des commissions
+  commission?: number;
   user?: {
     id: number;
     nom: string;
@@ -153,6 +153,17 @@ export default function AdminReservationTabs() {
   // Modals state
   const [isCommissionModalOpen, setIsCommissionModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [statusModalConfig, setStatusModalConfig] = useState<any>({
+    id: 0,
+    newStatus: 'PENDING',
+    title: '',
+    message: '',
+    showReasonField: false,
+    icon: faCheck,
+    color: 'emerald'
+  });
+  const [statusReason, setStatusReason] = useState('');
   const [editReservationData, setEditReservationData] = useState<any>(null);
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
   const [commissionAmount, setCommissionAmount] = useState('');
@@ -162,7 +173,7 @@ export default function AdminReservationTabs() {
   // Advanced Filters State
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [advancedFilters, setAdvancedFilters] = useState({
-    type: 'ALL', // ALL, ACHAT, LOCATION
+    type: 'ALL',
     dateMin: '',
     dateMax: '',
     minPrice: '',
@@ -172,12 +183,10 @@ export default function AdminReservationTabs() {
   const fetchReservations = async () => {
     setLoading(true);
     try {
-      // Dans un vrai cas, mobilityAPI.getAdminReservations() renvoie les réservations avec les sous-objets structurés
       const data = await mobilityAPI.getAdminReservations();
       setReservations(data as Reservation[]);
     } catch (error) {
       console.error('Erreur lors de la récupération des réservations', error);
-      // Fallback/Mock pour démontrer l'affichage en cas d'erreur de développement si l'API n'est pas prête
       setReservations([]);
     } finally {
       setLoading(false);
@@ -219,32 +228,98 @@ export default function AdminReservationTabs() {
   }, [selectedReservation, isGalleryHovered, viewModeTab]);
 
   const handleStatusChange = async (id: number, newStatus: ReservationStatus, reason?: string) => {
-    let finalReason = reason;
+    let finalReason = reason || statusReason;
 
-    // Si on annule ou refuse et qu'aucune raison n'est fournie, on demande
-    if (newStatus === 'CANCELED' && !finalReason) {
-      finalReason = window.prompt("Veuillez saisir le motif de l'annulation :") || "Annulée par l'administrateur";
-    }
-
+    setUpdating(true);
     try {
-      await mobilityAPI.updateReservationStatus(id.toString(), newStatus, finalReason);
+      await mobilityAPI.updateReservation(id, {
+        status: newStatus,
+        ...(finalReason ? { reason: finalReason } : {})
+      });
+
       setReservations(prev => prev.map(res => res.id === id ? { ...res, status: newStatus } : res));
       if (selectedReservation?.id === id) {
         setSelectedReservation(prev => prev ? ({ ...prev, status: newStatus }) : null);
       }
-    } catch (error) {
-      console.error('Erreur lors du changement de statut', error);
-      alert('Impossible de modifier le statut');
+      setIsStatusModalOpen(false);
+      setStatusReason('');
+    } catch (firstError: any) {
+      console.warn('Endpoint admin échoué, essai de l\'endpoint status:', firstError?.message);
+      try {
+        await mobilityAPI.updateReservationStatus(id.toString(), newStatus, finalReason);
+        setReservations(prev => prev.map(res => res.id === id ? { ...res, status: newStatus } : res));
+        if (selectedReservation?.id === id) {
+          setSelectedReservation(prev => prev ? ({ ...prev, status: newStatus }) : null);
+        }
+        setIsStatusModalOpen(false);
+        setStatusReason('');
+      } catch (secondError: any) {
+        console.error('Erreur lors du changement de statut', secondError);
+        const msg = secondError?.details || secondError?.message || 'Impossible de modifier le statut.';
+        alert(msg);
+      }
+    } finally {
+      setUpdating(false);
     }
+  };
+
+  const openStatusModal = (id: number, newStatus: ReservationStatus) => {
+    const reservation = reservations.find(r => r.id === id);
+    if (!reservation) return;
+
+    setSelectedReservation(reservation);
+    setStatusReason('');
+
+    let config = {
+      id,
+      newStatus,
+      title: '',
+      message: '',
+      showReasonField: false,
+      icon: faCheck,
+      color: 'emerald'
+    };
+
+    switch (newStatus) {
+      case 'ACCEPTED':
+        config = {
+          ...config,
+          title: 'Accepter la réservation',
+          message: `Êtes-vous sûr de vouloir accepter la réservation #${id} pour ${reservation.vehicle.marque} ${reservation.vehicle.model} ?`,
+          icon: faCheckCircle,
+          color: 'emerald'
+        };
+        break;
+      case 'COMPLETED':
+        config = {
+          ...config,
+          title: 'Terminer la réservation',
+          message: `Voulez-vous marquer la réservation #${id} comme terminée ? Cela confirmera que le service a été rendu.`,
+          icon: faCheckCircle,
+          color: 'blue'
+        };
+        break;
+      case 'CANCELED':
+        config = {
+          ...config,
+          title: 'Annuler la réservation',
+          message: `Vous êtes sur le point d'annuler la réservation #${id}. Veuillez indiquer le motif de l'annulation.`,
+          showReasonField: true,
+          icon: faBan,
+          color: 'rose'
+        };
+        break;
+    }
+
+    setStatusModalConfig(config);
+    setIsStatusModalOpen(true);
   };
 
   const handleUpdateCommission = () => {
     if (!selectedReservation || !commissionAmount) return;
 
-    // Simuler un appel API pour la commission - À lier avec votre vrai backend
     console.log(`Mise à jour de la commission pour la résa #${selectedReservation.id} avec montant: ${commissionAmount}`);
 
-    // Update locale
     setReservations(prev => prev.map(res =>
       res.id === selectedReservation.id ? { ...res, commission: parseFloat(commissionAmount) } : res
     ));
@@ -262,9 +337,16 @@ export default function AdminReservationTabs() {
 
   const openEditModal = (reservation: Reservation) => {
     setSelectedReservation(reservation);
+    const formatForDateTimeLocal = (dateString: string | null) => {
+      if (!dateString) return '';
+      const d = new Date(dateString);
+      d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+      return d.toISOString().slice(0, 16);
+    };
+
     setEditReservationData({
-      dateDebut: reservation.dateDebut ? new Date(reservation.dateDebut).toISOString().split('T')[0] : '',
-      dateFin: reservation.dateFin ? new Date(reservation.dateFin).toISOString().split('T')[0] : '',
+      dateDebut: formatForDateTimeLocal(reservation.dateDebut),
+      dateFin: formatForDateTimeLocal(reservation.dateFin),
       type: reservation.type,
       commission: reservation.commission || 0,
       motifLocation: MOTIFS_LOCATION.find(m => m.label === reservation.motifLocation)?.id || (reservation.motifLocation ? 'autre' : ''),
@@ -278,13 +360,11 @@ export default function AdminReservationTabs() {
     if (!selectedReservation || !editReservationData) return;
     setUpdating(true);
     try {
-      // Préparer les dates au format ISO
-      // Si la date est vide (''), on envoie null
       const dateD = editReservationData.dateDebut ? new Date(editReservationData.dateDebut) : null;
       const dateF = editReservationData.dateFin ? new Date(editReservationData.dateFin) : null;
 
       const selectedMotifObj = MOTIFS_LOCATION.find(m => m.id === editReservationData.motifLocation);
-      const motifFinal = selectedMotifObj && selectedMotifObj.id !== 'autre' ? selectedMotifObj.label : editReservationData.motifLocation;
+      const motifFinal = selectedMotifObj && selectedMotifObj.id !== 'autre' ? selectedMotifObj.label : editReservationData.autreMotif;
 
       const payload: any = {
         type: editReservationData.type,
@@ -314,22 +394,17 @@ export default function AdminReservationTabs() {
     }
   };
 
-  // Filtrage par onglet et recherche
   const filteredReservations = useMemo(() => {
     let result = reservations;
 
-    // Filtrage par Onglet
     if (activeTab === 'pending') {
       result = result.filter(r => r.status === 'PENDING');
     } else if (activeTab === 'ongoing') {
-      // Locations en cours (ACCEPTED) ou en approche
       result = result.filter(r => r.status === 'ACCEPTED');
     } else if (activeTab === 'history') {
-      // Historique (Tout)
       result = reservations;
     }
 
-    // Filtrage par recherche
     if (search) {
       const lowerSearch = search.toLowerCase();
       result = result.filter(r =>
@@ -346,7 +421,6 @@ export default function AdminReservationTabs() {
       );
     }
 
-    // Advanced Filters
     if (advancedFilters.type !== 'ALL') {
       result = result.filter(r => r.type === advancedFilters.type);
     }
@@ -432,10 +506,8 @@ export default function AdminReservationTabs() {
   };
 
   const getParkingDisplay = (res: Reservation) => {
-    // 1. Chercher l'objet parking (plusieurs variantes de casse possibles)
     const p = res.parking || res.vehicle?.parking || (res as any).Parking || (res.vehicle as any)?.Parking;
     
-    // Si on a un objet parking structuré
     if (p && typeof p === 'object') {
       const name = p.name || p.nom || (p as any).name_parking || (p as any).nom_parking;
       if (name) return name;
@@ -447,7 +519,6 @@ export default function AdminReservationTabs() {
       }
     }
 
-    // 2. Si on n'a pas l'objet ou qu'il est vide, tenter de résoudre par l'ID via la liste globale
     const pId = res.vehicle?.parkingId || res.parking?.id || (p && typeof p === 'object' ? p.id : (typeof p === 'number' ? p : null));
     if (pId && allParkings.length > 0) {
       const foundParking = allParkings.find(parking => parking.id === pId);
@@ -456,7 +527,6 @@ export default function AdminReservationTabs() {
       }
     }
 
-    // 3. Fallback sur le texte en direct si présent
     const directName = (res as any).parkingName || (res.vehicle as any)?.parkingName || (res.vehicle as any)?.nom_parking;
     if (directName) return directName;
 
@@ -681,26 +751,6 @@ export default function AdminReservationTabs() {
               </div>
             </div>
 
-            {v.parking && (
-              <div className="p-4 bg-orange-50 rounded-xl border border-orange-100 mb-6 font-sans">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 rounded-full bg-orange-200 flex items-center justify-center text-orange-700">
-                    <FontAwesomeIcon icon={faMapMarkerAlt} />
-                  </div>
-                  {/* <div>
-                    <p className="font-black text-orange-900">
-                      {v.parking?.name || v.parking?.nom || 
-                       selectedReservation.parking?.name || selectedReservation.parking?.nom ||
-                       (v.parking?.user ? `${v.parking.user.prenom} ${v.parking.user.nom}` : 
-                        selectedReservation.parking?.user ? `${selectedReservation.parking.user.prenom} ${selectedReservation.parking.user.nom}` : 
-                        'Parking privé')}
-                    </p>
-                    <p className="text-xs text-orange-700">{v.parking.address || 'Adresse non spécifiée'}</p>
-                  </div> */}
-                </div>
-              </div>
-            )}
-
             <div className="mb-8">
               <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
                 <span className="w-8 h-[1px] bg-slate-200"></span>
@@ -732,14 +782,14 @@ export default function AdminReservationTabs() {
                 {selectedReservation.status === 'PENDING' && (
                   <>
                     <button
-                      onClick={() => handleStatusChange(selectedReservation.id, 'ACCEPTED')}
+                      onClick={() => openStatusModal(selectedReservation.id, 'ACCEPTED')}
                       className="flex-1 min-w-[150px] py-4 bg-emerald-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 hover:bg-emerald-600 transition-all flex items-center justify-center gap-2 active:scale-95"
                     >
                       <FontAwesomeIcon icon={faCheck} />
                       Accepter la demande
                     </button>
                     <button
-                      onClick={() => handleStatusChange(selectedReservation.id, 'CANCELED', "Rejetée par l'administrateur")}
+                      onClick={() => openStatusModal(selectedReservation.id, 'CANCELED')}
                       className="flex-1 min-w-[150px] py-4 bg-rose-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-rose-500/20 hover:bg-rose-600 transition-all flex items-center justify-center gap-2 active:scale-95"
                     >
                       <FontAwesomeIcon icon={faTimes} />
@@ -750,7 +800,7 @@ export default function AdminReservationTabs() {
 
                 {selectedReservation.status === 'ACCEPTED' && (
                   <button
-                    onClick={() => handleStatusChange(selectedReservation.id, 'COMPLETED')}
+                    onClick={() => openStatusModal(selectedReservation.id, 'COMPLETED')}
                     className="flex-1 py-4 bg-blue-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-500/20 hover:bg-blue-600 transition-all flex items-center justify-center gap-2 active:scale-95"
                   >
                     <FontAwesomeIcon icon={faCheckCircle} />
@@ -760,7 +810,7 @@ export default function AdminReservationTabs() {
 
                 {(selectedReservation.status === 'ACCEPTED' || selectedReservation.status === 'PENDING') && (
                   <button
-                    onClick={() => handleStatusChange(selectedReservation.id, 'CANCELED')}
+                    onClick={() => openStatusModal(selectedReservation.id, 'CANCELED')}
                     className="px-8 py-4 bg-slate-100 text-slate-600 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-200 transition-all flex items-center justify-center gap-2 active:scale-95"
                   >
                     <FontAwesomeIcon icon={faBan} />
@@ -871,7 +921,7 @@ export default function AdminReservationTabs() {
         </div>
       </div>
 
-      {/* Modal Filtres Avancés (Style Véhicule) */}
+      {/* Modal Filtres Avancés */}
       {showAdvancedFilters && (
         <div className="fixed inset-0 z-[100] flex justify-end animate-fadeIn bg-slate-900/40 backdrop-blur-sm p-0 m-0 border-none transition-all">
           <div className="w-full max-w-sm h-full bg-white shadow-2xl flex flex-col animate-slideLeft">
@@ -1005,7 +1055,7 @@ export default function AdminReservationTabs() {
             <tbody className="divide-y divide-gray-100 bg-white">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="py-8 text-center text-gray-500 font-medium">
+                  <td colSpan={8} className="py-8 text-center text-gray-500 font-medium">
                     Chargement des réservations...
                   </td>
                 </tr>
@@ -1018,23 +1068,18 @@ export default function AdminReservationTabs() {
               ) : (
                 paginatedReservations.map((res) => (
                   <tr key={res.id} className="hover:bg-gray-50/50 transition-colors">
-                    {/* ID */}
                     <td className="py-3 px-6 whitespace-nowrap">
                       <div className="text-sm font-bold text-gray-900">#{res.id}</div>
                       <div className="text-xs text-gray-500 mt-1">
                         Soumis le {formatDate(res.dateDebut)}
                       </div>
                     </td>
-
-                    {/* Client */}
                     <td className="py-3 px-6">
                       <div className="text-sm font-medium text-gray-900">
                         {res.user ? `${res.user.nom} ${res.user.prenom}` : 'Inconnu'}
                       </div>
                       <div className="text-xs text-gray-500 mt-1">{res.user?.email || '-'}</div>
                     </td>
-
-                    {/* Véhicule */}
                     <td className="py-3 px-6">
                       <div className="text-sm font-medium text-gray-900">
                         {res.vehicle?.marqueRef?.name || res.vehicle?.marque} {res.vehicle?.model || res.vehicle?.modele}
@@ -1044,8 +1089,6 @@ export default function AdminReservationTabs() {
                         {getParkingDisplay(res)}
                       </div>
                     </td>
-
-                    {/* Période / Type */}
                     <td className="py-3 px-6">
                       <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium mb-1 ${res.type === 'ACHAT' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
                         }`}>
@@ -1058,8 +1101,6 @@ export default function AdminReservationTabs() {
                         }
                       </div>
                     </td>
-
-                    {/* Motif & Lieu */}
                     <td className="py-3 px-1">
                       {res.type === 'LOCATION' ? (
                         <div className="flex flex-col gap-1 max-w-[120px]">
@@ -1075,8 +1116,6 @@ export default function AdminReservationTabs() {
                         <span className="text-gray-300 text-xs">-</span>
                       )}
                     </td>
-
-                    {/* Montant */}
                     <td className="py-3 px-6 whitespace-nowrap">
                       <div className="text-sm font-bold text-gray-900">
                         {calculateTotal(res).toLocaleString('fr-FR')} FCFA
@@ -1087,8 +1126,6 @@ export default function AdminReservationTabs() {
                         </div>
                       )}
                     </td>
-
-                    {/* Statut */}
                     <td className="py-3 px-6 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${res.status === 'PENDING' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
                           res.status === 'ACCEPTED' ? 'bg-green-50 text-green-700 border-green-200' :
@@ -1101,8 +1138,6 @@ export default function AdminReservationTabs() {
                         {res.status === 'CANCELED' && 'Annulée'}
                       </span>
                     </td>
-
-                    {/* Actions */}
                     <td className="py-3 px-6 whitespace-nowrap text-right">
                       <div className="flex items-center justify-end gap-2">
                         <button
@@ -1119,7 +1154,7 @@ export default function AdminReservationTabs() {
                         {res.status !== 'ACCEPTED' && res.status !== 'COMPLETED' && (
                           <button
                             title="Accepter"
-                            onClick={() => handleStatusChange(res.id, 'ACCEPTED')}
+                            onClick={() => openStatusModal(res.id, 'ACCEPTED')}
                             className="p-1.5 text-green-500 hover:bg-green-50 rounded transition-colors"
                           >
                             <FontAwesomeIcon icon={faCheck} />
@@ -1128,7 +1163,7 @@ export default function AdminReservationTabs() {
                         {res.status === 'ACCEPTED' && (
                           <button
                             title="Marquer Terminée"
-                            onClick={() => handleStatusChange(res.id, 'COMPLETED')}
+                            onClick={() => openStatusModal(res.id, 'COMPLETED')}
                             className="p-1.5 text-blue-500 hover:bg-blue-50 rounded transition-colors"
                           >
                             <FontAwesomeIcon icon={faCheck} />
@@ -1137,7 +1172,7 @@ export default function AdminReservationTabs() {
                         {res.status !== 'COMPLETED' && res.status !== 'CANCELED' && (
                           <button
                             title={res.status === 'PENDING' ? 'Refuser' : 'Annuler'}
-                            onClick={() => handleStatusChange(res.id, 'CANCELED', res.status === 'PENDING' ? 'Rejetée par l\'administrateur' : 'Annulée par l\'administrateur')}
+                            onClick={() => openStatusModal(res.id, 'CANCELED')}
                             className="p-1.5 text-red-500 hover:bg-red-50 rounded transition-colors"
                           >
                             <FontAwesomeIcon icon={res.status === 'PENDING' ? faTimes : faBan} />
@@ -1150,7 +1185,6 @@ export default function AdminReservationTabs() {
                         >
                           <FontAwesomeIcon icon={faMoneyBillWave} />
                         </button>
-
                         <button
                           title="Modifier la réservation"
                           onClick={(e) => { e.stopPropagation(); openEditModal(res); }}
@@ -1184,7 +1218,6 @@ export default function AdminReservationTabs() {
                   }}
                   className="group bg-white rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-500 overflow-hidden flex flex-col cursor-pointer"
                 >
-                  {/* Image du véhicule */}
                   <div className="aspect-[16/9] relative rounded-[2rem] overflow-hidden bg-slate-50 shadow-inner border border-white m-[3px]">
                     {getPhotoUrl(res.vehicle?.photos) ? (
                       <Image
@@ -1198,14 +1231,11 @@ export default function AdminReservationTabs() {
                         <FontAwesomeIcon icon={faCar} size="3x" />
                       </div>
                     )}
-
                     <div className="absolute top-4 left-4 flex flex-row gap-1.5 flex-wrap">
-                      <span className={`px-4 py-1.5 text-white rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm ${res.type === 'ACHAT' ? 'bg-[#05b17B]' : 'bg-[#05b17B]'
-                        }`}>
+                      <span className={`px-4 py-1.5 text-white rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm ${res.type === 'ACHAT' ? 'bg-[#05b17B]' : 'bg-[#05b17B]'}`}>
                         {res.type === 'ACHAT' ? 'ACHAT' : 'LOCATION'}
                       </span>
                     </div>
-
                     <div className="absolute top-4 right-4">
                       <span className="inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black uppercase shadow-sm bg-white/95 text-[#8fa3b0] backdrop-blur-sm">
                         {res.status === 'PENDING' && 'EN ATTENTE'}
@@ -1215,7 +1245,6 @@ export default function AdminReservationTabs() {
                       </span>
                     </div>
                   </div>
-
                   <div className="p-6 pt-2 flex-1 flex flex-col">
                     <div className="flex justify-between items-start mb-4">
                       <div>
@@ -1225,7 +1254,6 @@ export default function AdminReservationTabs() {
                         </div>
                       </div>
                     </div>
-
                     <div className="space-y-3 mb-4 flex-1">
                       <div className="flex justify-between">
                         <span className="text-gray-500">Client</span>
@@ -1254,27 +1282,52 @@ export default function AdminReservationTabs() {
                           )}
                         </div>
                       </div>
-                    </div>
-
-                    <div className="border-t border-gray-100 pt-4 flex flex-wrap items-center gap-2">
-                      {res.status !== 'ACCEPTED' && res.status !== 'COMPLETED' && (
-                        <button title="Accepter" onClick={(e) => { e.stopPropagation(); handleStatusChange(res.id, 'ACCEPTED'); }} className="flex-1 h-9 flex justify-center items-center rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-colors gap-2 text-xs font-bold"><FontAwesomeIcon icon={faCheck} /> Accepter</button>
-                      )}
-                      {res.status === 'ACCEPTED' && (
-                        <button title="Terminer" onClick={(e) => { e.stopPropagation(); handleStatusChange(res.id, 'COMPLETED'); }} className="flex-1 h-9 flex justify-center items-center rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors gap-2 text-xs font-bold"><FontAwesomeIcon icon={faCheck} /> Terminer</button>
-                      )}
-                      {res.status !== 'COMPLETED' && res.status !== 'CANCELED' && (
-                        <button title={res.status === 'PENDING' ? 'Refuser' : 'Annuler'} onClick={(e) => { e.stopPropagation(); handleStatusChange(res.id, 'CANCELED', res.status === 'PENDING' ? 'Rejetée par l\'administrateur' : 'Annulée par l\'administrateur'); }} className="w-10 h-9 flex items-center justify-center rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors"><FontAwesomeIcon icon={res.status === 'PENDING' ? faTimes : faBan} /></button>
-                      )}
-                      {(res.status === 'COMPLETED' || res.status === 'CANCELED') && (
-                        <div className="flex-1"></div>
-                      )}
-                      <button title="Gérer Commissions" onClick={(e) => { e.stopPropagation(); openCommissionModal(res); }} className="w-10 h-9 flex items-center justify-center rounded-lg bg-orange-50 text-orange-600 font-medium hover:bg-orange-100 transition-colors text-xs gap-2">
-                        <FontAwesomeIcon icon={faMoneyBillWave} />
-                      </button>
-                      <button title="Modifier" onClick={(e) => { e.stopPropagation(); openEditModal(res); }} className="w-10 h-9 flex items-center justify-center rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors text-xs">
-                        <FontAwesomeIcon icon={faEdit} />
-                      </button>
+                      <div className="flex items-center gap-2 border-t border-gray-100 pt-3 mt-auto">
+                        {res.status !== 'ACCEPTED' && res.status !== 'COMPLETED' && (
+                          <button 
+                            title="Accepter" 
+                            onClick={(e) => { e.stopPropagation(); openStatusModal(res.id, 'ACCEPTED'); }} 
+                            className="flex-1 h-9 flex justify-center items-center rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors gap-2 text-xs font-bold"
+                          >
+                            <FontAwesomeIcon icon={faCheck} /> Accepter
+                          </button>
+                        )}
+                        {res.status === 'ACCEPTED' && (
+                          <button 
+                            title="Terminer" 
+                            onClick={(e) => { e.stopPropagation(); openStatusModal(res.id, 'COMPLETED'); }} 
+                            className="flex-1 h-9 flex justify-center items-center rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors gap-2 text-xs font-bold"
+                          >
+                            <FontAwesomeIcon icon={faCheckCircle} /> Terminer
+                          </button>
+                        )}
+                        {res.status !== 'COMPLETED' && res.status !== 'CANCELED' && (
+                          <button 
+                            title={res.status === 'PENDING' ? 'Refuser' : 'Annuler'} 
+                            onClick={(e) => { e.stopPropagation(); openStatusModal(res.id, 'CANCELED'); }} 
+                            className="w-10 h-9 flex items-center justify-center rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 transition-colors"
+                          >
+                            <FontAwesomeIcon icon={res.status === 'PENDING' ? faTimes : faBan} />
+                          </button>
+                        )}
+                        {(res.status === 'COMPLETED' || res.status === 'CANCELED') && (
+                          <div className="flex-1"></div>
+                        )}
+                        <button 
+                          title="Gérer Commissions" 
+                          onClick={(e) => { e.stopPropagation(); openCommissionModal(res); }} 
+                          className="w-10 h-9 flex items-center justify-center rounded-lg bg-orange-50 text-orange-600 font-medium hover:bg-orange-100 transition-colors text-xs gap-2"
+                        >
+                          <FontAwesomeIcon icon={faMoneyBillWave} />
+                        </button>
+                        <button 
+                          title="Modifier" 
+                          onClick={(e) => { e.stopPropagation(); openEditModal(res); }} 
+                          className="w-10 h-9 flex items-center justify-center rounded-lg bg-slate-50 text-slate-600 hover:bg-slate-100 transition-colors text-xs"
+                        >
+                          <FontAwesomeIcon icon={faEdit} />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1285,387 +1338,462 @@ export default function AdminReservationTabs() {
       )}
 
       {/* Pagination Controls */}
-{
-  filteredReservations.length > 0 && (
-    <div className="px-6 py-4 border-t border-gray-200 bg-white flex items-center justify-between">
-      <div className="text-sm text-gray-500">
-        Affichage de <span className="font-medium text-gray-900">{((currentPage - 1) * itemsPerPage) + 1}</span> à <span className="font-medium text-gray-900">{Math.min(currentPage * itemsPerPage, filteredReservations.length)}</span> sur <span className="font-medium text-gray-900">{filteredReservations.length}</span>
-      </div>
-      <div className="flex gap-2">
-        <button
-          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-          className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${currentPage === 1
-              ? 'text-gray-400 bg-gray-50 cursor-not-allowed'
-              : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
-            }`}
-        >
-          Précédent
-        </button>
-
-        <div className="flex items-center gap-1 mx-1 hidden sm:flex">
-          {[...Array(totalPages)].map((_, idx) => {
-            const pageNum = idx + 1;
-            if (pageNum === 1 || pageNum === totalPages || (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)) {
-              return (
-                <button
-                  key={pageNum}
-                  onClick={() => setCurrentPage(pageNum)}
-                  className={`w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${currentPage === pageNum
-                      ? 'bg-orange-600 text-white shadow-sm'
-                      : 'text-gray-600 hover:bg-gray-100'
-                    }`}
-                >
-                  {pageNum}
-                </button>
-              );
-            } else if (pageNum === currentPage - 2 || pageNum === currentPage + 2) {
-              return <span key={pageNum} className="text-gray-400 px-1">...</span>;
-            }
-            return null;
-          })}
-        </div>
-
-        <button
-          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-          disabled={currentPage === totalPages}
-          className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${currentPage === totalPages
-              ? 'text-gray-400 bg-gray-50 cursor-not-allowed'
-              : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
-            }`}
-        >
-          Suivant
-        </button>
-      </div>
-    </div>
-  )
-}
-
-{/* Modal Commissions */ }
-{
-  isCommissionModalOpen && (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 animate-fade-in-up">
-        <h3 className="text-xl font-bold text-gray-900 mb-4">Gérer les Commissions</h3>
-        {selectedReservation && (
-          <div className="mb-4 text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100">
-            Réservation <span className="font-semibold text-gray-900">#{selectedReservation.id}</span>
-            <br />
-            Montant Total: <span className="font-semibold text-gray-900">{calculateTotal(selectedReservation).toLocaleString('fr-FR')} FCFA</span>
+      {filteredReservations.length > 0 && (
+        <div className="px-6 py-4 border-t border-gray-200 bg-white flex items-center justify-between">
+          <div className="text-sm text-gray-500">
+            Affichage de <span className="font-medium text-gray-900">{((currentPage - 1) * itemsPerPage) + 1}</span> à <span className="font-medium text-gray-900">{Math.min(currentPage * itemsPerPage, filteredReservations.length)}</span> sur <span className="font-medium text-gray-900">{filteredReservations.length}</span>
           </div>
-        )}
-
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Montant de la commission (FCFA)
-          </label>
-          <input
-            type="number"
-            value={commissionAmount}
-            onChange={(e) => setCommissionAmount(e.target.value)}
-            placeholder="Ex: 5000"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all"
-          />
-        </div>
-
-        <div className="flex gap-3 justify-end">
-          <button
-            onClick={() => setIsCommissionModalOpen(false)}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            Annuler
-          </button>
-          <button
-            onClick={handleUpdateCommission}
-            className="px-4 py-2 text-sm font-medium text-white bg-orange-600 rounded-lg hover:bg-orange-700 transition-colors"
-          >
-            Enregistrer la commission
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
-{/* Modal Modification */ }
-{/* Modal Modification - Style identique à la modale des véhicules */}
-{isEditModalOpen && selectedReservation && editReservationData && (
-  <div className="fixed inset-0 z-[200] flex items-center justify-center animate-fadeIn bg-slate-900/60 backdrop-blur-sm p-4">
-    <div className="w-full max-w-lg bg-white rounded-[2.5rem] shadow-2xl max-h-[90vh] overflow-y-auto relative flex flex-col">
-      {/* Header - Style identique à la modale des véhicules */}
-      <div className="sticky top-0 bg-white p-8 border-b border-slate-100 flex justify-between items-center z-20">
-        <div>
-          <h2 className="text-3xl font-black text-slate-900 flex items-center gap-4">
-            <span className="w-12 h-12 rounded-2xl bg-orange-100 text-orange-500 flex items-center justify-center shadow-inner">
-              <FontAwesomeIcon icon={faEdit} />
-            </span>
-            Modifier la réservation
-          </h2>
-          <div className="flex items-center gap-3 mt-3">
-            <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.5)] transition-all" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-slate-900">
-                #{selectedReservation.id}
-              </span>
-            </div>
-            <div className="w-8 h-px bg-slate-100" />
-            <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-orange-200 transition-all" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                {selectedReservation.vehicle.marqueRef?.name || selectedReservation.vehicle.marque} {selectedReservation.vehicle.model}
-              </span>
-            </div>
-          </div>
-        </div>
-        <button
-          title="Fermer"
-          onClick={() => setIsEditModalOpen(false)}
-          className="w-12 h-12 rounded-full bg-slate-50 text-slate-400 hover:text-slate-900 hover:bg-white border border-slate-100 transition-all flex items-center justify-center shadow-sm"
-        >
-          <FontAwesomeIcon icon={faTimes} />
-        </button>
-      </div>
-
-      <div className="p-8">
-        {/* Dates de réservation - Style carte */}
-        <div className="mb-8 p-6 bg-slate-50 rounded-[2rem] border border-slate-200 shadow-inner">
-          <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2 mb-6 block flex items-center gap-2">
-            <FontAwesomeIcon icon={faCalendarAlt} className="text-orange-500" />
-            Période de réservation
-          </label>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Date de début</p>
-              <input
-                type="date"
-                value={editReservationData.dateDebut}
-                onChange={(e) => setEditReservationData({ ...editReservationData, dateDebut: e.target.value })}
-                className="w-full px-5 py-3.5 bg-white border border-slate-200 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all"
-              />
-            </div>
-            <div>
-              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Date de fin</p>
-              <input
-                type="date"
-                value={editReservationData.dateFin}
-                onChange={(e) => setEditReservationData({ ...editReservationData, dateFin: e.target.value })}
-                className="w-full px-5 py-3.5 bg-white border border-slate-200 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Type de réservation - Style boutons toggle */}
-        <div className="mb-8">
-          <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2 mb-4 block flex items-center gap-2">
-            <FontAwesomeIcon icon={faTag} className="text-orange-500" />
-            Type de réservation
-          </label>
-          <div className="grid grid-cols-2 gap-4">
-            {[
-              { id: 'LOCATION', label: 'Location', icon: faClockRegular, activeClass: 'bg-emerald-500 text-white border-emerald-500 shadow-xl shadow-emerald-500/20' },
-              { id: 'ACHAT', label: 'Achat', icon: faShoppingCart, activeClass: 'bg-purple-500 text-white border-purple-500 shadow-xl shadow-purple-500/20' }
-            ].map((type) => (
-              <button
-                key={type.id}
-                onClick={() => setEditReservationData({ ...editReservationData, type: type.id })}
-                className={`py-5 rounded-2xl border-2 font-black text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-3 ${
-                  editReservationData.type === type.id
-                    ? type.activeClass
-                    : 'bg-white text-slate-400 border-slate-200 hover:border-orange-200 hover:text-slate-600'
+          <div className="flex gap-2">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${currentPage === 1
+                  ? 'text-gray-400 bg-gray-50 cursor-not-allowed'
+                  : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
                 }`}
-              >
-                <FontAwesomeIcon icon={type.icon} />
-                {type.label}
-              </button>
-            ))}
+            >
+              Précédent
+            </button>
+            <div className="flex items-center gap-1 mx-1 hidden sm:flex">
+              {[...Array(totalPages)].map((_, idx) => {
+                const pageNum = idx + 1;
+                if (pageNum === 1 || pageNum === totalPages || (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)) {
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => setCurrentPage(pageNum)}
+                      className={`w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${currentPage === pageNum
+                          ? 'bg-orange-600 text-white shadow-sm'
+                          : 'text-gray-600 hover:bg-gray-100'
+                        }`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                } else if (pageNum === currentPage - 2 || pageNum === currentPage + 2) {
+                  return <span key={pageNum} className="text-gray-400 px-1">...</span>;
+                }
+                return null;
+              })}
+            </div>
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${currentPage === totalPages
+                  ? 'text-gray-400 bg-gray-50 cursor-not-allowed'
+                  : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
+                }`}
+            >
+              Suivant
+            </button>
           </div>
         </div>
+      )}
 
-        {/* Motif et Localisation (Visible uniquement pour LOCATION) */}
-        {editReservationData.type === 'LOCATION' && (
-          <div className="mb-8 space-y-6">
-            <div>
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2 mb-3 block flex items-center gap-2">
-                <FontAwesomeIcon icon={faInfoCircle} className="text-orange-500" />
-                Motif de location
-              </label>
-              <div className="grid grid-cols-3 gap-2">
-                {MOTIFS_LOCATION.map((motif) => (
-                  <button
-                    key={motif.id}
-                    onClick={() => setEditReservationData({ ...editReservationData, motifLocation: motif.id })}
-                    className={`py-2.5 rounded-xl border text-[9px] font-black uppercase tracking-wider transition-all flex flex-col items-center justify-center gap-1.5 ${
-                      editReservationData.motifLocation === motif.id
-                        ? 'bg-slate-900 text-white border-slate-900 shadow-lg'
-                        : 'bg-slate-50 text-slate-400 border-slate-100 hover:border-slate-200'
-                    }`}
-                  >
-                    <FontAwesomeIcon icon={motif.icon} className={editReservationData.motifLocation === motif.id ? 'text-orange-400' : 'text-slate-300'} />
-                    {motif.label}
-                  </button>
-                ))}
+      {/* Modal Commissions */}
+      {isCommissionModalOpen && (
+        <div className="fixed inset-0 z-[250] flex items-center justify-center animate-fadeIn bg-slate-900/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md bg-white rounded-[2.5rem] shadow-2xl overflow-hidden relative flex flex-col animate-slideUp">
+            <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-white">
+              <div>
+                <h2 className="text-2xl font-black text-slate-900 flex items-center gap-3">
+                  <span className="w-10 h-10 rounded-2xl bg-orange-100 text-orange-500 flex items-center justify-center shadow-inner">
+                    <FontAwesomeIcon icon={faMoneyBillWave} />
+                  </span>
+                  Commissions
+                </h2>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-2">
+                  Gestion des revenus plateforme
+                </p>
               </div>
-              {editReservationData.motifLocation === 'autre' && (
-                <div className="mt-3">
+              <button
+                title="Fermer"
+                onClick={() => setIsCommissionModalOpen(false)}
+                className="w-10 h-10 rounded-full bg-slate-50 text-slate-400 hover:text-slate-900 transition-all flex items-center justify-center border border-slate-100"
+              >
+                <FontAwesomeIcon icon={faTimes} />
+              </button>
+            </div>
+            <div className="p-8">
+              {selectedReservation && (
+                <div className="mb-6 p-5 bg-slate-50 rounded-[1.5rem] border border-slate-100 flex justify-between items-center">
+                  <div>
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Réservation</p>
+                    <p className="text-sm font-black text-slate-900">#{selectedReservation.id}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Montant Total</p>
+                    <p className="text-sm font-black text-orange-600">{calculateTotal(selectedReservation).toLocaleString('fr-FR')} FCFA</p>
+                  </div>
+                </div>
+              )}
+              <div className="space-y-4 mb-8">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2 block">
+                  Montant de la commission (FCFA)
+                </label>
+                <div className="relative">
+                  <span className="absolute left-5 top-1/2 -translate-y-1/2 font-black text-orange-300 text-sm">FCFA</span>
                   <input
-                    type="text"
-                    value={editReservationData.autreMotif || ''}
-                    onChange={(e) => setEditReservationData({ ...editReservationData, autreMotif: e.target.value })}
-                    placeholder="Précisez votre motif..."
-                    className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-xs"
+                    type="number"
+                    value={commissionAmount}
+                    onChange={(e) => setCommissionAmount(e.target.value)}
+                    placeholder="0"
+                    className="w-full pl-20 pr-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-black text-orange-600 transition-all text-lg"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <button
+                  onClick={() => setIsCommissionModalOpen(false)}
+                  className="flex-1 py-4 bg-white border border-slate-200 text-slate-400 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:text-slate-900 transition-all active:scale-95"
+                >
+                  Annuler
+                </button>
+                <button
+                  onClick={handleUpdateCommission}
+                  className="flex-1 py-4 bg-orange-500 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-orange-500/20 hover:bg-orange-600 transition-all active:scale-95"
+                >
+                  Enregistrer
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Changement de Statut */}
+      {isStatusModalOpen && (
+        <div className="fixed inset-0 z-[300] flex items-center justify-center animate-fadeIn bg-slate-900/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md bg-white rounded-[2.5rem] shadow-2xl overflow-hidden relative flex flex-col animate-slideUp">
+            <div className="p-8 text-center bg-white">
+              <div className={`w-20 h-20 mx-auto rounded-[2rem] flex items-center justify-center mb-6 shadow-xl ${
+                statusModalConfig.color === 'emerald' ? 'bg-emerald-100 text-emerald-500 shadow-emerald-500/20' :
+                statusModalConfig.color === 'blue' ? 'bg-blue-100 text-blue-500 shadow-blue-500/20' :
+                'bg-rose-100 text-rose-500 shadow-rose-500/20'
+              }`}>
+                <FontAwesomeIcon icon={statusModalConfig.icon} size="2x" />
+              </div>
+              <h2 className="text-2xl font-black text-slate-900 mb-3">{statusModalConfig.title}</h2>
+              <p className="text-slate-500 text-sm leading-relaxed mb-8 px-4">
+                {statusModalConfig.message}
+              </p>
+              {statusModalConfig.showReasonField && (
+                <div className="mb-8 text-left">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2 mb-2 block">
+                    Motif de l'annulation (Optionnel)
+                  </label>
+                  <textarea
+                    value={statusReason}
+                    onChange={(e) => setStatusReason(e.target.value)}
+                    placeholder="Pourquoi annulez-vous cette réservation ?"
+                    className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-medium text-slate-700 transition-all text-sm min-h-[100px] resize-none"
                   />
                 </div>
               )}
-            </div>
-
-            <div>
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2 mb-3 block flex items-center gap-2">
-                <FontAwesomeIcon icon={faMapMarkerAlt} className="text-orange-500" />
-                Localisation
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                {LOCALISATIONS.map((loc) => (
-                  <button
-                    key={loc.id}
-                    onClick={() => setEditReservationData({ ...editReservationData, localisation: loc.id })}
-                    className={`py-3.5 rounded-xl border-2 font-black text-[10px] uppercase tracking-widest transition-all ${
-                      editReservationData.localisation === loc.id
-                        ? 'bg-orange-500 text-white border-orange-500 shadow-xl shadow-orange-500/20'
-                        : 'bg-white text-slate-400 border-slate-200 hover:border-orange-200'
-                    }`}
-                  >
-                    {loc.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Commission - Style inspiré de la modale véhicule */}
-        <div className="mb-8 p-6 bg-orange-50/30 rounded-[2rem] border border-orange-100">
-          <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2 mb-4 block flex items-center gap-2">
-            <FontAwesomeIcon icon={faMoneyBillWave} className="text-orange-500" />
-            Commission (FCFA)
-          </label>
-          <div className="relative">
-            <span className="absolute left-5 top-1/2 -translate-y-1/2 font-black text-orange-300 text-sm">FCFA</span>
-            <input
-              type="number"
-              value={editReservationData.commission}
-              onChange={(e) => setEditReservationData({ ...editReservationData, commission: e.target.value })}
-              placeholder="0"
-              className="w-full pl-20 pr-5 py-4 bg-white border border-orange-200 rounded-2xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 outline-none font-black text-orange-600 transition-all text-lg"
-            />
-          </div>
-          <p className="text-[9px] font-bold text-slate-400 mt-3 ml-2">
-            Montant total actuel : <span className="text-orange-600 font-black">{calculateTotal(selectedReservation).toLocaleString('fr-FR')} FCFA</span>
-          </p>
-        </div>
-
-        {/* Informations récapitulatives - Style carte */}
-        <div className="mb-8 p-6 bg-slate-50 rounded-[2rem] border border-slate-200">
-          <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-            <span className="w-8 h-[1px] bg-slate-200"></span>
-            Récapitulatif
-          </h3>
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="text-xs font-bold text-slate-500">Client</span>
-              <span className="text-sm font-black text-slate-900">
-                {selectedReservation.user?.nom} {selectedReservation.user?.prenom}
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-xs font-bold text-slate-500">Véhicule</span>
-              <span className="text-sm font-black text-slate-900">
-                {selectedReservation.vehicle.marqueRef?.name || selectedReservation.vehicle.marque} {selectedReservation.vehicle.model}
-              </span>
-            </div>
-            {editReservationData.type === 'LOCATION' && (
-              <>
-                <div className="flex justify-between items-center">
-                  <span className="text-xs font-bold text-slate-500">Motif</span>
-                  <span className="text-sm font-black text-slate-900">
-                    {editReservationData.motifLocation === 'autre' 
-                      ? (editReservationData.autreMotif || 'Autre')
-                      : (MOTIFS_LOCATION.find(m => m.id === editReservationData.motifLocation)?.label || '-')}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-xs font-bold text-slate-500">Localisation</span>
-                  <span className="text-sm font-black text-slate-900">
-                    {editReservationData.localisation === 'bamako' ? 'À BAMAKO' : 
-                     editReservationData.localisation === 'hors_bamako' ? 'HORS BAMAKO' : '-'}
-                  </span>
-                </div>
-              </>
-            )}
-            <div className="flex justify-between items-center">
-              <span className="text-xs font-bold text-slate-500">Statut actuel</span>
-              <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase border ${
-                selectedReservation.status === 'PENDING' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
-                selectedReservation.status === 'ACCEPTED' ? 'bg-green-50 text-green-700 border-green-200' :
-                selectedReservation.status === 'COMPLETED' ? 'bg-blue-50 text-blue-700 border-blue-200' :
-                'bg-red-50 text-red-700 border-red-200'
-              }`}>
-                {selectedReservation.status === 'PENDING' && 'En attente'}
-                {selectedReservation.status === 'ACCEPTED' && 'Acceptée'}
-                {selectedReservation.status === 'COMPLETED' && 'Terminée'}
-                {selectedReservation.status === 'CANCELED' && 'Annulée'}
-              </span>
-            </div>
-            <div className="flex justify-between items-center pt-2 border-t border-slate-200">
-              <span className="text-xs font-bold text-slate-500">Nouveau total</span>
-              <div className="text-right">
-                <span className="text-lg font-black text-orange-600">
-                  {(() => {
-                    const basePrice = calculateTotal(selectedReservation);
-                    const commission = parseFloat(editReservationData.commission?.toString() || '0') || 0;
-                    return (basePrice + commission).toLocaleString('fr-FR');
-                  })()} FCFA
-                </span>
-                {parseFloat(editReservationData.commission?.toString() || '0') > 0 && (
-                  <p className="text-[9px] font-bold text-orange-500 mt-0.5">
-                    + Commission incluse
-                  </p>
-                )}
+              <div className="flex gap-4">
+                <button
+                  onClick={() => setIsStatusModalOpen(false)}
+                  className="flex-1 py-5 bg-slate-50 text-slate-400 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:text-slate-900 transition-all active:scale-95"
+                >
+                  Retour
+                </button>
+                <button
+                  onClick={() => handleStatusChange(statusModalConfig.id, statusModalConfig.newStatus)}
+                  disabled={updating}
+                  className={`flex-1 py-5 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 ${
+                    statusModalConfig.color === 'emerald' ? 'bg-emerald-500 shadow-emerald-500/30 hover:bg-emerald-600' :
+                    statusModalConfig.color === 'blue' ? 'bg-blue-500 shadow-blue-500/30 hover:bg-blue-600' :
+                    'bg-rose-500 shadow-rose-500/30 hover:bg-rose-600'
+                  }`}
+                >
+                  {updating ? (
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <FontAwesomeIcon icon={faCheck} />
+                  )}
+                  Confirmer
+                </button>
               </div>
             </div>
           </div>
         </div>
+      )}
 
-        {/* Actions - Style identique à la modale véhicule */}
-        <div className="flex gap-4 pt-4">
-          <button
-            onClick={() => setIsEditModalOpen(false)}
-            className="flex-1 py-5 bg-white border border-slate-200 text-slate-400 rounded-2xl font-black text-xs uppercase tracking-widest hover:text-slate-900 hover:border-slate-400 transition-all active:scale-95 flex items-center justify-center gap-3"
-          >
-            <FontAwesomeIcon icon={faTimes} />
-            Annuler
-          </button>
-          <button
-            onClick={handleUpdateReservation}
-            disabled={updating}
-            className="flex-1 py-5 bg-orange-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-orange-500/40 hover:bg-orange-600 transition-all flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50"
-          >
-            {updating ? (
-              <>
-                <div className="w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin" />
-                Mise à jour...
-              </>
-            ) : (
-              <>
-                <FontAwesomeIcon icon={faCheck} />
-                Enregistrer les modifications
-              </>
-            )}
-          </button>
+      {/* Modal Modification */}
+      {isEditModalOpen && selectedReservation && editReservationData && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center animate-fadeIn bg-slate-900/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-lg bg-white rounded-[2.5rem] shadow-2xl max-h-[90vh] overflow-y-auto relative flex flex-col">
+            <div className="sticky top-0 bg-white p-8 border-b border-slate-100 flex justify-between items-center z-20">
+              <div>
+                <h2 className="text-3xl font-black text-slate-900 flex items-center gap-4">
+                  <span className="w-12 h-12 rounded-2xl bg-orange-100 text-orange-500 flex items-center justify-center shadow-inner">
+                    <FontAwesomeIcon icon={faEdit} />
+                  </span>
+                  Modifier la réservation
+                </h2>
+                <div className="flex items-center gap-3 mt-3">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-3 h-3 rounded-full bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.5)] transition-all" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900">
+                      #{selectedReservation.id}
+                    </span>
+                  </div>
+                  <div className="w-8 h-px bg-slate-100" />
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-3 h-3 rounded-full bg-orange-200 transition-all" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                      {selectedReservation.vehicle.marqueRef?.name || selectedReservation.vehicle.marque} {selectedReservation.vehicle.model}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <button
+                title="Fermer"
+                onClick={() => setIsEditModalOpen(false)}
+                className="w-12 h-12 rounded-full bg-slate-50 text-slate-400 hover:text-slate-900 hover:bg-white border border-slate-100 transition-all flex items-center justify-center shadow-sm"
+              >
+                <FontAwesomeIcon icon={faTimes} />
+              </button>
+            </div>
+            <div className="p-8">
+              <div className="mb-8 p-6 bg-slate-50 rounded-[2rem] border border-slate-200 shadow-inner">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2 mb-6 block flex items-center gap-2">
+                  <FontAwesomeIcon icon={faCalendarAlt} className="text-orange-500" />
+                  Période de réservation
+                </label>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Date de début</p>
+                    <input
+                      type="datetime-local"
+                      value={editReservationData.dateDebut}
+                      onChange={(e) => setEditReservationData({ ...editReservationData, dateDebut: e.target.value })}
+                      className="w-full px-5 py-3.5 bg-white border border-slate-200 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all"
+                    />
+                  </div>
+                  <div>
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Date de fin</p>
+                    <input
+                      type="datetime-local"
+                      value={editReservationData.dateFin}
+                      onChange={(e) => setEditReservationData({ ...editReservationData, dateFin: e.target.value })}
+                      className="w-full px-5 py-3.5 bg-white border border-slate-200 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="mb-8">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2 mb-4 block flex items-center gap-2">
+                  <FontAwesomeIcon icon={faTag} className="text-orange-500" />
+                  Type de réservation
+                </label>
+                <div className="grid grid-cols-2 gap-4">
+                  {[
+                    { id: 'LOCATION', label: 'Location', icon: faClockRegular, activeClass: 'bg-emerald-500 text-white border-emerald-500 shadow-xl shadow-emerald-500/20' },
+                    { id: 'ACHAT', label: 'Achat', icon: faShoppingCart, activeClass: 'bg-purple-500 text-white border-purple-500 shadow-xl shadow-purple-500/20' }
+                  ].map((type) => (
+                    <button
+                      key={type.id}
+                      onClick={() => setEditReservationData({ ...editReservationData, type: type.id })}
+                      className={`py-5 rounded-2xl border-2 font-black text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-3 ${
+                        editReservationData.type === type.id
+                          ? type.activeClass
+                          : 'bg-white text-slate-400 border-slate-200 hover:border-orange-200 hover:text-slate-600'
+                      }`}
+                    >
+                      <FontAwesomeIcon icon={type.icon} />
+                      {type.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {editReservationData.type === 'LOCATION' && (
+                <div className="mb-8 space-y-6">
+                  <div>
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2 mb-3 block flex items-center gap-2">
+                      <FontAwesomeIcon icon={faInfoCircle} className="text-orange-500" />
+                      Motif de location
+                    </label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {MOTIFS_LOCATION.map((motif) => (
+                        <button
+                          key={motif.id}
+                          onClick={() => setEditReservationData({ ...editReservationData, motifLocation: motif.id })}
+                          className={`py-2.5 rounded-xl border text-[9px] font-black uppercase tracking-wider transition-all flex flex-col items-center justify-center gap-1.5 ${
+                            editReservationData.motifLocation === motif.id
+                              ? 'bg-slate-900 text-white border-slate-900 shadow-lg'
+                              : 'bg-slate-50 text-slate-400 border-slate-100 hover:border-slate-200'
+                          }`}
+                        >
+                          <FontAwesomeIcon icon={motif.icon} className={editReservationData.motifLocation === motif.id ? 'text-orange-400' : 'text-slate-300'} />
+                          {motif.label}
+                        </button>
+                      ))}
+                    </div>
+                    {editReservationData.motifLocation === 'autre' && (
+                      <div className="mt-3">
+                        <input
+                          type="text"
+                          value={editReservationData.autreMotif || ''}
+                          onChange={(e) => setEditReservationData({ ...editReservationData, autreMotif: e.target.value })}
+                          placeholder="Précisez votre motif..."
+                          className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-xs"
+                        />
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2 mb-3 block flex items-center gap-2">
+                      <FontAwesomeIcon icon={faMapMarkerAlt} className="text-orange-500" />
+                      Localisation
+                    </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      {LOCALISATIONS.map((loc) => (
+                        <button
+                          key={loc.id}
+                          onClick={() => setEditReservationData({ ...editReservationData, localisation: loc.id })}
+                          className={`py-3.5 rounded-xl border-2 font-black text-[10px] uppercase tracking-widest transition-all ${
+                            editReservationData.localisation === loc.id
+                              ? 'bg-orange-500 text-white border-orange-500 shadow-xl shadow-orange-500/20'
+                              : 'bg-white text-slate-400 border-slate-200 hover:border-orange-200'
+                          }`}
+                        >
+                          {loc.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div className="mb-8 p-6 bg-orange-50/30 rounded-[2rem] border border-orange-100">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2 mb-4 block flex items-center gap-2">
+                  <FontAwesomeIcon icon={faMoneyBillWave} className="text-orange-500" />
+                  Commission (FCFA)
+                </label>
+                <div className="relative">
+                  <span className="absolute left-5 top-1/2 -translate-y-1/2 font-black text-orange-300 text-sm">FCFA</span>
+                  <input
+                    type="number"
+                    value={editReservationData.commission}
+                    onChange={(e) => setEditReservationData({ ...editReservationData, commission: e.target.value })}
+                    placeholder="0"
+                    className="w-full pl-20 pr-5 py-4 bg-white border border-orange-200 rounded-2xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 outline-none font-black text-orange-600 transition-all text-lg"
+                  />
+                </div>
+                <p className="text-[9px] font-bold text-slate-400 mt-3 ml-2">
+                  Montant total actuel : <span className="text-orange-600 font-black">{calculateTotal(selectedReservation).toLocaleString('fr-FR')} FCFA</span>
+                </p>
+              </div>
+              <div className="mb-8 p-6 bg-slate-50 rounded-[2rem] border border-slate-200">
+                <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                  <span className="w-8 h-[1px] bg-slate-200"></span>
+                  Récapitulatif
+                </h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs font-bold text-slate-500">Client</span>
+                    <span className="text-sm font-black text-slate-900">
+                      {selectedReservation.user?.nom} {selectedReservation.user?.prenom}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs font-bold text-slate-500">Véhicule</span>
+                    <span className="text-sm font-black text-slate-900">
+                      {selectedReservation.vehicle.marqueRef?.name || selectedReservation.vehicle.marque} {selectedReservation.vehicle.model}
+                    </span>
+                  </div>
+                  {editReservationData.type === 'LOCATION' && (
+                    <>
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs font-bold text-slate-500">Motif</span>
+                        <span className="text-sm font-black text-slate-900">
+                          {editReservationData.motifLocation === 'autre' 
+                            ? (editReservationData.autreMotif || 'Autre')
+                            : (MOTIFS_LOCATION.find(m => m.id === editReservationData.motifLocation)?.label || '-')}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs font-bold text-slate-500">Localisation</span>
+                        <span className="text-sm font-black text-slate-900">
+                          {editReservationData.localisation === 'bamako' ? 'À BAMAKO' : 
+                           editReservationData.localisation === 'hors_bamako' ? 'HORS BAMAKO' : '-'}
+                        </span>
+                      </div>
+                    </>
+                  )}
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs font-bold text-slate-500">Statut actuel</span>
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase border ${
+                      selectedReservation.status === 'PENDING' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+                      selectedReservation.status === 'ACCEPTED' ? 'bg-green-50 text-green-700 border-green-200' :
+                      selectedReservation.status === 'COMPLETED' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                      'bg-red-50 text-red-700 border-red-200'
+                    }`}>
+                      {selectedReservation.status === 'PENDING' && 'En attente'}
+                      {selectedReservation.status === 'ACCEPTED' && 'Acceptée'}
+                      {selectedReservation.status === 'COMPLETED' && 'Terminée'}
+                      {selectedReservation.status === 'CANCELED' && 'Annulée'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center pt-2 border-t border-slate-200">
+                    <span className="text-xs font-bold text-slate-500">Nouveau total</span>
+                    <div className="text-right">
+                      <span className="text-lg font-black text-orange-600">
+                        {(() => {
+                          let total = 0;
+                          if (editReservationData.type === 'ACHAT') {
+                            total = selectedReservation.vehicle.prix;
+                          } else if (editReservationData.dateDebut && editReservationData.dateFin) {
+                            const start = new Date(editReservationData.dateDebut).getTime();
+                            const end = new Date(editReservationData.dateFin).getTime();
+                            const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) || 1;
+                            total = (selectedReservation.vehicle.prixJour || selectedReservation.vehicle.prix) * days;
+                          } else {
+                            total = selectedReservation.vehicle.prixJour || selectedReservation.vehicle.prix;
+                          }
+                          const commission = parseFloat(editReservationData.commission?.toString() || '0') || 0;
+                          return (total + commission).toLocaleString('fr-FR');
+                        })()} FCFA
+                      </span>
+                      {parseFloat(editReservationData.commission?.toString() || '0') > 0 && (
+                        <p className="text-[9px] font-bold text-orange-500 mt-0.5">
+                          + Commission incluse
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex gap-4 pt-4">
+                <button
+                  onClick={() => setIsEditModalOpen(false)}
+                  className="flex-1 py-5 bg-white border border-slate-200 text-slate-400 rounded-2xl font-black text-xs uppercase tracking-widest hover:text-slate-900 hover:border-slate-400 transition-all active:scale-95 flex items-center justify-center gap-3"
+                >
+                  <FontAwesomeIcon icon={faTimes} />
+                  Annuler
+                </button>
+                <button
+                  onClick={handleUpdateReservation}
+                  disabled={updating}
+                  className="flex-1 py-5 bg-orange-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-orange-500/40 hover:bg-orange-600 transition-all flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50"
+                >
+                  {updating ? (
+                    <>
+                      <div className="w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin" />
+                      Mise à jour...
+                    </>
+                  ) : (
+                    <>
+                      <FontAwesomeIcon icon={faCheck} />
+                      Enregistrer les modifications
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  </div>
-)}
+      )}
     </div>
   );
 }
