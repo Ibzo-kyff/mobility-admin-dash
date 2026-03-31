@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCar,
@@ -11,7 +11,6 @@ import {
   faEye,
   faHistory,
   faChartBar,
-  faFileAlt,
   faSearch,
   faFilter,
   faEuroSign,
@@ -21,11 +20,9 @@ import {
   faUser,
   faMapMarkerAlt,
   faClock,
-  faExternalLinkAlt,
   faExclamationTriangle,
   faShieldAlt,
   faImage,
-  faHeart as faHeartSolid,
   faChevronLeft,
   faChevronRight,
   faCalendarCheck,
@@ -55,21 +52,16 @@ import {
   faLeaf,
   faMobile,
   faWaveSquare,
-  faStar,
-  faDollarSign,
-  faBell,
+  faThLarge,
 } from '@fortawesome/free-solid-svg-icons';
-import { faHeart as faHeartRegular, faClock as faClockRegular } from '@fortawesome/free-regular-svg-icons';
+import { faClock as faClockRegular } from '@fortawesome/free-regular-svg-icons';
 import { vehiclesAPI } from '@/services/vehicles-api';
-import type { Vehicule } from '@/types';
+import { mobilityAPI } from '@/services/mobility-api';
+import type { Vehicule, Parking } from '@/types';
 import Image from 'next/image';
+import { getCookie } from 'cookies-next';
 
 type TabType = 'list' | 'details' | 'history' | 'stats' | 'documents';
-
-// Constantes du mobile
-const PRIMARY_COLOR = '#ff7d00';
-const SECONDARY_COLOR = '#2c3e50';
-const BACKGROUND_COLOR = '#f8f9fa';
 
 // Motifs de location disponibles
 const MOTIFS_LOCATION = [
@@ -97,9 +89,6 @@ export default function AdminVehicleTabs() {
 
   // États pour le détail (inspirés du mobile)
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isFavorite, setIsFavorite] = useState(false);
-
-  // États réservation
   const [modalVisible, setModalVisible] = useState(false);
   const [modalPayVisible, setModalPayVisible] = useState(false);
   const [reservationType, setReservationType] = useState<'LOCATION' | 'ACHAT' | null>(null);
@@ -111,11 +100,9 @@ export default function AdminVehicleTabs() {
   const [conditionsAccepted, setConditionsAccepted] = useState(false);
   const [selectedDays, setSelectedDays] = useState<number>(1);
   const [calculatedPrice, setCalculatedPrice] = useState<number>(0);
-  const [showDurationModal, setShowDurationModal] = useState(false);
   const [currentReservation, setCurrentReservation] = useState<any>(null);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [showDateTimePicker, setShowDateTimePicker] = useState<'start' | 'end' | null>(null);
-  const [dateTimeMode, setDateTimeMode] = useState<'date' | 'time'>('date');
 
   // Edit State
   const [isEditing, setIsEditing] = useState(false);
@@ -139,6 +126,59 @@ export default function AdminVehicleTabs() {
   const [editYear, setEditYear] = useState(0);
   const [editExistingPhotos, setEditExistingPhotos] = useState<string[]>([]);
   const [editNewPhotos, setEditNewPhotos] = useState<File[]>([]);
+  const [isAdding, setIsAdding] = useState(false);
+  const [addStep, setAddStep] = useState(1);
+  const [addMarque, setAddMarque] = useState("");
+  const [addModel, setAddModel] = useState("");
+  const [addPrice, setAddPrice] = useState(0);
+  const [addYear, setAddYear] = useState(new Date().getFullYear());
+  const [addMileage, setAddMileage] = useState(0);
+  const [addFuelType, setAddFuelType] = useState("ESSENCE");
+  const [addTransmission, setAddTransmission] = useState("MANUAL");
+  const [addDescription, setAddDescription] = useState("");
+  const [addPhotos, setAddPhotos] = useState<File[]>([]);
+  const [addForSale, setAddForSale] = useState(true);
+  const [addForRent, setAddForRent] = useState(true);
+  const [addGarantie, setAddGarantie] = useState(false);
+  const [addDureeGarantie, setAddDureeGarantie] = useState(0);
+  const [addChauffeur, setAddChauffeur] = useState(false);
+  const [addAssurance, setAddAssurance] = useState(false);
+  const [addDureeAssurance, setAddDureeAssurance] = useState(0);
+  const [addCarteGrise, setAddCarteGrise] = useState(false);
+  const [addVignette, setAddVignette] = useState(false);
+  const [addCategory, setAddCategory] = useState("Standard");
+  const [addParkingId, setAddParkingId] = useState("");
+  const [savingAdd, setSavingAdd] = useState(false);
+
+  // Notification State
+  const [notification, setNotification] = useState<{
+    show: boolean;
+    type: 'success' | 'error' | 'warning' | 'info';
+    message: string;
+    details?: string;
+  }>({
+    show: false,
+    type: 'info',
+    message: '',
+  });
+  const notificationTimer = useRef<NodeJS.Timeout | null>(null);
+
+  const showNotification = (type: 'success' | 'error' | 'warning' | 'info', message: string, details?: string) => {
+    console.log(`[Notification] ${type}: ${message}`, details);
+    // Nettoyer le timer précédent s'il existe
+    if (notificationTimer.current) clearTimeout(notificationTimer.current);
+
+    setNotification({ show: true, type, message, details });
+
+    // Masquer automatiquement après 6 secondes quel que soit le type
+    notificationTimer.current = setTimeout(() => {
+      setNotification(prev => ({ ...prev, show: false }));
+    }, 6000);
+  };
+
+  // Lists
+  const [marquesList, setMarquesList] = useState<{ name: string }[]>([]);
+  const [parkingsList, setParkingsList] = useState<Parking[]>([]);
 
   // Mobile-inspired Filtering State
   const [saleRentTab, setSaleRentTab] = useState<'all' | 'sale' | 'rent'>('all');
@@ -156,6 +196,10 @@ export default function AdminVehicleTabs() {
     maxYear: '',
     transmission: '',
   });
+
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(6);
 
   const BASE_URL = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'https://parkapp-pi.vercel.app';
 
@@ -185,22 +229,6 @@ export default function AdminVehicleTabs() {
     if (normalized === 'AUTOMATIQUE') return 'Automatique';
     if (normalized === 'SEMI-AUTOMATIQUE') return 'Semi-Auto';
     return normalized.charAt(0).toUpperCase() + normalized.slice(1).toLowerCase();
-  };
-
-  const getFuelIcon = (fuelType: string | undefined) => {
-    switch (fuelType?.toLowerCase()) {
-      case 'essence':
-        return faFire;
-      case 'diesel':
-        return faOilCan;
-      case 'electrique':
-      case 'électrique':
-        return faBolt;
-      case 'hybride':
-        return faLeaf;
-      default:
-        return faCar;
-    }
   };
 
   const getPhotoUrl = (photos: string[] | string | undefined) => {
@@ -241,9 +269,166 @@ export default function AdminVehicleTabs() {
 
   const availableFuelTypes = [...new Set(vehicles.map(v => v.fuelType || v.carburant).filter(Boolean))];
 
+  const loadMarques = async () => {
+    try {
+      const data = await vehiclesAPI.getMarques();
+      setMarquesList(data);
+    } catch (e) {
+      console.error("Erreur marques:", e);
+    }
+  };
+
+  const loadParkings = async () => {
+    try {
+      const data = await mobilityAPI.getParkings();
+      setParkingsList(data);
+    } catch (e) {
+      console.error("Erreur parkings:", e);
+    }
+  };
+
+  const loadMyParking = async () => {
+    try {
+      // Vérifier d'abord le rôle de l'utilisateur
+      const userStr = getCookie('user') as string | null;
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          // Si c'est un administrateur, on ne tente pas de charger "son" parking (car il en gère plusieurs)
+          if (user.role === 'ADMIN') return;
+        } catch (parseError) {
+          console.error("Erreur parse user cookie:", parseError);
+        }
+      }
+
+      const data = await vehiclesAPI.getMyParking();
+      if (data && data.id) {
+        setAddParkingId(data.id.toString());
+      }
+    } catch (e) {
+      // Ne loguer l'erreur que si ce n'est pas un 404 attendu pour certains rôles
+      console.warn("Info: Pas de parking personnel trouvé pour cet utilisateur.");
+    }
+  };
+
   useEffect(() => {
     loadVehicles();
+    loadMarques();
+    loadParkings();
+    loadMyParking();
+
+    const handleOpenAdd = () => {
+      setIsAdding(true);
+      resetAddForm();
+    };
+
+    window.addEventListener('open-add-vehicle-modal', handleOpenAdd);
+    return () => window.removeEventListener('open-add-vehicle-modal', handleOpenAdd);
   }, []);
+
+  const resetAddForm = () => {
+    setAddStep(1);
+    setAddMarque("");
+    setAddModel("");
+    setAddPrice(0);
+    setAddYear(new Date().getFullYear());
+    setAddMileage(0);
+    setAddFuelType("ESSENCE");
+    setAddTransmission("MANUAL");
+    setAddDescription("");
+    setAddPhotos([]);
+    setAddForSale(true);
+    setAddForRent(true);
+    setAddGarantie(false);
+    setAddDureeGarantie(0);
+    setAddChauffeur(false);
+    setAddAssurance(false);
+    setAddDureeAssurance(0);
+    setAddCarteGrise(false);
+    setAddVignette(false);
+    setAddCategory("Standard");
+
+    const userStr = getCookie('user');
+    if (userStr) {
+      const user = JSON.parse(userStr as string);
+      setAddParkingId(user.parkingId?.toString() || "");
+    }
+  };
+
+  const handleAddSubmit = async () => {
+    try {
+      // Validations de base
+      if (!addMarque || !addModel || !addPrice || addPrice <= 0) {
+        showNotification('warning', "Informations manquantes", "Veuillez remplir la marque, le modèle et un prix valide.");
+        return;
+      }
+
+      if (addPhotos.length === 0) {
+        showNotification('warning', "Photo requise", "Veuillez ajouter au moins une photo du véhicule.");
+        return;
+      }
+
+      // Log pour débogage
+      console.log('Tentative d\'ajout avec:', { addMarque, addModel, addPrice, addYear });
+
+      setSavingAdd(true);
+      const formData = new FormData();
+
+      // Récupération du parkingId
+      const userStr = getCookie('user');
+      const user = userStr ? JSON.parse(userStr as string) : null;
+      const finalParkingId = addParkingId || user?.parkingId?.toString();
+
+      if (finalParkingId) {
+        formData.append('parkingId', finalParkingId);
+      } else {
+        showNotification('warning', "Parking non défini", "Attention: Aucun parking sélectionné. L'ajout risque d'échouer.");
+      }
+
+      // Données du véhicule (conformes au type Vehicule)
+      formData.append('marque', addMarque);
+      formData.append('model', addModel);
+      formData.append('prix', addPrice.toString());
+      formData.append('annee', addYear.toString());
+      formData.append('mileage', addMileage.toString());
+      formData.append('fuelType', addFuelType);
+      formData.append('transmission', addTransmission);
+      formData.append('description', addDescription);
+      formData.append('categorie', addCategory);
+
+      // Booleans
+      formData.append('forSale', String(addForSale));
+      formData.append('forRent', String(addForRent));
+      formData.append('garantie', String(addGarantie));
+      formData.append('assurance', String(addAssurance));
+      formData.append('chauffeur', String(addChauffeur));
+      formData.append('carteGrise', String(addCarteGrise));
+      formData.append('vignette', String(addVignette));
+
+      if (addGarantie) formData.append('dureeGarantie', addDureeGarantie.toString());
+      if (addAssurance) formData.append('dureeAssurance', addDureeAssurance.toString());
+
+      // Photos
+      addPhotos.forEach(file => {
+        formData.append('photos', file);
+      });
+
+      console.log('FormData prêt, envoi...');
+      await vehiclesAPI.createVehicule(formData);
+
+      console.log('Véhicule ajouté avec succès !');
+      showNotification('success', "Véhicule ajouté !", "Le véhicule a été créé avec succès dans votre inventaire.");
+      setIsAdding(false);
+      resetAddForm();
+      loadVehicles();
+    } catch (error: unknown) {
+      console.error('Erreur API détaillée:', error);
+      const apiError = error as { message: string, details?: any };
+      showNotification('error', "Erreur lors de l'ajout", apiError.message + (apiError.details ? ` : ${JSON.stringify(apiError.details)}` : ''));
+    } finally {
+      setSavingAdd(false);
+    }
+  };
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -256,7 +441,7 @@ export default function AdminVehicleTabs() {
       }
     }
     return () => clearInterval(interval);
-  }, [selectedVehicle, isGalleryHovered, activeTab]);
+  }, [selectedVehicle, isGalleryHovered, activeTab, getAllPhotoUrls]);
 
   useEffect(() => {
     if (selectedVehicle) {
@@ -349,7 +534,7 @@ export default function AdminVehicleTabs() {
         marque: editMarque,
         model: editModel,
         prixJour: editPrice,
-        status: editStatus as any,
+        status: editStatus as Vehicule['status'],
         description: editDescription,
         fuelType: editFuelType,
         transmission: editTransmission,
@@ -370,10 +555,10 @@ export default function AdminVehicleTabs() {
       setVehicles(vehicles.map(v => v.id === selectedVehicle.id ? { ...v, ...updateData } : v));
       setSelectedVehicle({ ...selectedVehicle, ...updateData });
       setIsEditing(false);
-      alert('Véhicule mis à jour avec succès');
-    } catch (error) {
+      showNotification('success', "Mise à jour réussie", "Les informations du véhicule ont été actualisées.");
+    } catch (error: unknown) {
       console.error('Error updating vehicle:', error);
-      alert('Erreur lors de la mise à jour');
+      showNotification('error', "Erreur de mise à jour", "Impossible d'enregistrer les modifications du véhicule.");
     } finally {
       setLoading(false);
     }
@@ -397,10 +582,11 @@ export default function AdminVehicleTabs() {
 
       setVehicles(vehicles.map(v => v.id === id ? { ...v, status } : v));
       if (selectedVehicle?.id === id) setSelectedVehicle({ ...selectedVehicle, status });
+      showNotification('success', "Action effectuée", `Le véhicule a été ${action === 'APPROVE' ? 'approuvé' : 'mis à jour'}.`);
 
     } catch (error) {
       console.error(`Error performing action ${action}:`, error);
-      alert('Une erreur est survenue.');
+      showNotification('error', "Erreur d'action", "L'opération a échoué. Veuillez réessayer.");
     }
   };
 
@@ -438,90 +624,46 @@ export default function AdminVehicleTabs() {
     }
   };
 
-  const handleDateTimeChange = (event: any, selectedDate?: Date) => {
-    if (!selectedDate || !showDateTimePicker) return;
-
-    const newDate = new Date(selectedDate);
-
-    if (showDateTimePicker === 'start') {
-      const currentEnd = endDateTime || new Date();
-      const newEnd = new Date(currentEnd);
-
-      if (dateTimeMode === 'date') {
-        newEnd.setFullYear(newDate.getFullYear(), newDate.getMonth(), newDate.getDate());
-        if (newEnd.getTime() <= newDate.getTime()) {
-          newEnd.setDate(newDate.getDate() + 1);
-        }
-      } else {
-        const hoursDiff = newEnd.getHours() - (startDateTime?.getHours() || 8);
-        newEnd.setHours(newDate.getHours() + hoursDiff, newDate.getMinutes(), 0, 0);
-      }
-
-      setStartDateTime(newDate);
-      setEndDateTime(newEnd);
-      calculateDurationAndPrice(newDate, newEnd);
-    } else if (showDateTimePicker === 'end') {
-      if (startDateTime && newDate.getTime() > startDateTime.getTime()) {
-        setEndDateTime(newDate);
-        calculateDurationAndPrice(startDateTime, newDate);
-      }
-    }
-
-    setShowDateTimePicker(null);
-  };
-
-  const getIconForMotif = (motifId: string) => {
-    const motif = MOTIFS_LOCATION.find(m => m.id === motifId);
-    switch (motif?.icon) {
-      case faPlane: return faPlane;
-      case faHeart: return faHeart;
-      case faBriefcase: return faBriefcase;
-      case faCamera: return faCamera;
-      case faUser: return faUser;
-      default: return faList;
-    }
-  };
-
   const confirmReservation = () => {
     if (!reservationType || !selectedVehicle) {
-      alert('Sélectionnez un type de réservation');
+      showNotification('warning', "Type requis", "Veuillez sélectionner un type de réservation (Location ou Achat).");
       return;
     }
 
     if (reservationType === 'LOCATION') {
       if (!startDateTime || !endDateTime) {
-        alert('Les dates sont requises pour la location');
+        showNotification('warning', "Dates manquantes", "Les dates de début et de fin sont obligatoires pour la location.");
         return;
       }
       if (endDateTime.getTime() <= startDateTime.getTime()) {
-        alert('La date de fin doit être après la date de début');
+        showNotification('warning', "Dates invalides", "La date de fin doit être postérieure à la date de début.");
         return;
       }
       const diffHours = (endDateTime.getTime() - startDateTime.getTime()) / (1000 * 60 * 60);
       if (diffHours < 1) {
-        alert('La location doit être d\'au moins 1 heure');
+        showNotification('warning', "Durée insuffisante", "La durée de location doit être d'au moins 1 heure.");
         return;
       }
       if (!selectedMotif) {
-        alert('Veuillez sélectionner un motif de location');
+        showNotification('warning', "Motif requis", "Veuillez sélectionner un motif de location.");
         return;
       }
       if (!selectedLocalisation) {
-        alert('Veuillez sélectionner une localisation');
+        showNotification('warning', "Localisation requise", "Veuillez préciser la zone d'utilisation du véhicule.");
         return;
       }
       if (!conditionsAccepted) {
-        alert('Veuillez accepter les conditions générales');
+        showNotification('warning', "Conditions requises", "Vous devez accepter les conditions générales pour continuer.");
         return;
       }
       if (!selectedVehicle.forRent) {
-        alert('Ce véhicule n\'est pas disponible à la location');
+        showNotification('error', "Indisponible", "Ce véhicule n'est malheureusement pas ouvert à la location pour le moment.");
         return;
       }
     }
 
     if (reservationType === 'ACHAT' && !selectedVehicle.forSale) {
-      alert('Ce véhicule n\'est pas disponible à l\'achat');
+      showNotification('error', "Indisponible", "Ce véhicule n'est pas disponible à la vente.");
       return;
     }
 
@@ -530,7 +672,7 @@ export default function AdminVehicleTabs() {
       if (selectedMotif === 'autre') {
         motifFinal = autreMotif.trim();
         if (!motifFinal) {
-          alert('Veuillez préciser votre motif');
+          showNotification('warning', "Précision requise", "Veuillez préciser votre motif de location personnalisé.");
           return;
         }
       } else {
@@ -562,7 +704,7 @@ export default function AdminVehicleTabs() {
 
   const processPayment = async (paymentMethod: string) => {
     if (!currentReservation || !selectedVehicle) {
-      alert('Informations de réservation manquantes');
+      showNotification('error', "Données manquantes", "Les informations de réservation sont incomplètes.");
       return;
     }
 
@@ -575,7 +717,7 @@ export default function AdminVehicleTabs() {
         ? 'Votre réservation est confirmée !\n\nLe parking vous contactera bientôt pour organiser le paiement en espèces et la remise du véhicule.'
         : 'Votre réservation et paiement sont confirmés !';
 
-      alert(message);
+      showNotification('success', "Confirmation", message);
 
       setModalPayVisible(false);
       setModalVisible(false);
@@ -588,7 +730,7 @@ export default function AdminVehicleTabs() {
 
     } catch (error: any) {
       console.error('Erreur lors du traitement:', error);
-      alert(error.message || 'Une erreur est survenue lors de la confirmation');
+      showNotification('error', "Échec de l'opération", error.message || 'Une erreur est survenue lors de la confirmation.');
     } finally {
       setIsProcessingPayment(false);
     }
@@ -613,7 +755,7 @@ export default function AdminVehicleTabs() {
   const filteredVehicles = vehicles.filter(v => {
     const brand = (v.marque || v.marqueRef?.name || '').toLowerCase();
     const model = (v.model || v.modele || '').toLowerCase();
-    const parkingName = (v.parking?.name || '').toLowerCase();
+    const parkingName = (v.parking?.name || (v.parking?.user ? `${v.parking.user.prenom} ${v.parking.user.nom}` : '')).toLowerCase();
     const matchesSearch =
       brand.includes(searchTerm.toLowerCase()) ||
       model.includes(searchTerm.toLowerCase()) ||
@@ -708,6 +850,7 @@ export default function AdminVehicleTabs() {
 
           <div className="relative flex-1 md:flex-initial">
             <select
+              title="Filtrer par statut"
               className="w-full md:w-48 pl-4 pr-10 py-3 bg-white border border-slate-100 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 appearance-none cursor-pointer font-bold text-slate-600"
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
@@ -721,6 +864,29 @@ export default function AdminVehicleTabs() {
             <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
               <FontAwesomeIcon icon={faFilter} size="xs" />
             </div>
+          </div>
+
+          <div className="flex bg-slate-100 p-1.5 rounded-2xl shadow-inner ml-auto">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${viewMode === 'grid'
+                ? 'bg-white text-orange-500 shadow-sm'
+                : 'text-slate-400 hover:text-slate-600'
+                }`}
+              title="Vue grille"
+            >
+              <FontAwesomeIcon icon={faThLarge} />
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${viewMode === 'list'
+                ? 'bg-white text-orange-500 shadow-sm'
+                : 'text-slate-400 hover:text-slate-600'
+                }`}
+              title="Vue liste"
+            >
+              <FontAwesomeIcon icon={faList} />
+            </button>
           </div>
         </div>
       </div>
@@ -766,144 +932,345 @@ export default function AdminVehicleTabs() {
         )}
       </div>
 
-      {/* Grid of Vehicles */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredVehicles.map((vehicle) => (
-          <div
-            key={vehicle.id}
-            className="group bg-white rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-500 overflow-hidden flex flex-col cursor-pointer"
-            onClick={() => {
-              setSelectedVehicle(vehicle);
-              setActiveTab('details');
-            }}
-          >
-            {/* Image Section */}
-            <div className="p-3">
-              <div className="aspect-[16/10] relative rounded-[2rem] overflow-hidden bg-slate-50 shadow-inner">
-                {getPhotoUrl(vehicle.photos) ? (
-                  <Image src={getPhotoUrl(vehicle.photos)!} alt="" fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-slate-200">
-                    <FontAwesomeIcon icon={faCar} size="3x" />
+      {/* Mode d'affichage Grille ou Liste */}
+      {viewMode === 'grid' ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredVehicles
+            .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+            .map((vehicle) => (
+              <div
+                key={vehicle.id}
+                className="group bg-white rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-500 overflow-hidden flex flex-col cursor-pointer"
+                onClick={() => {
+                  setSelectedVehicle(vehicle);
+                  setActiveTab('details');
+                }}
+              >
+                {/* Image Section */}
+                <div className="p-2">
+                  <div className="aspect-[16/9] relative rounded-[2rem] overflow-hidden bg-slate-100 shadow-inner border border-slate-50">
+                    {getPhotoUrl(vehicle.photos) ? (
+                      <Image
+                        src={getPhotoUrl(vehicle.photos)!}
+                        alt=""
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-700"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-slate-200">
+                        <FontAwesomeIcon icon={faCar} size="3x" />
+                      </div>
+                    )}
+
+                    {/* Badges sur l'image plus compacts */}
+                    <div className="absolute top-3 left-3 flex flex-row gap-1.5 flex-wrap">
+                      {vehicle.forSale && (
+                        <span className="px-3 py-1 bg-rose-500/90 backdrop-blur-sm text-white rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg flex items-center gap-1">
+                          Vente
+                        </span>
+                      )}
+                      {vehicle.forRent && (
+                        <span className="px-3 py-1 bg-emerald-500/90 backdrop-blur-sm text-white rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg flex items-center gap-1">
+                          Location
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="absolute top-3 right-3">
+                      <span className={`inline-flex items-center px-3.5 py-1.5 rounded-xl text-[10px] font-black uppercase border backdrop-blur-md shadow-sm ${getStatusColor(vehicle.status)} bg-white/90`}>
+                        {vehicle.status === 'PENDING' ? 'Attente' : vehicle.status === 'APPROVED' ? 'Validé' : vehicle.status}
+                      </span>
+                    </div>
                   </div>
-                )}
-
-                <div className="absolute top-4 left-4 flex flex-col gap-2">
-                  {vehicle.forSale && (
-                    <span className="px-3 py-1 bg-rose-500 text-white rounded-full text-[8px] font-black uppercase tracking-widest shadow-lg flex items-center gap-1">
-                      <FontAwesomeIcon icon={faTag} size="xs" />
-                      Vente
-                    </span>
-                  )}
-                  {vehicle.forRent && (
-                    <span className="px-3 py-1 bg-emerald-500 text-white rounded-full text-[8px] font-black uppercase tracking-widest shadow-lg flex items-center gap-1">
-                      <FontAwesomeIcon icon={faClockRegular} size="xs" />
-                      Location
-                    </span>
-                  )}
                 </div>
 
-                <div className="absolute top-4 right-4">
-                  <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black uppercase border backdrop-blur-md shadow-sm ${getStatusColor(vehicle.status)} bg-white/80`}>
-                    <span className="w-1.5 h-1.5 rounded-full bg-current mr-2 animate-pulse"></span>
-                    {vehicle.status === 'PENDING' ? 'En attente' : vehicle.status === 'APPROVED' ? 'Validé' : vehicle.status}
-                  </span>
+                <div className="p-6 pt-2 flex-1 flex flex-col">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 className="text-2xl font-black text-slate-800 tracking-tight leading-tight group-hover:text-orange-600 transition-colors">
+                        {vehicle.marque || vehicle.marqueRef?.name} {vehicle.model || vehicle.modele}
+                      </h3>
+                      <p className="text-slate-400 font-bold text-sm uppercase tracking-widest mt-1">
+                        {vehicle.annee || vehicle.year} • {vehicle.categorie || 'Standard'}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-3xl font-black text-orange-600 leading-none">
+                        {formatPrice(vehicle.prixJour || vehicle.prix || 0)}
+                      </p>
+                      <p className="text-xs font-black text-slate-400 uppercase tracking-widest mt-1">/jour</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+                    <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl text-xs font-bold text-slate-500">
+                      <FontAwesomeIcon icon={faGasPump} className="text-orange-500/50" />
+                      <span className="truncate">{vehicle.fuelType || vehicle.carburant || 'N/A'}</span>
+                    </div>
+                    <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl text-xs font-bold text-slate-500">
+                      <FontAwesomeIcon icon={faCogs} className="text-indigo-500/50" />
+                      <span className="truncate">{formatTransmissionForDisplay(vehicle.transmission || vehicle.boite)}</span>
+                    </div>
+                    <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl text-xs font-bold text-slate-500">
+                      <FontAwesomeIcon icon={faCalendarAlt} className="text-rose-500/50" />
+                      <span className="truncate">{vehicle.annee || vehicle.year || 'N/A'}</span>
+                    </div>
+                    <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl text-xs font-bold text-slate-500">
+                      <FontAwesomeIcon icon={faTachometerAlt} className="text-emerald-500/50" />
+                      <span className="truncate">{formatMileage(vehicle.mileage || vehicle.kilometrage || 0)}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {vehicle.garantie && (
+                      <span className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-600 rounded-lg text-[9px] font-black uppercase tracking-widest border border-emerald-100">
+                        <FontAwesomeIcon icon={faShieldAlt} size="xs" />
+                        Garantie
+                      </span>
+                    )}
+                    {vehicle.assurance && (
+                      <span className="flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-[9px] font-black uppercase tracking-widest border border-blue-100">
+                        <FontAwesomeIcon icon={faCheckCircle} size="xs" />
+                        Assurance
+                      </span>
+                    )}
+                    {vehicle.chauffeur && (
+                      <span className="flex items-center gap-1.5 px-3 py-1 bg-purple-50 text-purple-600 rounded-lg text-[9px] font-black uppercase tracking-widest border border-purple-100">
+                        <FontAwesomeIcon icon={faUserTie} size="xs" />
+                        Chauffeur
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-2 mb-6 px-1">
+                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                      <FontAwesomeIcon icon={faMapMarkerAlt} size="sm" />
+                    </div>
+                    <p className="text-sm font-bold text-slate-500 truncate">
+                      {vehicle.parking?.name || 'Localisation non spécifiée'}
+                    </p>
+                  </div>
+
+                  <div className="mt-auto flex gap-2">
+                    <button
+                      title="Voir les détails du véhicule"
+                      className="flex-1 py-3 bg-slate-50 hover:bg-orange-50 text-slate-600 hover:text-orange-600 rounded-2xl font-black text-sm uppercase tracking-widest transition-all"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedVehicle(vehicle);
+                        setActiveTab('details');
+                      }}
+                    >
+                      Détails
+                    </button>
+                    <button
+                      className="w-12 py-3 bg-rose-50 hover:bg-rose-100 text-rose-500 rounded-2xl flex items-center justify-center transition-all"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleAction(vehicle.id, 'DELETE');
+                      }}
+                    >
+                      <FontAwesomeIcon icon={faTrash} />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
+            ))}
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {filteredVehicles
+            .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+            .map((vehicle) => (
+              <div
+                key={vehicle.id}
+                className="group bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/40 transition-all duration-300 overflow-hidden flex flex-col md:flex-row cursor-pointer"
+                onClick={() => {
+                  setSelectedVehicle(vehicle);
+                  setActiveTab('details');
+                }}
+              >
+                {/* Image Section - Fixed width and flex-shrink-0 */}
+                <div className="w-full md:w-80 p-3 shrink-0">
+                  <div className="aspect-[16/10] md:h-full relative rounded-2xl overflow-hidden bg-slate-50 shadow-inner">
+                    {getPhotoUrl(vehicle.photos) ? (
+                      <Image
+                        src={getPhotoUrl(vehicle.photos)!}
+                        alt=""
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-700"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-slate-200">
+                        <FontAwesomeIcon icon={faCar} size="2x" />
+                      </div>
+                    )}
 
-            <div className="p-6 pt-2 flex-1 flex flex-col">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className="text-xl font-black text-slate-800 tracking-tight leading-tight group-hover:text-orange-600 transition-colors">
-                    {vehicle.marque || vehicle.marqueRef?.name} {vehicle.model || vehicle.modele}
-                  </h3>
-                  <p className="text-slate-400 font-bold text-xs uppercase tracking-widest mt-1">
-                    {vehicle.annee || vehicle.year} • {vehicle.categorie || 'Standard'}
-                  </p>
+                    <div className="absolute top-3 left-3 flex flex-row gap-1 flex-wrap">
+                      {vehicle.forSale && (
+                        <span className="px-3 py-1 bg-rose-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest shadow-lg">
+                          Vente
+                        </span>
+                      )}
+                      {vehicle.forRent && (
+                        <span className="px-3 py-1 bg-emerald-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest shadow-lg">
+                          Location
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-2xl font-black text-orange-600 leading-none">
-                    {formatPrice(vehicle.prixJour || vehicle.prix || 0)}
-                  </p>
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">/jour</p>
+
+                {/* Contenu - Espacement garanti par le padding et flex-1 */}
+                <div className="flex-1 p-6 flex flex-col justify-center min-w-0">
+                  <div className="flex flex-col lg:flex-row justify-between lg:items-start gap-4">
+                    <div className="min-w-0">
+                      <h3 className="text-3xl font-black text-slate-800 tracking-tight group-hover:text-orange-600 transition-colors truncate">
+                        {vehicle.marque || vehicle.marqueRef?.name} {vehicle.model || vehicle.modele}
+                      </h3>
+                      <div className="flex items-center gap-2 mt-1">
+                        <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">
+                          {vehicle.annee || vehicle.year} • {vehicle.categorie || 'Standard'}
+                        </p>
+                        <span className={`inline-flex items-center px-3.5 py-1.5 rounded-full text-[11px] font-black uppercase border ${getStatusColor(vehicle.status)} bg-white`}>
+                          {vehicle.status === 'PENDING' ? 'En attente' : vehicle.status === 'APPROVED' ? 'Validé' : vehicle.status}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="lg:text-right shrink-0">
+                      <p className="text-3xl font-black text-orange-600 leading-none">
+                        {formatPrice(vehicle.prixJour || vehicle.prix || 0)}
+                      </p>
+                      <p className="text-xs font-black text-slate-400 uppercase tracking-widest mt-1">/jour</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                    <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
+                      <div className="w-6 h-6 rounded-lg bg-orange-50 flex items-center justify-center text-orange-500 shrink-0">
+                        <FontAwesomeIcon icon={faGasPump} size="xs" />
+                      </div>
+                      <span className="truncate">{vehicle.fuelType || vehicle.carburant || 'N/A'}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
+                      <div className="w-6 h-6 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-500 shrink-0">
+                        <FontAwesomeIcon icon={faCogs} size="xs" />
+                      </div>
+                      <span className="truncate">{formatTransmissionForDisplay(vehicle.transmission || vehicle.boite)}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
+                      <div className="w-6 h-6 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-500 shrink-0">
+                        <FontAwesomeIcon icon={faTachometerAlt} size="xs" />
+                      </div>
+                      <span className="truncate">{formatMileage(vehicle.mileage || vehicle.kilometrage || 0)}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
+                      <div className="w-6 h-6 rounded-lg bg-rose-50 flex items-center justify-center text-rose-500 shrink-0">
+                        <FontAwesomeIcon icon={faMapMarkerAlt} size="xs" />
+                      </div>
+                      <span className="truncate">{vehicle.parking?.name || 'Localisation'}</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-auto pt-6 flex items-center justify-between border-t border-slate-50">
+                    <div className="flex gap-2">
+                      {vehicle.garantie && (
+                        <div className="w-8 h-8 rounded-lg border border-emerald-100 bg-emerald-50 flex items-center justify-center text-emerald-600" title="Garantie">
+                          <FontAwesomeIcon icon={faShieldAlt} size="xs" />
+                        </div>
+                      )}
+                      {vehicle.assurance && (
+                        <div className="w-8 h-8 rounded-lg border border-blue-100 bg-blue-50 flex items-center justify-center text-blue-600" title="Assurance">
+                          <FontAwesomeIcon icon={faCheckCircle} size="xs" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        title="Voir les détails du véhicule"
+                        className="px-6 py-2 bg-slate-50 hover:bg-orange-50 text-slate-600 hover:text-orange-600 rounded-xl font-black text-xs uppercase tracking-widest transition-all"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedVehicle(vehicle);
+                          setActiveTab('details');
+                        }}
+                      >
+                        Détails
+                      </button>
+                      <button
+                        className="w-10 h-10 bg-rose-50 hover:bg-rose-100 text-rose-500 rounded-xl flex items-center justify-center transition-all"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAction(vehicle.id, 'DELETE');
+                        }}
+                      >
+                        <FontAwesomeIcon icon={faTrash} />
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
+            ))}
+        </div>
+      )}
 
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-                <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl text-[10px] font-bold text-slate-500">
-                  <FontAwesomeIcon icon={faGasPump} className="text-orange-500/50" />
-                  <span className="truncate">{vehicle.fuelType || vehicle.carburant || 'N/A'}</span>
-                </div>
-                <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl text-[10px] font-bold text-slate-500">
-                  <FontAwesomeIcon icon={faCogs} className="text-indigo-500/50" />
-                  <span className="truncate">{formatTransmissionForDisplay(vehicle.transmission || vehicle.boite)}</span>
-                </div>
-                <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl text-[10px] font-bold text-slate-500">
-                  <FontAwesomeIcon icon={faCalendarAlt} className="text-rose-500/50" />
-                  <span className="truncate">{vehicle.annee || vehicle.year || 'N/A'}</span>
-                </div>
-                <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl text-[10px] font-bold text-slate-500">
-                  <FontAwesomeIcon icon={faTachometerAlt} className="text-emerald-500/50" />
-                  <span className="truncate">{formatMileage(vehicle.mileage || vehicle.kilometrage || 0)}</span>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap gap-2 mb-6">
-                {vehicle.garantie && (
-                  <span className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-600 rounded-lg text-[9px] font-black uppercase tracking-widest border border-emerald-100">
-                    <FontAwesomeIcon icon={faShieldAlt} size="xs" />
-                    Garantie
-                  </span>
-                )}
-                {vehicle.assurance && (
-                  <span className="flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-[9px] font-black uppercase tracking-widest border border-blue-100">
-                    <FontAwesomeIcon icon={faCheckCircle} size="xs" />
-                    Assurance
-                  </span>
-                )}
-                {vehicle.chauffeur && (
-                  <span className="flex items-center gap-1.5 px-3 py-1 bg-purple-50 text-purple-600 rounded-lg text-[9px] font-black uppercase tracking-widest border border-purple-100">
-                    <FontAwesomeIcon icon={faUserTie} size="xs" />
-                    Chauffeur
-                  </span>
-                )}
-              </div>
-
-              <div className="flex items-center gap-2 mb-6 px-1">
-                <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
-                  <FontAwesomeIcon icon={faMapMarkerAlt} size="xs" />
-                </div>
-                <p className="text-xs font-bold text-slate-500 truncate">
-                  {vehicle.parking?.name || 'Localisation non spécifiée'}
-                </p>
-              </div>
-
-              <div className="mt-auto flex gap-2">
-                <button
-                  className="flex-1 py-3 bg-slate-50 hover:bg-orange-50 text-slate-600 hover:text-orange-600 rounded-2xl font-black text-xs uppercase tracking-widest transition-all"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedVehicle(vehicle);
-                    setActiveTab('details');
-                  }}
-                >
-                  Détails
-                </button>
-                <button
-                  className="w-12 py-3 bg-rose-50 hover:bg-rose-100 text-rose-500 rounded-2xl flex items-center justify-center transition-all"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleAction(vehicle.id, 'DELETE');
-                  }}
-                >
-                  <FontAwesomeIcon icon={faTrash} />
-                </button>
-              </div>
-            </div>
+      {/* Pagination Style Utilisateur - Harmonisation avec la page Users */}
+      {filteredVehicles.length > 0 && (
+        <div className="mt-8 px-6 py-4 bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-700 font-medium">
+              Affichage de <span className="font-bold">{(currentPage - 1) * itemsPerPage + 1}</span> à <span className="font-bold">{Math.min(currentPage * itemsPerPage, filteredVehicles.length)}</span> sur <span className="font-bold text-orange-600">{filteredVehicles.length}</span> véhicules
+            </span>
+            <select
+              title="Nombre d'éléments par page"
+              value={itemsPerPage}
+              onChange={(e) => {
+                setItemsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm font-bold text-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500/20 cursor-pointer transition-all hover:bg-gray-100"
+            >
+              <option value={6}>6 par page</option>
+              <option value={12}>12 par page</option>
+              <option value={24}>24 par page</option>
+              <option value={48}>48 par page</option>
+            </select>
           </div>
-        ))}
-      </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              title="Page précédente"
+              onClick={() => {
+                setCurrentPage(prev => Math.max(prev - 1, 1));
+                window.scrollTo({ top: 300, behavior: 'smooth' });
+              }}
+              disabled={currentPage === 1}
+              className="w-10 h-10 border border-gray-200 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-50 hover:text-orange-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+            >
+              <FontAwesomeIcon icon={faChevronLeft} />
+            </button>
+
+            <div className="px-4 py-2 bg-gray-50 rounded-lg border border-gray-100">
+              <span className="text-sm font-bold text-gray-700">
+                Page <span className="text-orange-600">{currentPage}</span> sur {Math.ceil(filteredVehicles.length / itemsPerPage) || 1}
+              </span>
+            </div>
+
+            <button
+              title="Page suivante"
+              onClick={() => {
+                setCurrentPage(prev => Math.min(prev + 1, Math.ceil(filteredVehicles.length / itemsPerPage)));
+                window.scrollTo({ top: 300, behavior: 'smooth' });
+              }}
+              disabled={currentPage === Math.ceil(filteredVehicles.length / itemsPerPage) || filteredVehicles.length === 0}
+              className="w-10 h-10 border border-gray-200 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-50 hover:text-orange-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+            >
+              <FontAwesomeIcon icon={faChevronRight} />
+            </button>
+          </div>
+        </div>
+      )}
 
       {filteredVehicles.length === 0 && (
         <div className="py-24 text-center">
@@ -911,7 +1278,7 @@ export default function AdminVehicleTabs() {
             <FontAwesomeIcon icon={faCar} size="2x" />
           </div>
           <h3 className="text-2xl font-black text-slate-800 tracking-tight">Aucun véhicule</h3>
-          <p className="text-slate-400 font-bold mt-1">Nous n'avons trouvé aucun véhicule correspondant à votre recherche.</p>
+          <p className="text-slate-400 font-bold mt-1">Nous n&apos;avons trouvé aucun véhicule correspondant à votre recherche.</p>
           <button
             onClick={() => {
               setSearchTerm('');
@@ -944,6 +1311,7 @@ export default function AdminVehicleTabs() {
             <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
               <h3 className="text-2xl font-black text-slate-900 tracking-tight">Filtres Avancés</h3>
               <button
+                title="Fermer les filtres"
                 onClick={() => setShowAdvancedFilters(false)}
                 className="w-10 h-10 rounded-full bg-white border border-slate-100 text-slate-400 hover:text-slate-900 transition-all flex items-center justify-center shadow-sm"
               >
@@ -1123,7 +1491,7 @@ export default function AdminVehicleTabs() {
             <div className="w-10 h-10 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center group-hover:bg-orange-50 group-hover:border-orange-100 transition-all">
               <FontAwesomeIcon icon={faChevronLeft} size="xs" />
             </div>
-            Retour à l'inventaire
+            Retour à l&apos;inventaire
           </button>
 
           <div className="flex flex-wrap gap-2">
@@ -1189,12 +1557,14 @@ export default function AdminVehicleTabs() {
                   {photos.length > 1 && (
                     <>
                       <button
+                        title="Image précédente"
                         onClick={prevImage}
                         className="absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md text-white border border-white/30 flex items-center justify-center hover:bg-white/40 transition-all z-20 shadow-2xl active:scale-90"
                       >
                         <FontAwesomeIcon icon={faChevronLeft} />
                       </button>
                       <button
+                        title="Image suivante"
                         onClick={nextImage}
                         className="absolute right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md text-white border border-white/30 flex items-center justify-center hover:bg-white/40 transition-all z-20 shadow-2xl active:scale-90"
                       >
@@ -1215,7 +1585,7 @@ export default function AdminVehicleTabs() {
               )}
 
               {/* Status Badges Overlay */}
-              <div className="absolute top-6 left-6 flex flex-col gap-2 z-20">
+              <div className="absolute top-6 left-6 flex flex-row gap-2 z-20 flex-wrap">
                 {selectedVehicle.forSale && (
                   <span className="px-5 py-2.5 bg-rose-500/90 backdrop-blur-sm text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center gap-2 border border-rose-400/30">
                     <FontAwesomeIcon icon={faTag} size="xs" />
@@ -1236,6 +1606,7 @@ export default function AdminVehicleTabs() {
               <div className="bg-slate-50 border-b border-slate-100 p-4 flex justify-center gap-3">
                 {photos.map((photo, idx) => (
                   <button
+                    title={`Voir la photo ${idx + 1}`}
                     key={idx}
                     onClick={() => setCurrentImageIndex(idx)}
                     className={`relative w-20 h-14 rounded-xl overflow-hidden border-2 transition-all ${idx === currentImageIndex
@@ -1366,7 +1737,7 @@ export default function AdminVehicleTabs() {
                     <FontAwesomeIcon icon={faMapMarkerAlt} />
                   </div>
                   <div>
-                    <p className="font-black text-orange-900">{selectedVehicle.parking.name || 'Parking'}</p>
+                    <p className="font-black text-orange-900">{selectedVehicle.parking.name || (selectedVehicle.parking.user ? `${selectedVehicle.parking.user.prenom} ${selectedVehicle.parking.user.nom}` : 'Parking privé')}</p>
                     <p className="text-xs text-orange-700">{selectedVehicle.parking.address || 'Adresse non spécifiée'}</p>
                   </div>
                 </div>
@@ -1466,6 +1837,7 @@ export default function AdminVehicleTabs() {
           <div className="sticky top-0 bg-white p-6 border-b border-slate-100 flex justify-between items-center z-10">
             <h2 className="text-2xl font-black text-slate-900">Aperçu réservation</h2>
             <button
+              title="Fermer"
               onClick={() => {
                 setModalVisible(false);
                 setReservationType(null);
@@ -1558,6 +1930,7 @@ export default function AdminVehicleTabs() {
                   </div>
                   {selectedMotif === 'autre' && (
                     <input
+                      title="Précisez votre motif"
                       type="text"
                       placeholder="Précisez votre motif..."
                       value={autreMotif}
@@ -1591,20 +1964,21 @@ export default function AdminVehicleTabs() {
                 <div className="mb-6">
                   <label className="flex items-start gap-3 cursor-pointer">
                     <input
+                      title="Accepter les conditions"
                       type="checkbox"
                       checked={conditionsAccepted}
                       onChange={(e) => setConditionsAccepted(e.target.checked)}
                       className="mt-1 w-5 h-5 accent-orange-500"
                     />
                     <span className="text-sm font-bold text-slate-700">
-                      J'accepte les conditions générales de location
+                      J&apos;accepte les conditions générales de location
                     </span>
                   </label>
 
                   <div className="mt-4 p-4 bg-slate-50 rounded-xl text-sm text-slate-600 space-y-2">
                     <p className="flex items-center gap-2">
                       <FontAwesomeIcon icon={faCheckCircle} className="text-emerald-500" size="xs" />
-                      Le client prend en charge les frais d'essence
+                      Le client prend en charge les frais d&apos;essence
                     </p>
                     <p className="flex items-center gap-2">
                       <FontAwesomeIcon icon={faCheckCircle} className="text-emerald-500" size="xs" />
@@ -1612,7 +1986,7 @@ export default function AdminVehicleTabs() {
                     </p>
                     <p className="flex items-center gap-2">
                       <FontAwesomeIcon icon={faCheckCircle} className="text-emerald-500" size="xs" />
-                      Véhicule doit être retourné dans l'état initial
+                      Véhicule doit être retourné dans l&apos;état initial
                     </p>
                     {selectedVehicle.chauffeur && (
                       <p className="flex items-center gap-2">
@@ -1630,7 +2004,7 @@ export default function AdminVehicleTabs() {
                 <FontAwesomeIcon icon={faShoppingCart} size="3x" className="text-emerald-600 mb-4" />
                 <p className="text-lg font-black text-emerald-800 mb-2">Achat immédiat</p>
                 <p className="text-3xl font-black text-emerald-600 mb-4">{formatPrice(dailyPrice)}</p>
-                <p className="text-sm text-emerald-700">Ce véhicule est disponible à l'achat. Tous les documents sont inclus.</p>
+                <p className="text-sm text-emerald-700">Ce véhicule est disponible à l&apos;achat. Tous les documents sont inclus.</p>
               </div>
             )}
 
@@ -1673,6 +2047,7 @@ export default function AdminVehicleTabs() {
           <div className="p-6 border-b border-slate-100 flex justify-between items-center">
             <h2 className="text-2xl font-black text-slate-900">Paiement</h2>
             <button
+              title="Fermer"
               onClick={() => {
                 setModalPayVisible(false);
                 setCurrentReservation(null);
@@ -1946,6 +2321,7 @@ export default function AdminVehicleTabs() {
               Édition du véhicule
             </h2>
             <button
+              title="Fermer"
               onClick={() => setIsEditing(false)}
               className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center transition-all"
             >
@@ -1964,6 +2340,7 @@ export default function AdminVehicleTabs() {
                   <div key={`existing-${index}`} className="relative w-24 h-24 rounded-xl overflow-hidden group/photo shadow-sm">
                     <Image src={photo} alt="" fill className="object-cover" />
                     <button
+                      title="Supprimer la photo"
                       onClick={() => {
                         const newPhotos = [...editExistingPhotos];
                         newPhotos.splice(index, 1);
@@ -1983,6 +2360,7 @@ export default function AdminVehicleTabs() {
                   <div key={`new-${index}`} className="relative w-24 h-24 rounded-xl overflow-hidden group/photo border-2 border-orange-500 shadow-sm">
                     <Image src={URL.createObjectURL(file)} alt="" fill className="object-cover" />
                     <button
+                      title="Supprimer la photo"
                       onClick={() => setEditNewPhotos(prev => prev.filter((_, i) => i !== index))}
                       className="absolute top-1 right-1 w-6 h-6 bg-rose-500 text-white rounded-full flex items-center justify-center text-xs opacity-0 group-hover/photo:opacity-100 transition-opacity z-10 shadow-md"
                     >
@@ -2050,6 +2428,7 @@ export default function AdminVehicleTabs() {
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Prix (FCFA)</label>
                 <input
+                  title="Prix du véhicule"
                   type="number"
                   value={editPrice}
                   onChange={(e) => setEditPrice(Number(e.target.value))}
@@ -2060,6 +2439,7 @@ export default function AdminVehicleTabs() {
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Kilométrage (km)</label>
                 <input
+                  title="Kilométrage du véhicule"
                   type="number"
                   value={editMileage}
                   onChange={(e) => setEditMileage(Number(e.target.value))}
@@ -2070,6 +2450,7 @@ export default function AdminVehicleTabs() {
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Statut</label>
                 <select
+                  title="Statut du véhicule"
                   value={editStatus}
                   onChange={(e) => setEditStatus(e.target.value)}
                   className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all"
@@ -2083,6 +2464,7 @@ export default function AdminVehicleTabs() {
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Carburant</label>
                 <select
+                  title="Type de carburant"
                   value={editFuelType}
                   onChange={(e) => setEditFuelType(e.target.value)}
                   className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all"
@@ -2097,6 +2479,7 @@ export default function AdminVehicleTabs() {
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Transmission</label>
                 <select
+                  title="Type de transmission"
                   value={editTransmission}
                   onChange={(e) => setEditTransmission(e.target.value)}
                   className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all"
@@ -2149,6 +2532,7 @@ export default function AdminVehicleTabs() {
                     <div className="space-y-2">
                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Durée Garantie (mois)</label>
                       <select
+                        title="Durée de la garantie"
                         value={editDureeGarantie}
                         onChange={(e) => setEditDureeGarantie(Number(e.target.value))}
                         className="w-full px-5 py-3 bg-orange-50 border border-orange-100 rounded-2xl outline-none font-bold text-orange-700 transition-all"
@@ -2163,6 +2547,7 @@ export default function AdminVehicleTabs() {
                     <div className="space-y-2">
                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Durée Assurance (mois)</label>
                       <select
+                        title="Durée de l'assurance"
                         value={editDureeAssurance}
                         onChange={(e) => setEditDureeAssurance(Number(e.target.value))}
                         className="w-full px-5 py-3 bg-orange-50 border border-orange-100 rounded-2xl outline-none font-bold text-orange-700 transition-all"
@@ -2191,6 +2576,365 @@ export default function AdminVehicleTabs() {
     );
   };
 
+  const renderAddModal = () => {
+    return (
+      <div className="fixed inset-0 z-[200] flex items-center justify-center animate-fadeIn bg-slate-900/60 backdrop-blur-sm p-4">
+        <div className="w-full max-w-4xl bg-white rounded-[2.5rem] shadow-2xl max-h-[90vh] overflow-y-auto relative flex flex-col">
+          {/* Header */}
+          <div className="sticky top-0 bg-white p-8 border-b border-slate-100 flex justify-between items-center z-20">
+            <div>
+              <h2 className="text-3xl font-black text-slate-900 flex items-center gap-4">
+                <span className="w-12 h-12 rounded-2xl bg-orange-100 text-orange-500 flex items-center justify-center shadow-inner">
+                  <FontAwesomeIcon icon={faCar} />
+                </span>
+                Nouveau véhicule
+              </h2>
+              <div className="flex items-center gap-3 mt-3">
+                <div className="flex items-center gap-1.5">
+                  <div className={`w-3 h-3 rounded-full ${addStep >= 1 ? 'bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.5)]' : 'bg-slate-200'} transition-all`} />
+                  <span className={`text-[10px] font-black uppercase tracking-widest ${addStep === 1 ? 'text-slate-900' : 'text-slate-400'}`}>Infos Base</span>
+                </div>
+                <div className="w-8 h-px bg-slate-100" />
+                <div className="flex items-center gap-1.5">
+                  <div className={`w-3 h-3 rounded-full ${addStep >= 2 ? 'bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.5)]' : 'bg-slate-200'} transition-all`} />
+                  <span className={`text-[10px] font-black uppercase tracking-widest ${addStep === 2 ? 'text-slate-900' : 'text-slate-400'}`}>Options</span>
+                </div>
+              </div>
+            </div>
+            <button
+              title="Fermer"
+              onClick={() => setIsAdding(false)}
+              className="w-12 h-12 rounded-full bg-slate-50 text-slate-400 hover:text-slate-900 hover:bg-white border border-slate-100 transition-all flex items-center justify-center shadow-sm"
+            >
+              <FontAwesomeIcon icon={faTimes} />
+            </button>
+          </div>
+
+          <div className="p-8">
+            {addStep === 1 ? (
+              <div className="space-y-8 animate-fadeIn">
+                {/* Photo Upload Section */}
+                <div className="p-8 bg-slate-50 rounded-[2.5rem] border border-slate-200 shadow-inner">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2 mb-6 block">
+                    Photos du véhicule ({addPhotos.length}/10)
+                  </label>
+                  <div className="flex flex-wrap gap-4">
+                    {addPhotos.map((file, index) => (
+                      <div key={index} className="relative w-28 h-28 rounded-2xl overflow-hidden group/photo border-2 border-white shadow-lg">
+                        <Image src={URL.createObjectURL(file)} alt="" fill className="object-cover" />
+                        <button
+                          title="Supprimer la photo"
+                          onClick={() => setAddPhotos(prev => prev.filter((_, i) => i !== index))}
+                          className="absolute top-2 right-2 w-8 h-8 bg-rose-500 text-white rounded-full flex items-center justify-center text-sm opacity-0 group-hover/photo:opacity-100 transition-all z-10 shadow-xl"
+                        >
+                          <FontAwesomeIcon icon={faTimesCircle} />
+                        </button>
+                      </div>
+                    ))}
+                    {addPhotos.length < 10 && (
+                      <label className="w-28 h-28 rounded-2xl border-2 border-dashed border-slate-300 bg-white flex flex-col items-center justify-center cursor-pointer hover:border-orange-500 hover:bg-orange-50 transition-all text-slate-400 hover:text-orange-500 group shadow-sm">
+                        <FontAwesomeIcon icon={faImage} size="xl" className="group-hover:scale-110 transition-transform text-slate-300 group-hover:text-orange-400" />
+                        <span className="text-[10px] font-black uppercase tracking-widest mt-3 transition-colors">Ajouter</span>
+                        <input
+                          type="file"
+                          multiple
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            if (e.target.files) {
+                              const files = Array.from(e.target.files);
+                              setAddPhotos(prev => [...prev, ...files].slice(0, 10));
+                            }
+                          }}
+                        />
+                      </label>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Marque</label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        list="marques-list"
+                        value={addMarque}
+                        onChange={(e) => setAddMarque(e.target.value)}
+                        className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all"
+                        placeholder="Ex: Toyota"
+                      />
+                      <datalist id="marques-list">
+                        {marquesList.map((m, i) => (
+                          <option key={i} value={m.name} />
+                        ))}
+                      </datalist>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Modèle</label>
+                    <input
+                      type="text"
+                      value={addModel}
+                      onChange={(e) => setAddModel(e.target.value)}
+                      className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all"
+                      placeholder="Corolla"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Année</label>
+                    <input
+                      title="Année du véhicule"
+                      type="number"
+                      value={addYear}
+                      onChange={(e) => setAddYear(Number(e.target.value))}
+                      className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all"
+                    />
+                  </div>
+                  <div className="space-y-2 text-orange-600">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Prix (FCFA)</label>
+                    <div className="relative">
+                      <input
+                        title="Prix du véhicule"
+                        type="number"
+                        value={addPrice}
+                        onChange={(e) => setAddPrice(Number(e.target.value))}
+                        className="w-full px-6 py-4 bg-orange-50/50 border border-orange-100 rounded-2xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 outline-none font-black text-orange-600 transition-all text-xl"
+                      />
+                      <span className="absolute right-6 top-1/2 -translate-y-1/2 font-black text-orange-300">FCFA</span>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Kilométrage (km)</label>
+                    <input
+                      title="Kilométrage du véhicule"
+                      type="number"
+                      value={addMileage}
+                      onChange={(e) => setAddMileage(Number(e.target.value))}
+                      className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Catégorie</label>
+                    <select
+                      title="Catégorie du véhicule"
+                      value={addCategory}
+                      onChange={(e) => setAddCategory(e.target.value)}
+                      className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all appearance-none cursor-pointer"
+                    >
+                      <option value="Standard">Standard</option>
+                      <option value="Économique">Économique</option>
+                      <option value="Luxe">Luxe</option>
+                      <option value="4x4">4x4 / SUV</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Carburant</label>
+                    <select
+                      title="Type de carburant"
+                      value={addFuelType}
+                      onChange={(e) => setAddFuelType(e.target.value)}
+                      className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none font-bold text-slate-700 appearance-none cursor-pointer"
+                    >
+                      <option value="ESSENCE">Essence</option>
+                      <option value="DIESEL">Diesel</option>
+                      <option value="ELECTRIQUE">Électrique</option>
+                      <option value="HYBRIDE">Hybride</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Transmission</label>
+                    <select
+                      title="Type de transmission"
+                      value={addTransmission}
+                      onChange={(e) => setAddTransmission(e.target.value)}
+                      className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none font-bold text-slate-700 appearance-none cursor-pointer"
+                    >
+                      <option value="MANUAL">Manuelle</option>
+                      <option value="AUTOMATIC">Automatique</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Parking de rattachement *</label>
+                    <select
+                      title="Sélectionner un parking"
+                      value={addParkingId}
+                      onChange={(e) => setAddParkingId(e.target.value)}
+                      className="w-full px-6 py-4 bg-indigo-50 border border-indigo-100 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-indigo-700 appearance-none cursor-pointer"
+                    >
+                      <option value="">Sélectionner un parking</option>
+                      {parkingsList.map((p) => (
+                        <option key={p.id} value={p.id}>{p.name || `Parking #${p.id}`}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="space-y-2 md:col-span-2 lg:col-span-3">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Description</label>
+                    <textarea
+                      value={addDescription}
+                      onChange={(e) => setAddDescription(e.target.value)}
+                      rows={3}
+                      className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-[2rem] outline-none font-bold text-slate-700 resize-none transition-all focus:ring-4 focus:ring-orange-500/10"
+                      placeholder="Décrivez l'état général du véhicule..."
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-6 p-8 bg-slate-50 rounded-[2rem] border border-slate-100">
+                  <div className="flex-1">
+                    <p className="text-sm font-black text-slate-900 uppercase tracking-widest">Disponibilités obligatoires</p>
+                    <p className="text-xs font-bold text-slate-400 mt-1">Choisissez les modes d&apos;exploitation du véhicule</p>
+                  </div>
+                  <div className="flex gap-4">
+                    <button
+                      onClick={() => setAddForSale(!addForSale)}
+                      className={`px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all flex items-center gap-2 ${addForSale ? 'bg-orange-500 text-white border-orange-600 shadow-xl shadow-orange-500/20' : 'bg-white text-slate-400 border-slate-100'}`}
+                    >
+                      <FontAwesomeIcon icon={faTag} />
+                      Vente
+                    </button>
+                    <button
+                      onClick={() => setAddForRent(!addForRent)}
+                      className={`px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all flex items-center gap-2 ${addForRent ? 'bg-indigo-500 text-white border-indigo-600 shadow-xl shadow-indigo-500/20' : 'bg-white text-slate-400 border-slate-100'}`}
+                    >
+                      <FontAwesomeIcon icon={faClockRegular} />
+                      Location
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex justify-end pt-4">
+                  <button
+                    onClick={() => {
+                      if (!addMarque || !addModel || !addPrice || !addParkingId || addPhotos.length === 0 || (!addForSale && !addForRent)) {
+                        const missingFields = [];
+                        if (!addMarque) missingFields.push("la marque");
+                        if (!addModel) missingFields.push("le modèle");
+                        if (!addPrice) missingFields.push("le prix");
+                        if (!addParkingId) missingFields.push("le parking");
+                        if (addPhotos.length === 0) missingFields.push("au moins une photo");
+                        if (!addForSale && !addForRent) missingFields.push("un type (Vente ou Location)");
+
+                        showNotification('warning', "Champs requis", `Veuillez renseigner ${missingFields.join(', ')}.`);
+                        return;
+                      }
+                      setAddStep(2);
+                    }}
+                    className="group px-12 py-5 bg-slate-900 text-white rounded-[2rem] font-black text-sm uppercase tracking-widest shadow-2xl shadow-slate-900/40 hover:bg-black transition-all flex items-center gap-4 active:scale-95"
+                  >
+                    Suivant
+                    <FontAwesomeIcon icon={faArrowRight} className="group-hover:translate-x-1 transition-transform text-orange-500" />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-8 animate-fadeIn">
+                <div className="bg-slate-50 p-8 rounded-[2.5rem] border border-slate-100 shadow-inner grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                  {[
+                    { id: 'garantie', label: 'Garantie', state: addGarantie, setter: setAddGarantie, icon: faShieldAlt, color: 'emerald' },
+                    { id: 'assurance', label: 'Assurance', state: addAssurance, setter: setAddAssurance, icon: faCheckCircle, color: 'blue' },
+                    { id: 'chauffeur', label: 'Chauffeur', state: addChauffeur, setter: setAddChauffeur, icon: faUserTie, color: 'purple' },
+                    { id: 'carteGrise', label: 'Carte Grise', state: addCarteGrise, setter: setAddCarteGrise, icon: faFileContract, color: 'rose' },
+                    { id: 'vignette', label: 'Vignette', state: addVignette, setter: setAddVignette, icon: faCertificate, color: 'amber' },
+                  ].map((opt) => (
+                    <button
+                      key={opt.id}
+                      onClick={() => opt.setter(!opt.state)}
+                      className={`flex flex-col items-center gap-4 p-6 rounded-[2rem] border transition-all duration-500 group ${opt.state
+                        ? `bg-white border-${opt.color}-200 shadow-xl shadow-slate-200/50`
+                        : 'bg-slate-50 border-slate-100 opacity-60 grayscale hover:grayscale-0 hover:opacity-100'}`}
+                    >
+                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-xl transition-all duration-500 ${opt.state ? `bg-${opt.color}-100 text-${opt.color}-500 shadow-inner` : 'bg-slate-200 text-slate-400 group-hover:scale-110'}`}>
+                        <FontAwesomeIcon icon={opt.icon} />
+                      </div>
+                      <span className={`text-[10px] font-black uppercase tracking-widest text-center ${opt.state ? 'text-slate-900' : 'text-slate-400'}`}>
+                        {opt.label}
+                      </span>
+                      <div className={`w-8 h-4 rounded-full relative transition-colors ${opt.state ? `bg-${opt.color}-500/20` : 'bg-slate-200'}`}>
+                        <div className={`absolute top-1 w-2 h-2 rounded-full transition-all duration-300 ${opt.state ? 'right-1 bg-white shadow-sm scale-125' : 'left-1 bg-slate-400'}`} />
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {addGarantie && (
+                    <div className="space-y-3 p-6 bg-emerald-50/50 rounded-[2rem] border border-emerald-100 animate-slideDown">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                          <FontAwesomeIcon icon={faShieldAlt} size="xs" />
+                        </div>
+                        <label className="text-[10px] font-black text-emerald-700 uppercase tracking-widest">Durée de Garantie</label>
+                      </div>
+                      <select
+                        title="Durée de la garantie"
+                        value={addDureeGarantie}
+                        onChange={(e) => setAddDureeGarantie(Number(e.target.value))}
+                        className="w-full px-6 py-4 bg-white border border-emerald-100 rounded-2xl outline-none font-bold text-emerald-700 cursor-pointer hover:border-emerald-300 transition-all appearance-none"
+                      >
+                        <option value={0}>Non spécifiée</option>
+                        {[3, 6, 12, 24, 36].map(m => <option key={m} value={m}>{m} mois</option>)}
+                      </select>
+                    </div>
+                  )}
+
+                  {addAssurance && (
+                    <div className="space-y-3 p-6 bg-blue-50/50 rounded-[2rem] border border-blue-100 animate-slideDown">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+                          <FontAwesomeIcon icon={faCheckCircle} size="xs" />
+                        </div>
+                        <label className="text-[10px] font-black text-blue-700 uppercase tracking-widest">Durée d&apos;Assurance</label>
+                      </div>
+                      <select
+                        title="Durée de l'assurance"
+                        value={addDureeAssurance}
+                        onChange={(e) => setAddDureeAssurance(Number(e.target.value))}
+                        className="w-full px-6 py-4 bg-white border border-blue-100 rounded-2xl outline-none font-bold text-blue-700 cursor-pointer hover:border-blue-300 transition-all appearance-none"
+                      >
+                        <option value={0}>Non spécifiée</option>
+                        {[3, 6, 12, 24].map(m => <option key={m} value={m}>{m} mois</option>)}
+                      </select>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex gap-4 pt-12">
+                  <button
+                    onClick={() => setAddStep(1)}
+                    className="px-10 py-5 bg-white border border-slate-200 text-slate-400 rounded-[2rem] font-black text-sm uppercase tracking-widest hover:text-slate-900 hover:border-slate-400 transition-all active:scale-95 flex items-center gap-3"
+                  >
+                    <FontAwesomeIcon icon={faChevronLeft} />
+                    Précédent
+                  </button>
+                  <button
+                    onClick={handleAddSubmit}
+                    disabled={savingAdd}
+                    className="flex-1 px-12 py-5 bg-orange-500 text-white rounded-[2rem] font-black text-sm uppercase tracking-widest shadow-2xl shadow-orange-500/40 hover:bg-orange-600 transition-all flex items-center justify-center gap-4 active:scale-95 disabled:opacity-50"
+                  >
+                    {savingAdd ? (
+                      <>
+                        <div className="w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin" />
+                        Enregistrement...
+                      </>
+                    ) : (
+                      <>
+                        Confirmer l&apos;ajout
+                        <FontAwesomeIcon icon={faCheck} />
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   if (loading && vehicles.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center p-32">
@@ -2211,6 +2955,7 @@ export default function AdminVehicleTabs() {
       {activeTab !== 'list' && (
         <div className="sticky top-6 z-40 mb-12 flex items-center justify-center gap-4">
           <button
+            title="Retour à l'inventaire"
             onClick={() => {
               setSelectedVehicle(null);
               setActiveTab('list');
@@ -2252,10 +2997,58 @@ export default function AdminVehicleTabs() {
         {activeTab === 'documents' && renderDocuments()}
       </div>
 
+      {/* Notification Toast Component */}
+      {notification.show && (
+        <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[10000] animate-in notification-fade-in slide-in-from-top-10 duration-500 w-full max-w-md px-4">
+          <div className="relative group">
+            <div className={`absolute -inset-0.5 blur-xl opacity-50 group-hover:opacity-100 transition duration-500 rounded-[2.5rem] ${notification.type === 'success' ? 'bg-emerald-500' :
+              notification.type === 'error' ? 'bg-rose-500' :
+                notification.type === 'warning' ? 'bg-amber-500' : 'bg-indigo-500'
+              }`}></div>
+
+            <div className={`relative px-8 py-6 rounded-[2rem] border backdrop-blur-3xl shadow-2xl min-w-[320px] max-w-md ${notification.type === 'success' ? 'bg-emerald-50/80 border-emerald-100 text-emerald-900' :
+              notification.type === 'error' ? 'bg-rose-50/80 border-rose-100 text-rose-900' :
+                notification.type === 'warning' ? 'bg-amber-50/80 border-amber-100 text-amber-900' : 'bg-indigo-50/80 border-indigo-100 text-indigo-900'
+              }`}>
+              <div className="flex items-start gap-4">
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg ${notification.type === 'success' ? 'bg-emerald-500 text-white' :
+                  notification.type === 'error' ? 'bg-rose-500 text-white' :
+                    notification.type === 'warning' ? 'bg-amber-500 text-white' : 'bg-indigo-500 text-white'
+                  }`}>
+                  <FontAwesomeIcon icon={
+                    notification.type === 'success' ? faCheck :
+                      notification.type === 'error' ? faTimes :
+                        notification.type === 'warning' ? faExclamationTriangle : faInfoCircle
+                  } className="text-xl" />
+                </div>
+
+                <div className="flex-1 pt-1">
+                  <h3 className="font-black text-sm uppercase tracking-widest">{notification.message}</h3>
+                  {notification.details && (
+                    <p className="mt-2 text-xs font-bold opacity-70 leading-relaxed italic border-l-2 border-current pl-3">
+                      {notification.details}
+                    </p>
+                  )}
+                </div>
+
+                <button
+                  title="Fermer la notification"
+                  onClick={() => setNotification(prev => ({ ...prev, show: false }))}
+                  className="w-8 h-8 rounded-full hover:bg-black/5 flex items-center justify-center transition-colors"
+                >
+                  <FontAwesomeIcon icon={faTimes} className="text-xs opacity-40" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Modales */}
       {modalVisible && renderReservationModal()}
       {modalPayVisible && renderPaymentModal()}
       {isEditing && renderEditModal()}
+      {isAdding && renderAddModal()}
     </div>
   );
 }

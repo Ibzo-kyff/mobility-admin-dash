@@ -20,8 +20,12 @@ import {
   faChevronLeft,
   faChevronRight,
   faImage,
-  faUser
+  faUser,
+  faCheck,
+  faExclamationTriangle,
+  faInfoCircle
 } from '@fortawesome/free-solid-svg-icons';
+import { faTimesCircle } from '@fortawesome/free-regular-svg-icons';
 import { adminUsersService } from '@/services/admin/users';
 import type { User } from '@/types';
 import Image from 'next/image';
@@ -38,14 +42,37 @@ export default function AdminUsersPage() {
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  
+
   // Modal states
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'view' | 'edit' | 'add'>('view');
   const [formData, setFormData] = useState<Partial<User & { password?: string }>>({});
   const [saving, setSaving] = useState(false);
-  
+
+  // Notification State
+  const [notification, setNotification] = useState<{
+    show: boolean;
+    type: 'success' | 'error' | 'warning' | 'info';
+    message: string;
+    details?: string;
+  }>({
+    show: false,
+    type: 'info',
+    message: '',
+  });
+  const notificationTimer = useRef<NodeJS.Timeout | null>(null);
+
+  const showNotification = (type: 'success' | 'error' | 'warning' | 'info', message: string, details?: string) => {
+    if (notificationTimer.current) clearTimeout(notificationTimer.current);
+
+    setNotification({ show: true, type, message, details });
+
+    notificationTimer.current = setTimeout(() => {
+      setNotification(prev => ({ ...prev, show: false }));
+    }, 6000);
+  };
+
   // Menu dropdown state
   const [activeMenu, setActiveMenu] = useState<number | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -117,9 +144,9 @@ export default function AdminUsersPage() {
       try {
         await adminUsersService.deleteUser(user.id);
         await loadUsers();
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error deleting user:', error);
-        alert('Erreur lors de la suppression de l\'utilisateur');
+        showNotification('error', "Échec de suppression", "Erreur lors de la suppression de l'utilisateur : " + (error.message || "Erreur serveur"));
       }
     }
     setActiveMenu(null);
@@ -142,16 +169,16 @@ export default function AdminUsersPage() {
     try {
       if (modalMode === 'add') {
         if (!formData.password) {
-          alert('Le mot de passe est requis');
+          showNotification('warning', "Mot de passe requis", "Veuillez saisir un mot de passe pour le nouvel utilisateur.");
           setSaving(false);
           return;
         }
-        
+
         await adminUsersService.createUser(formData as any);
-        
+
       } else if (modalMode === 'edit' && selectedUser) {
         const { password, ...updateData } = formData;
-        
+
         if (imageFile) {
           // Mise à jour avec image
           await adminUsersService.updateUserWithImage(selectedUser.id, updateData, imageFile);
@@ -160,14 +187,15 @@ export default function AdminUsersPage() {
           await adminUsersService.updateUser(selectedUser.id, updateData);
         }
       }
-      
+
       await loadUsers();
       setIsModalOpen(false);
       setImageFile(null);
       setImagePreview(null);
+      showNotification('success', "Action réussie", `L'utilisateur a été ${modalMode === 'add' ? 'créé' : 'mis à jour'} avec succès.`);
     } catch (error: any) {
       console.error('Error saving user:', error);
-      alert(error.message || 'Erreur lors de l\'enregistrement');
+      showNotification('error', "Erreur d'enregistrement", error.message || "Une erreur est survenue lors de l'enregistrement de l'utilisateur.");
     } finally {
       setSaving(false);
     }
@@ -175,11 +203,11 @@ export default function AdminUsersPage() {
 
   // Filtrage des utilisateurs
   const filteredUsers = users.filter(user => {
-    const matchesSearch = 
+    const matchesSearch =
       user.nom?.toLowerCase().includes(search.toLowerCase()) ||
       user.prenom?.toLowerCase().includes(search.toLowerCase()) ||
       user.email.toLowerCase().includes(search.toLowerCase());
-    
+
     let matchesStatus = true;
     if (filterStatus !== 'all') {
       if (filterStatus === 'clients') matchesStatus = user.role === 'CLIENT';
@@ -192,7 +220,7 @@ export default function AdminUsersPage() {
       const userDate = new Date(user.createdAt).toISOString().split('T')[0];
       matchesDate = userDate === filterDate;
     }
-    
+
     return matchesSearch && matchesStatus && matchesDate;
   });
 
@@ -242,8 +270,8 @@ export default function AdminUsersPage() {
       <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
-            <FontAwesomeIcon 
-              icon={faSearch} 
+            <FontAwesomeIcon
+              icon={faSearch}
               className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
             />
             <input
@@ -336,8 +364,8 @@ export default function AdminUsersPage() {
                       <div className="flex items-center">
                         <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
                           {user.image ? (
-                            <img 
-                              src={user.image} 
+                            <img
+                              src={user.image}
                               alt={`${user.prenom} ${user.nom}`}
                               className="w-full h-full object-cover"
                               onError={(e) => {
@@ -361,24 +389,22 @@ export default function AdminUsersPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`px-2 py-1 text-xs rounded-full ${
-                        user.role === 'ADMIN' 
-                          ? 'bg-purple-100 text-purple-800'
-                          : user.role === 'PARKING'
-                            ? 'bg-blue-100 text-blue-800'
-                            : 'bg-green-100 text-green-800'
-                      }`}>
+                      <span className={`px-2 py-1 text-xs rounded-full ${user.role === 'ADMIN'
+                        ? 'bg-purple-100 text-purple-800'
+                        : user.role === 'PARKING'
+                          ? 'bg-blue-100 text-blue-800'
+                          : 'bg-green-100 text-green-800'
+                        }`}>
                         {user.role}
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`px-2 py-1 text-xs rounded-full ${
-                        user.status === 'APPROVED'
-                          ? 'bg-green-100 text-green-800'
-                          : user.status === 'PENDING'
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : 'bg-red-100 text-red-800'
-                      }`}>
+                      <span className={`px-2 py-1 text-xs rounded-full ${user.status === 'APPROVED'
+                        ? 'bg-green-100 text-green-800'
+                        : user.status === 'PENDING'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-red-100 text-red-800'
+                        }`}>
                         {user.status}
                       </span>
                     </td>
@@ -399,10 +425,10 @@ export default function AdminUsersPage() {
                       >
                         <FontAwesomeIcon icon={faEllipsisVertical} />
                       </button>
-                      
+
                       {/* Menu déroulant */}
                       {activeMenu === user.id && (
-                        <div 
+                        <div
                           ref={menuRef}
                           className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200"
                         >
@@ -504,8 +530,8 @@ export default function AdminUsersPage() {
                   <div className="flex justify-center mb-6">
                     <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
                       {selectedUser.image ? (
-                        <img 
-                          src={selectedUser.image} 
+                        <img
+                          src={selectedUser.image}
                           alt={`${selectedUser.prenom} ${selectedUser.nom}`}
                           className="w-full h-full object-cover"
                         />
@@ -566,9 +592,9 @@ export default function AdminUsersPage() {
                     <div className="flex items-center space-x-4">
                       {(imagePreview || (modalMode === 'edit' && selectedUser?.image)) && (
                         <div className="w-16 h-16 rounded-full overflow-hidden">
-                          <img 
-                            src={imagePreview || selectedUser?.image || ''} 
-                            alt="Preview" 
+                          <img
+                            src={imagePreview || selectedUser?.image || ''}
+                            alt="Preview"
                             className="w-full h-full object-cover"
                           />
                         </div>
@@ -705,6 +731,52 @@ export default function AdminUsersPage() {
                   )}
                 </button>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Notification Toast Component */}
+      {notification.show && (
+        <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[10000] animate-in notification-fade-in slide-in-from-top-10 duration-500 w-full max-w-md px-4">
+          <div className="relative group">
+            <div className={`absolute -inset-0.5 blur-xl opacity-50 group-hover:opacity-100 transition duration-500 rounded-[2.5rem] ${notification.type === 'success' ? 'bg-emerald-500' :
+              notification.type === 'error' ? 'bg-rose-500' :
+                notification.type === 'warning' ? 'bg-amber-500' : 'bg-indigo-500'
+              }`}></div>
+
+            <div className={`relative px-8 py-6 rounded-[2rem] border backdrop-blur-3xl shadow-2xl min-w-[320px] max-w-md ${notification.type === 'success' ? 'bg-emerald-50/80 border-emerald-100 text-emerald-900' :
+              notification.type === 'error' ? 'bg-rose-50/80 border-rose-100 text-rose-900' :
+                notification.type === 'warning' ? 'bg-amber-50/80 border-amber-100 text-amber-900' : 'bg-indigo-50/80 border-indigo-100 text-indigo-900'
+              }`}>
+              <div className="flex items-start gap-4">
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg ${notification.type === 'success' ? 'bg-emerald-500 text-white' :
+                  notification.type === 'error' ? 'bg-rose-500 text-white' :
+                    notification.type === 'warning' ? 'bg-amber-500 text-white' : 'bg-indigo-500 text-white'
+                  }`}>
+                  <FontAwesomeIcon icon={
+                    notification.type === 'success' ? faCheck :
+                      notification.type === 'error' ? faTimes :
+                        notification.type === 'warning' ? faExclamationTriangle : faInfoCircle
+                  } className="text-xl" />
+                </div>
+
+                <div className="flex-1 pt-1">
+                  <h3 className="font-black text-sm uppercase tracking-widest">{notification.message}</h3>
+                  {notification.details && (
+                    <p className="mt-2 text-xs font-bold opacity-70 leading-relaxed italic border-l-2 border-current pl-3">
+                      {notification.details}
+                    </p>
+                  )}
+                </div>
+
+                <button
+                  onClick={() => setNotification(prev => ({ ...prev, show: false }))}
+                  className="w-8 h-8 rounded-full hover:bg-black/5 flex items-center justify-center transition-colors"
+                >
+                  <FontAwesomeIcon icon={faTimes} className="text-xs opacity-40" />
+                </button>
+              </div>
             </div>
           </div>
         </div>

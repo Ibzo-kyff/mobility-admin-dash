@@ -8,11 +8,28 @@ export interface Marque {
 
 export interface Parking {
   id: number;
-  name?: string;
-  logo?: string;
-  address?: string;
-  phone?: string;
-  email?: string;
+  userId: number;
+  name: string;
+  address: string;
+  city: string;
+  zipCode?: string | null;
+  email: string;
+  phone: string | null;
+  description: string | null;
+  capacity: number;
+  hoursOfOperation: string | null;
+  status: string;
+  logo: string | null;
+  createdAt: string;
+  updatedAt: string;
+  user?: {
+    id: number;
+    nom: string;
+    prenom: string;
+    email: string;
+    phone: string;
+  };
+  vehicles?: any[];
 }
 
 export interface Vehicule {
