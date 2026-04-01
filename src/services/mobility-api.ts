@@ -32,13 +32,16 @@ class MobilityAPI {
       if (contentType?.includes('application/json')) {
         try {
           const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
-          errorDetails = errorData.details || '';
+          errorMessage = errorData.error || errorData.message || errorMessage;
+          errorDetails = errorData.details || (errorData.message && errorData.error ? errorData.message : '');
         } catch {}
       }
 
-      const error: ApiError = { message: errorMessage };
-      if (errorDetails) error.details = errorDetails;
+      const error: ApiError = { 
+        message: errorMessage,
+        details: errorDetails,
+        status: response.status
+      };
       throw error;
     }
 
