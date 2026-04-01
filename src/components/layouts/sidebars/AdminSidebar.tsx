@@ -16,6 +16,7 @@ import {
   faFileAlt,
   faChevronLeft,
   faChevronRight,
+
   faShieldAlt,
   faUserCircle,       // profil
   faQuestionCircle,    // help
@@ -84,7 +85,6 @@ export default function AdminSidebar() {
           <FontAwesomeIcon icon={collapsed ? faChevronRight : faChevronLeft} />
         </button>
       </div>
-
       {/* Menu principal */}
       <nav className="flex-1 overflow-y-auto py-6">
         <ul className="space-y-2 px-3">
