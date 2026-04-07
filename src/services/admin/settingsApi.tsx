@@ -102,6 +102,17 @@ export interface NotificationSettings {
     criticalAlerts: boolean;
   };
 }
+export interface AuditLogEntry {
+  id: number;
+  createdAt: string;
+  userId?: number;
+  userName?: string;
+  action: string;
+  entity: string;
+  entityId?: number;
+  details?: any;
+  ip?: string;
+}
 
 class SettingsAPI {
   private async fetchWithAuth(url: string, options: RequestInit = {}) {
@@ -409,13 +420,26 @@ class SettingsAPI {
     return hourlyData;
   }
 
-  async getRecentLogs(limit: number = 50, page: number = 1): Promise<{ logs: LogEntry[]; total: number }> {
-    // À implémenter avec un vrai endpoint
-    return {
-      logs: [],
-      total: 0,
-    };
-  }
+  async getAuditLogs(params: {
+  page?: number;
+  limit?: number;
+  entity?: string;
+  action?: string;
+  search?: string;
+} = {}) {
+  const query = new URLSearchParams();
+  
+  if (params.page) query.append('page', params.page.toString());
+  if (params.limit) query.append('limit', params.limit.toString());
+  if (params.entity) query.append('entity', params.entity);
+  if (params.action) query.append('action', params.action);
+  if (params.search) query.append('search', params.search);
+
+  const queryString = query.toString();
+  const url = queryString ? `/admin/logs?${queryString}` : '/admin/logs';
+
+  return this.fetchWithAuth(url);
+}
 
   async getSupportTickets(): Promise<SupportTicket[]> {
     // À implémenter avec un vrai endpoint
