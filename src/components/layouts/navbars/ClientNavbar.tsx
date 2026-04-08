@@ -17,11 +17,30 @@ import {
   faHistory
 } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
+import { notificationAPI } from '@/services/notification-api';
+import { useEffect } from 'react';
 
 export default function ClientNavbar() {
   const { user, logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    const checkNotifications = async () => {
+      try {
+        if (!user) return;
+        const data = await notificationAPI.getNotifications({ userId: user.id });
+        const unread = data.filter((n: any) => !n.read && n.type !== "MESSAGE").length;
+        setUnreadCount(unread);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    checkNotifications();
+    const interval = setInterval(checkNotifications, 30000);
+    return () => clearInterval(interval);
+  }, [user]);
 
   return (
     <nav className="bg-white border-b border-gray-200 px-6 py-3">
@@ -78,11 +97,14 @@ export default function ClientNavbar() {
 
         {/* Actions utilisateur */}
         <div className="flex items-center gap-4">
-          {/* Notifications */}
-          <button className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
+          <Link href="/dashboard/client/notifications" className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors inline-block">
             <FontAwesomeIcon icon={faBell} className="text-xl" />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-orange-500 rounded-full"></span>
-          </button>
+            {unreadCount > 0 && (
+              <span className="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full z-10 shadow-sm border-white border">
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </span>
+            )}
+          </Link>
 
           {/* Menu utilisateur */}
           <div className="relative">

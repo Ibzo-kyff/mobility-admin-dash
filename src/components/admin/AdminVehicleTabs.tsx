@@ -862,13 +862,13 @@ export default function AdminVehicleTabs() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <div className="flex gap-3 w-full md:w-auto">
-          <div className="flex bg-slate-100 p-1.5 rounded-2xl shadow-inner">
+        <div className="flex flex-wrap gap-3 w-full md:w-auto">
+          <div className="flex flex-1 md:flex-initial bg-slate-100 p-1.5 rounded-2xl shadow-inner">
             {(['all', 'sale', 'rent'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setSaleRentTab(tab)}
-                className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${saleRentTab === tab
+                className={`flex-1 md:px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${saleRentTab === tab
                   ? 'bg-white text-slate-900 shadow-sm'
                   : 'text-slate-400 hover:text-slate-600'
                   }`}
@@ -1532,10 +1532,10 @@ export default function AdminVehicleTabs() {
             Retour à l&apos;inventaire
           </button>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-col sm:flex-row flex-wrap gap-3 w-full md:w-auto">
             <button
               onClick={() => setModalVisible(true)}
-              className="px-6 py-3 bg-indigo-500 text-white rounded-2xl hover:bg-indigo-600 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-indigo-500/20 active:scale-95 flex items-center gap-2"
+              className="flex-1 sm:px-6 py-3 bg-indigo-500 text-white rounded-2xl hover:bg-indigo-600 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-indigo-500/20 active:scale-95 flex items-center justify-center gap-2"
             >
               <FontAwesomeIcon icon={faCalendarCheck} />
               Aperçu réservation
@@ -1544,7 +1544,7 @@ export default function AdminVehicleTabs() {
             {selectedVehicle.status === 'PENDING' && (
               <button
                 onClick={() => handleAction(selectedVehicle.id, 'APPROVE')}
-                className="px-6 py-3 bg-emerald-500 text-white rounded-2xl hover:bg-emerald-600 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-emerald-500/20 active:scale-95 flex items-center gap-2"
+                className="flex-1 sm:px-6 py-3 bg-emerald-500 text-white rounded-2xl hover:bg-emerald-600 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-emerald-500/20 active:scale-95 flex items-center justify-center gap-2"
               >
                 <FontAwesomeIcon icon={faCheckCircle} />
                 Approuver
@@ -1552,7 +1552,7 @@ export default function AdminVehicleTabs() {
             )}
             <button
               onClick={() => setIsEditing(true)}
-              className="px-6 py-3 bg-orange-500 text-white rounded-2xl hover:opacity-90 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-orange-500/20 active:scale-95 flex items-center gap-2"
+              className="flex-1 sm:px-6 py-3 bg-orange-500 text-white rounded-2xl hover:opacity-90 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-orange-500/20 active:scale-95 flex items-center justify-center gap-2"
             >
               <FontAwesomeIcon icon={faEdit} />
               Modifier
@@ -1661,26 +1661,27 @@ export default function AdminVehicleTabs() {
 
           {/* Informations principales */}
           <div className="p-6">
-            <div className="flex justify-between items-start mb-4">
+            <div className="flex flex-col md:flex-row justify-between items-start gap-6 mb-8">
               <div>
-                <h1 className="text-3xl font-black text-slate-900">
+                <h1 className="text-3xl md:text-4xl font-black text-slate-900 leading-tight">
                   {selectedVehicle.marque || selectedVehicle.marqueRef?.name} {selectedVehicle.model || selectedVehicle.modele}
                 </h1>
-                <div className="flex flex-wrap items-center gap-2 mt-3 text-slate-400 text-[10px] font-bold uppercase tracking-widest">
-                  <span className="flex items-center gap-1">
-                    <FontAwesomeIcon icon={faCalendarAlt} className="text-orange-500/50" />
+                <div className="flex flex-wrap items-center gap-3 mt-4 text-slate-400 text-[10px] font-bold uppercase tracking-widest">
+                  <span className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
+                    <FontAwesomeIcon icon={faCalendarAlt} className="text-orange-500/70" />
                     {selectedVehicle.annee || selectedVehicle.year || 'N/A'}
                   </span>
-                  <span className="text-slate-300 mx-1">•</span>
-                  <span className="flex items-center gap-1">
-                    <FontAwesomeIcon icon={faTachometerAlt} className="text-orange-500/50" />
+                  <span className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
+                    <FontAwesomeIcon icon={faTachometerAlt} className="text-orange-500/70" />
                     {formatMileage(selectedVehicle.mileage || selectedVehicle.kilometrage || 0)}
                   </span>
                 </div>
               </div>
-              <div className="text-right">
-                <p className="text-3xl font-black text-orange-600">{formatPrice(dailyPrice)}</p>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">par jour</p>
+              <div className="w-full md:w-auto flex md:flex-col items-center md:items-end justify-between md:justify-center p-4 bg-orange-50 md:bg-transparent rounded-2xl border border-orange-100 md:border-none">
+                <div className="md:text-right">
+                  <p className="text-3xl md:text-4xl font-black text-orange-600">{formatPrice(dailyPrice)}</p>
+                  <p className="text-[10px] font-black text-orange-400 uppercase tracking-widest">par jour</p>
+                </div>
               </div>
             </div>
 
@@ -1742,27 +1743,33 @@ export default function AdminVehicleTabs() {
                 <span className="w-8 h-[1px] bg-slate-200"></span>
                 Documents & Conformité
               </h3>
-              <div className="grid grid-cols-3 gap-4">
-                <div className={`p-4 rounded-[1.5rem] border ${selectedVehicle.carteGrise ? 'bg-emerald-50/50 border-emerald-100' : 'bg-slate-50 border-slate-100'} flex flex-col items-center text-center transition-all`}>
-                  <div className={`w-10 h-10 mb-3 rounded-xl flex items-center justify-center ${selectedVehicle.carteGrise ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-400'}`}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <div className={`p-4 rounded-[1.5rem] border ${selectedVehicle.carteGrise ? 'bg-emerald-50/50 border-emerald-100' : 'bg-slate-50 border-slate-100'} flex items-center md:flex-col md:text-center gap-4 md:gap-0 transition-all`}>
+                  <div className={`w-10 h-10 md:mb-3 shrink-0 rounded-xl flex items-center justify-center ${selectedVehicle.carteGrise ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-400'}`}>
                     <FontAwesomeIcon icon={faFileContract} />
                   </div>
-                  <p className={`text-[10px] font-black uppercase tracking-widest ${selectedVehicle.carteGrise ? 'text-emerald-700' : 'text-slate-400'}`}>Carte Grise</p>
-                  <p className="text-[9px] font-bold mt-1 text-slate-500">{selectedVehicle.carteGrise ? 'Disponible' : 'Non spécifie'}</p>
+                  <div>
+                    <p className={`text-[10px] font-black uppercase tracking-widest ${selectedVehicle.carteGrise ? 'text-emerald-700' : 'text-slate-400'}`}>Carte Grise</p>
+                    <p className="text-[9px] font-bold mt-1 text-slate-500">{selectedVehicle.carteGrise ? 'Disponible' : 'Non spécifié'}</p>
+                  </div>
                 </div>
-                <div className={`p-4 rounded-[1.5rem] border ${selectedVehicle.vignette ? 'bg-emerald-50/50 border-emerald-100' : 'bg-slate-50 border-slate-100'} flex flex-col items-center text-center transition-all`}>
-                  <div className={`w-10 h-10 mb-3 rounded-xl flex items-center justify-center ${selectedVehicle.vignette ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-400'}`}>
+                <div className={`p-4 rounded-[1.5rem] border ${selectedVehicle.vignette ? 'bg-emerald-50/50 border-emerald-100' : 'bg-slate-50 border-slate-100'} flex items-center md:flex-col md:text-center gap-4 md:gap-0 transition-all`}>
+                  <div className={`w-10 h-10 md:mb-3 shrink-0 rounded-xl flex items-center justify-center ${selectedVehicle.vignette ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-400'}`}>
                     <FontAwesomeIcon icon={faCertificate} />
                   </div>
-                  <p className={`text-[10px] font-black uppercase tracking-widest ${selectedVehicle.vignette ? 'text-emerald-700' : 'text-slate-400'}`}>Vignette</p>
-                  <p className="text-[9px] font-bold mt-1 text-slate-500">{selectedVehicle.vignette ? 'Validé' : 'Non spécifié'}</p>
+                  <div>
+                    <p className={`text-[10px] font-black uppercase tracking-widest ${selectedVehicle.vignette ? 'text-emerald-700' : 'text-slate-400'}`}>Vignette</p>
+                    <p className="text-[9px] font-bold mt-1 text-slate-500">{selectedVehicle.vignette ? 'Validé' : 'Non spécifié'}</p>
+                  </div>
                 </div>
-                <div className="p-4 rounded-[1.5rem] border bg-emerald-50/50 border-emerald-100 flex flex-col items-center text-center">
-                  <div className="w-10 h-10 mb-3 rounded-xl bg-emerald-500 text-white flex items-center justify-center">
+                <div className="p-4 rounded-[1.5rem] border bg-emerald-50/50 border-emerald-100 flex items-center md:flex-col md:text-center gap-4 md:gap-0">
+                  <div className="w-10 h-10 md:mb-3 shrink-0 rounded-xl bg-emerald-500 text-white flex items-center justify-center">
                     <FontAwesomeIcon icon={faShield} />
                   </div>
-                  <p className="text-[10px] font-black text-emerald-700 uppercase tracking-widest">Contrôle T.</p>
-                  <p className="text-[9px] font-bold mt-1 text-slate-500">Conforme</p>
+                  <div>
+                    <p className="text-[10px] font-black text-emerald-700 uppercase tracking-widest">Contrôle T.</p>
+                    <p className="text-[9px] font-bold mt-1 text-slate-500">Conforme</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1793,19 +1800,21 @@ export default function AdminVehicleTabs() {
                 <span className="w-8 h-[1px] bg-slate-200"></span>
                 Caractéristiques
               </h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
                   { label: 'Année', value: selectedVehicle.annee || selectedVehicle.year || 'N/A', icon: faCalendarAlt, color: 'text-orange-500', bg: 'bg-orange-50' },
                   { label: 'Boîte', value: formatTransmissionForDisplay(selectedVehicle.transmission || selectedVehicle.boite), icon: faCogs, color: 'text-indigo-500', bg: 'bg-indigo-50' },
                   { label: 'Carburant', value: selectedVehicle.fuelType || selectedVehicle.carburant || 'N/A', icon: faGasPump, color: 'text-emerald-500', bg: 'bg-emerald-50' },
                   { label: 'Kilométrage', value: formatMileage(selectedVehicle.mileage || selectedVehicle.kilometrage || 0), icon: faTachometerAlt, color: 'text-blue-500', bg: 'bg-blue-50' },
                 ].map((spec, i) => (
-                  <div key={i} className="bg-white border border-slate-100 p-4 rounded-[2rem] hover:shadow-xl hover:shadow-slate-200/50 transition-all group">
-                    <div className={`w-12 h-12 ${spec.bg} ${spec.color} rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
-                      <FontAwesomeIcon icon={spec.icon} />
+                  <div key={i} className="bg-white border border-slate-100 p-6 rounded-[2.5rem] hover:shadow-xl hover:shadow-slate-200/50 transition-all group flex items-center lg:flex-col lg:text-center gap-6 lg:gap-0">
+                    <div className={`w-14 h-14 ${spec.bg} ${spec.color} shrink-0 rounded-2xl flex items-center justify-center lg:mb-4 group-hover:scale-110 transition-transform`}>
+                      <FontAwesomeIcon icon={spec.icon} className="text-xl" />
                     </div>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{spec.label}</p>
-                    <p className="text-sm font-black text-slate-900">{spec.value}</p>
+                    <div>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{spec.label}</p>
+                      <p className="text-base font-black text-slate-900">{spec.value}</p>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -1870,10 +1879,10 @@ export default function AdminVehicleTabs() {
     const dailyPrice = selectedVehicle.prixJour || selectedVehicle.prix || 0;
 
     return (
-      <div className="fixed inset-0 z-[200] flex items-center justify-center animate-fadeIn bg-slate-900/60 backdrop-blur-sm p-4">
-        <div className="w-full max-w-2xl bg-white rounded-[2.5rem] shadow-2xl max-h-[90vh] overflow-y-auto">
-          <div className="sticky top-0 bg-white p-6 border-b border-slate-100 flex justify-between items-center z-10">
-            <h2 className="text-2xl font-black text-slate-900">Aperçu réservation</h2>
+      <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center animate-fadeIn bg-slate-900/60 backdrop-blur-sm p-0 sm:p-4">
+        <div className="w-full max-w-2xl bg-white rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl max-h-[95vh] sm:max-h-[90vh] flex flex-col">
+          <div className="flex-shrink-0 bg-white p-6 border-b border-slate-100 flex justify-between items-center z-10">
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900">Aperçu réservation</h2>
             <button
               title="Fermer"
               onClick={() => {
@@ -1886,29 +1895,29 @@ export default function AdminVehicleTabs() {
             </button>
           </div>
 
-          <div className="p-6">
+          <div className="p-6 overflow-y-auto custom-scrollbar">
             {/* Type de réservation */}
-            <div className="mb-6">
-              <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3 block">Type de réservation</label>
-              <div className="flex gap-3">
+            <div className="mb-8">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 block">Type de réservation</label>
+              <div className="flex gap-4">
                 <button
                   onClick={() => selectReservationType('ACHAT')}
-                  className={`flex-1 py-4 rounded-xl border-2 font-black text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-3 ${reservationType === 'ACHAT'
-                    ? 'bg-orange-500 text-white border-orange-500'
-                    : 'border-slate-200 text-slate-500 hover:border-orange-200'
+                  className={`flex-1 py-5 rounded-2xl border-2 font-black text-xs uppercase tracking-widest transition-all flex flex-col sm:flex-row items-center justify-center gap-3 ${reservationType === 'ACHAT'
+                    ? 'bg-orange-500 text-white border-orange-500 shadow-lg shadow-orange-500/20'
+                    : 'border-slate-100 text-slate-500 hover:border-orange-200'
                     }`}
                 >
-                  <FontAwesomeIcon icon={faShoppingCart} />
+                  <FontAwesomeIcon icon={faShoppingCart} className="text-lg" />
                   Achat
                 </button>
                 <button
                   onClick={() => selectReservationType('LOCATION')}
-                  className={`flex-1 py-4 rounded-xl border-2 font-black text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-3 ${reservationType === 'LOCATION'
-                    ? 'bg-orange-500 text-white border-orange-500'
-                    : 'border-slate-200 text-slate-500 hover:border-orange-200'
+                  className={`flex-1 py-5 rounded-2xl border-2 font-black text-xs uppercase tracking-widest transition-all flex flex-col sm:flex-row items-center justify-center gap-3 ${reservationType === 'LOCATION'
+                    ? 'bg-orange-500 text-white border-orange-500 shadow-lg shadow-orange-500/20'
+                    : 'border-slate-100 text-slate-500 hover:border-orange-200'
                     }`}
                 >
-                  <FontAwesomeIcon icon={faCalendarCheck} />
+                  <FontAwesomeIcon icon={faCalendarCheck} className="text-lg" />
                   Location
                 </button>
               </div>
@@ -1985,16 +1994,16 @@ export default function AdminVehicleTabs() {
                 </div>
 
                 {/* Localisation */}
-                <div className="mb-6">
-                  <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3 block">Localisation</label>
-                  <div className="flex gap-3">
+                <div className="mb-8">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 block">Localisation</label>
+                  <div className="flex flex-col sm:flex-row gap-4">
                     {LOCALISATIONS.map((loc) => (
                       <button
                         key={loc.id}
                         onClick={() => setSelectedLocalisation(loc.id)}
-                        className={`flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-3 ${selectedLocalisation === loc.id
-                          ? 'bg-orange-500 text-white border-orange-500'
-                          : 'border-slate-200 text-slate-500 hover:border-orange-200'
+                        className={`flex-1 py-5 rounded-2xl border-2 font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-3 ${selectedLocalisation === loc.id
+                          ? 'bg-orange-500 text-white border-orange-500 shadow-lg shadow-orange-500/20'
+                          : 'border-slate-100 text-slate-500 hover:border-orange-200'
                           }`}
                       >
                         <FontAwesomeIcon icon={faLocationDot} />
@@ -2357,10 +2366,10 @@ export default function AdminVehicleTabs() {
     const photos = getAllPhotoUrls(selectedVehicle.photos);
 
     return (
-      <div className="fixed inset-0 z-[200] flex items-center justify-center animate-fadeIn bg-slate-900/60 backdrop-blur-sm p-4">
-        <div className="w-full max-w-4xl bg-white rounded-[2.5rem] shadow-2xl max-h-[90vh] overflow-y-auto relative">
+      <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center animate-fadeIn bg-slate-900/60 backdrop-blur-sm p-0 sm:p-4">
+        <div className="w-full max-w-4xl bg-white rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl max-h-[95vh] sm:max-h-[90vh] flex flex-col relative overflow-hidden">
           <div className="sticky top-0 bg-white p-6 border-b border-slate-100 flex justify-between items-center z-10">
-            <h2 className="text-2xl font-black text-slate-900 flex items-center gap-3">
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900 flex items-center gap-3">
               <FontAwesomeIcon icon={faEdit} className="text-orange-500" />
               Édition du véhicule
             </h2>
@@ -2373,32 +2382,26 @@ export default function AdminVehicleTabs() {
             </button>
           </div>
 
-          <div className="p-8">
+          <div className="p-6 sm:p-8 overflow-y-auto custom-scrollbar">
             {/* Photo Management */}
-            <div className="mb-8 p-6 bg-slate-50 rounded-[2rem] border border-slate-200">
+            <div className="mb-8 p-4 sm:p-6 bg-slate-50 rounded-[2rem] border border-slate-200">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2 mb-4 block">
-                Photos du véhicule ({photos.length + editNewPhotos.length})
+                Photos ({photos.length + editNewPhotos.length})
               </label>
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-wrap gap-3">
                 {photos.map((photo, index) => (
-                  <div key={`existing-${index}`} className="relative w-24 h-24 rounded-xl overflow-hidden group/photo shadow-sm">
+                  <div key={`existing-${index}`} className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden group/photo shadow-sm">
                     <Image src={photo} alt="" fill className="object-cover" />
                     <button
                       title="Supprimer la photo"
-                      onClick={() => {
-                        const newPhotos = [...editExistingPhotos];
-                        newPhotos.splice(index, 1);
-                        setEditExistingPhotos(newPhotos);
-                      }}
+                      onClick={() => setEditExistingPhotos(prev => prev.filter((_, i) => i !== index))}
                       className="absolute top-1 right-1 w-6 h-6 bg-rose-500 text-white rounded-full flex items-center justify-center text-xs opacity-0 group-hover/photo:opacity-100 transition-opacity z-10 shadow-md"
                     >
                       <FontAwesomeIcon icon={faTimesCircle} />
                     </button>
-                    <div className="absolute bottom-0 w-full bg-black/50 backdrop-blur-sm text-white text-[8px] font-bold text-center py-1">
-                      Existante
-                    </div>
                   </div>
                 ))}
+                {/* ... other photos and upload label ... */}
 
                 {editNewPhotos.map((file, index) => (
                   <div key={`new-${index}`} className="relative w-24 h-24 rounded-xl overflow-hidden group/photo border-2 border-orange-500 shadow-sm">
@@ -2622,39 +2625,39 @@ export default function AdminVehicleTabs() {
 
   const renderAddModal = () => {
     return (
-      <div className="fixed inset-0 z-[200] flex items-center justify-center animate-fadeIn bg-slate-900/60 backdrop-blur-sm p-4">
-        <div className="w-full max-w-4xl bg-white rounded-[2.5rem] shadow-2xl max-h-[90vh] overflow-y-auto relative flex flex-col">
+      <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center animate-fadeIn bg-slate-900/60 backdrop-blur-sm p-0 sm:p-4">
+        <div className="w-full max-w-4xl bg-white rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl max-h-[95vh] sm:max-h-[90vh] relative flex flex-col overflow-hidden">
           {/* Header */}
-          <div className="sticky top-0 bg-white p-8 border-b border-slate-100 flex justify-between items-center z-20">
+          <div className="flex-shrink-0 bg-white p-6 sm:p-8 border-b border-slate-100 flex justify-between items-center z-20">
             <div>
-              <h2 className="text-3xl font-black text-slate-900 flex items-center gap-4">
-                <span className="w-12 h-12 rounded-2xl bg-orange-100 text-orange-500 flex items-center justify-center shadow-inner">
-                  <FontAwesomeIcon icon={faCar} />
+              <h2 className="text-xl sm:text-3xl font-black text-slate-900 flex items-center gap-3 sm:gap-4">
+                <span className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-orange-100 text-orange-500 flex items-center justify-center shadow-inner">
+                  <FontAwesomeIcon icon={faCar} className="text-sm sm:text-lg" />
                 </span>
                 Nouveau véhicule
               </h2>
-              <div className="flex items-center gap-3 mt-3">
+              <div className="flex items-center gap-2 sm:gap-3 mt-3">
                 <div className="flex items-center gap-1.5">
-                  <div className={`w-3 h-3 rounded-full ${addStep >= 1 ? 'bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.5)]' : 'bg-slate-200'} transition-all`} />
-                  <span className={`text-[10px] font-black uppercase tracking-widest ${addStep === 1 ? 'text-slate-900' : 'text-slate-400'}`}>Infos Base</span>
+                  <div className={`w-2.5 h-2.5 rounded-full ${addStep >= 1 ? 'bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.5)]' : 'bg-slate-200'} transition-all`} />
+                  <span className={`text-[8px] sm:text-[10px] font-black uppercase tracking-widest ${addStep === 1 ? 'text-slate-900' : 'text-slate-400'}`}>Infos Base</span>
                 </div>
-                <div className="w-8 h-px bg-slate-100" />
+                <div className="w-4 sm:w-8 h-px bg-slate-100" />
                 <div className="flex items-center gap-1.5">
-                  <div className={`w-3 h-3 rounded-full ${addStep >= 2 ? 'bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.5)]' : 'bg-slate-200'} transition-all`} />
-                  <span className={`text-[10px] font-black uppercase tracking-widest ${addStep === 2 ? 'text-slate-900' : 'text-slate-400'}`}>Options</span>
+                  <div className={`w-2.5 h-2.5 rounded-full ${addStep >= 2 ? 'bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.5)]' : 'bg-slate-200'} transition-all`} />
+                  <span className={`text-[8px] sm:text-[10px] font-black uppercase tracking-widest ${addStep === 2 ? 'text-slate-900' : 'text-slate-400'}`}>Options</span>
                 </div>
               </div>
             </div>
             <button
               title="Fermer"
               onClick={() => setIsAdding(false)}
-              className="w-12 h-12 rounded-full bg-slate-50 text-slate-400 hover:text-slate-900 hover:bg-white border border-slate-100 transition-all flex items-center justify-center shadow-sm"
+              className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-50 text-slate-400 hover:text-slate-900 flex items-center justify-center border border-slate-100 transition-all"
             >
               <FontAwesomeIcon icon={faTimes} />
             </button>
           </div>
 
-          <div className="p-8">
+          <div className="p-6 sm:p-8 overflow-y-auto custom-scrollbar flex-1">
             {addStep === 1 ? (
               <div className="space-y-8 animate-fadeIn">
                 {/* Photo Upload Section */}
@@ -2996,20 +2999,19 @@ export default function AdminVehicleTabs() {
   return (
     <div className="pb-20">
       {/* Navigation Tabs */}
-      {activeTab !== 'list' && (
-        <div className="sticky top-6 z-40 mb-12 flex items-center justify-center gap-4">
+        <div className="sticky top-6 z-40 mb-12 flex flex-col sm:flex-row items-center justify-center gap-4 px-4 overflow-x-auto no-scrollbar scroll-smooth">
           <button
             title="Retour à l'inventaire"
             onClick={() => {
               setSelectedVehicle(null);
               setActiveTab('list');
             }}
-            className="w-14 h-14 rounded-[1.5rem] bg-white text-slate-400 hover:text-orange-500 shadow-xl border border-white flex items-center justify-center transition-all hover:scale-105 active:scale-95 group"
+            className="hidden sm:flex w-14 h-14 rounded-[1.5rem] bg-white text-slate-400 hover:text-orange-500 shadow-xl border border-white items-center justify-center transition-all hover:scale-105 active:scale-95 group flex-shrink-0"
           >
             <FontAwesomeIcon icon={faChevronLeft} className="group-hover:-translate-x-1 transition-transform" />
           </button>
 
-          <div className="inline-flex bg-white/70 backdrop-blur-3xl p-2 rounded-[3rem] border border-white/50 shadow-2xl shadow-slate-200/50">
+          <div className="flex bg-white/80 backdrop-blur-3xl p-1.5 rounded-3xl border border-white/50 shadow-2xl shadow-slate-200/50 w-full sm:w-auto overflow-x-auto no-scrollbar">
             {[
               { id: 'details', label: 'Détails', icon: faEye },
               { id: 'history', label: 'Journal', icon: faHistory },
@@ -3019,18 +3021,17 @@ export default function AdminVehicleTabs() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as TabType)}
-                className={`flex items-center gap-3 px-8 py-4 rounded-[2.5rem] font-black text-xs uppercase tracking-widest transition-all duration-500 ${activeTab === tab.id
-                  ? 'bg-slate-900 text-white shadow-xl shadow-slate-900/20 translate-y-[-2px]'
+                className={`flex-1 sm:flex-initial flex items-center justify-center gap-3 px-4 sm:px-8 py-3.5 sm:py-4 rounded-2xl sm:rounded-[2.5rem] font-black text-[10px] sm:text-xs uppercase tracking-widest transition-all duration-300 ${activeTab === tab.id
+                  ? 'bg-slate-900 text-white shadow-xl shadow-slate-900/20'
                   : 'text-slate-400 hover:text-slate-600 hover:bg-white'
                   }`}
               >
                 <FontAwesomeIcon icon={tab.icon} className={activeTab === tab.id ? 'text-orange-500' : ''} />
-                <span className="hidden md:block">{tab.label}</span>
+                <span className="hidden sm:block">{tab.label}</span>
               </button>
             ))}
           </div>
         </div>
-      )}
 
       {/* Main Content */}
       <div className="relative">

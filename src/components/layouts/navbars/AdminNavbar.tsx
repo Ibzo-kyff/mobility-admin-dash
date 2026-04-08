@@ -15,11 +15,30 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
 import Image from 'next/image';
+import { notificationAPI } from '@/services/notification-api';
+import { useEffect } from 'react';
 
 export default function AdminNavbar() {
   const { user, logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    const checkNotifications = async () => {
+      try {
+        if (!user) return;
+        const data = await notificationAPI.getNotifications();
+        const unread = data.filter((n: any) => !n.read && n.type !== "MESSAGE").length;
+        setUnreadCount(unread);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    checkNotifications();
+    const interval = setInterval(checkNotifications, 30000);
+    return () => clearInterval(interval);
+  }, [user]);
 
   return (
     <nav className="bg-white border-b border-gray-200 px-6 py-3">
@@ -53,7 +72,11 @@ export default function AdminNavbar() {
               className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <FontAwesomeIcon icon={faBell} className="text-xl" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              {unreadCount > 0 && (
+                <span className="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full z-10">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
             </button>
 
             {showNotifications && (
@@ -73,7 +96,7 @@ export default function AdminNavbar() {
                   </div>
                 </div>
                 <div className="px-4 py-2 border-t border-gray-200">
-                  <Link href="/admin/notifications" className="text-sm text-orange-600 hover:text-orange-700">
+                  <Link href="/dashboard/admin/notifications" className="text-sm text-orange-600 hover:text-orange-700">
                     Voir toutes les notifications
                   </Link>
                 </div>
