@@ -96,7 +96,7 @@ export default function AdminNavbar() {
                   </div>
                 </div>
                 <div className="px-4 py-2 border-t border-gray-200">
-                  <Link href="/dashboard/admin/notifications" className="text-sm text-orange-600 hover:text-orange-700">
+                  <Link href="/dasboard/admin/notifications" className="text-sm text-orange-600 hover:text-orange-700">
                     Voir toutes les notifications
                   </Link>
                 </div>
