@@ -37,11 +37,9 @@ class MobilityAPI {
         } catch {}
       }
 
-      const error: ApiError = { 
-        message: errorMessage,
-        details: errorDetails,
-        status: response.status
-      };
+      const error = new Error(errorMessage) as any;
+      error.details = errorDetails;
+      error.status = response.status;
       throw error;
     }
 
@@ -248,7 +246,7 @@ class MobilityAPI {
       );
       
       // Vérifier si le token a expiré
-      if (response.status === 401) {
+      if (response.status === 401 || response.status === 403) {
         try {
           // Essayer de rafraîchir le token
           await this.refreshAccessToken();
@@ -289,7 +287,9 @@ class MobilityAPI {
       
       return this.user;
     } catch (error) {
-      console.error('Get current user error:', error);
+      // Use console.warn instead of console.error to prevent Turbopack overlay in dev
+      // when a token simply expires
+      console.warn('Get current user error (session may be expired):', error);
       throw error;
     }
   }
