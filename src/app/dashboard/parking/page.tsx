@@ -161,7 +161,17 @@ export default function ParkingDashboardPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                 <XAxis dataKey="date" />
                 <YAxis />
-                <Tooltip formatter={(v: number) => [`${v} €`, 'Revenu']} />
+                <Tooltip 
+                  formatter={(value: any) => {
+                    if (typeof value === 'number') {
+                      return [`${value.toLocaleString('fr-FR')} €`, 'Revenu'];
+                    }
+                    if (typeof value === 'string') {
+                      return [`${value} €`, 'Revenu'];
+                    }
+                    return ['0 €', 'Revenu'];
+                  }}
+                />
                 <Line type="monotone" dataKey="amount" stroke="#f97316" strokeWidth={4} dot={{ r: 5 }} />
               </LineChart>
             </ResponsiveContainer>

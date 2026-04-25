@@ -54,6 +54,31 @@ class ParkingAPI {
     return this.handleResponse<any[]>(res);
   }
 
+  async createVehicle(vehicleData: any) {
+    const response = await fetch('/api/parking/vehicles', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(vehicleData),
+    });
+    return response.json();
+  }
+
+    async deleteVehicle(id: string): Promise<void> {
+    try {
+      const response = await fetch(`/api/parking/vehicles/${id}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Erreur lors de la suppression');
+      }
+    } catch (error) {
+      console.error('API Error:', error);
+      throw error;
+    }
+  }
+
   // Réservations du parking
   async getReservations(): Promise<any[]> {
     const res = await fetch(`${this.baseUrl}/reservations/parking/all`, { headers: this.getHeaders() });
