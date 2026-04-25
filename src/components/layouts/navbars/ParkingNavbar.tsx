@@ -7,93 +7,81 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faBell,
   faUser,
+  faCog,
   faSignOutAlt,
   faChevronDown,
-  faBars,
-  faCar,
-  faCalendarCheck,
-  faChartLine,
-  faCog
+  faSearch,
+  faBars
 } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
-import { notificationAPI } from '@/services/notification-api';
-import { useEffect } from 'react';
+import Image from 'next/image';
 
 export default function ParkingNavbar() {
   const { user, logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
-
-  useEffect(() => {
-    const checkNotifications = async () => {
-      try {
-        if (!user) return;
-        const data = await notificationAPI.getNotifications({ parkingId: user.parkingId ?? undefined });
-        const unread = data.filter((n: any) => !n.read && n.type !== "MESSAGE").length;
-        setUnreadCount(unread);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    checkNotifications();
-    const interval = setInterval(checkNotifications, 30000);
-    return () => clearInterval(interval);
-  }, [user]);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   return (
     <nav className="bg-white border-b border-gray-200 px-6 py-3">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <button 
-            onClick={() => setShowMobileMenu(!showMobileMenu)}
-            className="lg:hidden text-gray-600 hover:text-gray-900"
-          >
-            <FontAwesomeIcon icon={faBars} className="text-xl" />
-          </button>
-          
-          <Link href="/dashboard/parking" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">P</span>
-            </div>
-            <span className="font-bold text-gray-800 hidden sm:block">Parking Pro</span>
-          </Link>
+        {/* Menu hamburger pour mobile */}
+        <button className="lg:hidden text-gray-600 hover:text-gray-900">
+          <FontAwesomeIcon icon={faBars} className="text-xl" />
+        </button>
+
+        {/* Barre de recherche */}
+        <div className="hidden md:flex items-center flex-1 max-w-md ml-4">
+          <div className="relative w-full">
+            <FontAwesomeIcon 
+              icon={faSearch} 
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" 
+            />
+            <input
+              type="text"
+              placeholder="Rechercher..."
+              className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none text-sm"
+            />
+          </div>
         </div>
 
-        <div className="hidden lg:flex items-center gap-2">
-          <Link 
-            href="/dashboard/parking/vehicles" 
-            className="px-4 py-2 text-gray-600 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors flex items-center gap-2"
-          >
-            <FontAwesomeIcon icon={faCar} />
-            <span>Ma flotte</span>
-          </Link>
-          <Link 
-            href="/dashboard/parking/reservations" 
-            className="px-4 py-2 text-gray-600 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors flex items-center gap-2"
-          >
-            <FontAwesomeIcon icon={faCalendarCheck} />
-            <span>Réservations</span>
-          </Link>
-          <Link 
-            href="/dashboard/parking/analytics" 
-            className="px-4 py-2 text-gray-600 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors flex items-center gap-2"
-          >
-            <FontAwesomeIcon icon={faChartLine} />
-            <span>Statistiques</span>
-          </Link>
-        </div>
-
+        {/* Actions */}
         <div className="flex items-center gap-4">
-          <Link href="/dashboard/parking/notifications" className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors inline-block">
-            <FontAwesomeIcon icon={faBell} className="text-xl" />
-            {unreadCount > 0 && (
-              <span className="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full z-10 shadow-sm border-white border">
-                {unreadCount > 99 ? '99+' : unreadCount}
-              </span>
+          {/* Notifications */}
+          <div className="relative">
+            <button 
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <FontAwesomeIcon icon={faBell} className="text-xl" />
+              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+
+            {showNotifications && (
+              <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
+                <div className="px-4 py-2 border-b border-gray-200">
+                  <h3 className="font-semibold text-gray-800">Notifications</h3>
+                </div>
+                <div className="max-h-96 overflow-y-auto">
+                  {/* Liste des notifications */}
+                  <div className="px-4 py-3 hover:bg-gray-50">
+                    <p className="text-sm text-gray-800">Nouvel utilisateur inscrit</p>
+                    <p className="text-xs text-gray-500">Il y a 5 minutes</p>
+                  </div>
+                  <div className="px-4 py-3 hover:bg-gray-50">
+                    <p className="text-sm text-gray-800">Demande d'approbation en attente</p>
+                    <p className="text-xs text-gray-500">Il y a 1 heure</p>
+                  </div>
+                </div>
+                <div className="px-4 py-2 border-t border-gray-200">
+                  <Link href="/dasboard/parking/notifications" className="text-sm text-orange-600 hover:text-orange-700">
+                    Voir toutes les notifications
+                  </Link>
+                </div>
+              </div>
             )}
-          </Link>
+          </div>
 
+          {/* Menu utilisateur */}
           <div className="relative">
             <button
               onClick={() => setShowUserMenu(!showUserMenu)}
@@ -114,12 +102,7 @@ export default function ParkingNavbar() {
             </button>
 
             {showUserMenu && (
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
-                <div className="px-4 py-3 border-b border-gray-200">
-                  <p className="text-sm font-medium text-gray-800">Mon parking</p>
-                  <p className="text-xs text-gray-600">ID: {user?.parkingId}</p>
-                </div>
-                
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
                 <Link
                   href="/dashboard/parking/profile"
                   className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
@@ -128,7 +111,6 @@ export default function ParkingNavbar() {
                   <FontAwesomeIcon icon={faUser} className="w-4 h-4" />
                   Mon profil
                 </Link>
-                
                 <Link
                   href="/dashboard/parking/settings"
                   className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
@@ -137,9 +119,7 @@ export default function ParkingNavbar() {
                   <FontAwesomeIcon icon={faCog} className="w-4 h-4" />
                   Paramètres
                 </Link>
-                
                 <hr className="my-2 border-gray-200" />
-                
                 <button
                   onClick={() => {
                     setShowUserMenu(false);
@@ -155,37 +135,6 @@ export default function ParkingNavbar() {
           </div>
         </div>
       </div>
-
-      {showMobileMenu && (
-        <div className="lg:hidden mt-4 pt-4 border-t border-gray-200">
-          <div className="space-y-2">
-            <Link
-              href="/dashboard/parking/vehicles"
-              className="block px-4 py-2 text-gray-600 hover:bg-orange-50 rounded-lg"
-              onClick={() => setShowMobileMenu(false)}
-            >
-              <FontAwesomeIcon icon={faCar} className="mr-3" />
-              Ma flotte
-            </Link>
-            <Link
-              href="/dashboard/parking/reservations"
-              className="block px-4 py-2 text-gray-600 hover:bg-orange-50 rounded-lg"
-              onClick={() => setShowMobileMenu(false)}
-            >
-              <FontAwesomeIcon icon={faCalendarCheck} className="mr-3" />
-              Réservations
-            </Link>
-            <Link
-              href="/dashboard/parking/analytics"
-              className="block px-4 py-2 text-gray-600 hover:bg-orange-50 rounded-lg"
-              onClick={() => setShowMobileMenu(false)}
-            >
-              <FontAwesomeIcon icon={faChartLine} className="mr-3" />
-              Statistiques
-            </Link>
-          </div>
-        </div>
-      )}
     </nav>
   );
 }
