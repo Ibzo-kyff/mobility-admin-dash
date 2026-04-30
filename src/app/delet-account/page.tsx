@@ -13,7 +13,7 @@ export default function DeleteAccount() {
         Pour demander la suppression de votre compte, veuillez envoyer un email à :
       </p>
 
-      <p><strong>mobilitymali.app@gmail.com</strong></p>
+      <p><strong>mobilitymali.app@gmail.com </strong></p>
 
       <p>
         En précisant :
