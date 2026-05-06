@@ -34,7 +34,7 @@ class MobilityAPI {
           const errorData = await response.json();
           errorMessage = errorData.error || errorData.message || errorMessage;
           errorDetails = errorData.details || (errorData.message && errorData.error ? errorData.message : '');
-        } catch {}
+        } catch { }
       }
 
       const error = new Error(errorMessage) as any;
@@ -149,7 +149,7 @@ class MobilityAPI {
         isOnline: userData.isOnline || false,
         connectionCount: userData.connectionCount || 0
       };
-      
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/auth/register`,
         {
@@ -158,13 +158,13 @@ class MobilityAPI {
           body: JSON.stringify(backendData),
         }
       );
-      
+
       const data: RegisterResponse = await this.handleResponse(response);
-      
+
       // Stocker les tokens
       this.token = data.accessToken;
       this.refreshToken = data.refreshToken;
-      
+
       // Créer l'objet user partiel (l'ID sera récupéré par getCurrentUser)
       this.user = {
         id: 0, // Temporaire, sera mis à jour par getCurrentUser
@@ -180,9 +180,9 @@ class MobilityAPI {
         updatedAt: new Date().toISOString(),
         accessToken: data.accessToken
       };
-      
+
       this.saveToStorage();
-      
+
       return data;
     } catch (error) {
       console.error('Register error:', error);
@@ -208,7 +208,7 @@ class MobilityAPI {
     if (!this.refreshToken) {
       throw new Error('No refresh token available');
     }
-    
+
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/auth/refresh-token`,
@@ -218,13 +218,13 @@ class MobilityAPI {
           body: JSON.stringify({ refreshToken: this.refreshToken }),
         }
       );
-      
+
       const data = await this.handleResponse<{ accessToken: string; refreshToken: string }>(response);
-      
+
       this.token = data.accessToken;
       this.refreshToken = data.refreshToken;
       this.saveToStorage();
-      
+
       return data;
     } catch (error) {
       this.logout(); // Déconnexion si le refresh token est invalide
@@ -236,7 +236,7 @@ class MobilityAPI {
     if (!this.token) {
       throw new Error('Non authentifié. Veuillez vous connecter.');
     }
-    
+
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/auth/users/me`,
@@ -244,7 +244,7 @@ class MobilityAPI {
           headers: this.getHeaders(),
         }
       );
-      
+
       // Vérifier si le token a expiré
       if (response.status === 401 || response.status === 403) {
         try {
@@ -257,34 +257,34 @@ class MobilityAPI {
               headers: this.getHeaders(),
             }
           );
-          
+
           const userData = await this.handleResponse<User & { accessToken?: string }>(retryResponse);
-          
+
           // Mettre à jour l'utilisateur avec les données du serveur
           this.user = {
             ...userData,
             accessToken: this.token
           };
-          
+
           this.saveToStorage();
-          
+
           return this.user;
         } catch (refreshError) {
           this.logout();
           throw new Error('Session expirée. Veuillez vous reconnecter.');
         }
       }
-      
+
       const userData = await this.handleResponse<User & { accessToken?: string }>(response);
-      
+
       // Mettre à jour l'utilisateur avec les données du serveur
       this.user = {
         ...userData,
         accessToken: this.token
       };
-      
+
       this.saveToStorage();
-      
+
       return this.user;
     } catch (error) {
       // Use console.warn instead of console.error to prevent Turbopack overlay in dev
@@ -297,33 +297,33 @@ class MobilityAPI {
   async getVehicules(filters: Record<string, any> = {}): Promise<Vehicule[]> {
     const queryParams = new URLSearchParams(filters).toString();
     const url = `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/vehicules${queryParams ? `?${queryParams}` : ''}`;
-    
-    const response = await fetch(url, { 
-      headers: this.getHeaders() 
+
+    const response = await fetch(url, {
+      headers: this.getHeaders()
     });
-    
+
     return this.handleResponse<Vehicule[]>(response);
   }
 
   async getVehiculeById(id: string): Promise<Vehicule> {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/vehicules/${id}`,
-      { 
-        headers: this.getHeaders() 
+      {
+        headers: this.getHeaders()
       }
     );
-    
+
     return this.handleResponse<Vehicule>(response);
   }
 
   async getMarques(): Promise<{ name: string }[]> {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/marques`,
-      { 
-        headers: this.getHeaders() 
+      {
+        headers: this.getHeaders()
       }
     );
-    
+
     return this.handleResponse<{ name: string }[]>(response);
   }
 
@@ -336,29 +336,29 @@ class MobilityAPI {
         body: JSON.stringify(reservationData),
       }
     );
-    
+
     return this.handleResponse(response);
   }
 
   async getParkings(): Promise<any[]> {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/parkings`,
-      { 
-        headers: this.getHeaders() 
+      {
+        headers: this.getHeaders()
       }
     );
-    
+
     return this.handleResponse<any[]>(response);
   }
 
   async getStats(): Promise<{ totalVehicules: number; totalParkings: number }> {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/vehicules/parking/stats`,
-      { 
-        headers: this.getHeaders() 
+      {
+        headers: this.getHeaders()
       }
     );
-    
+
     return this.handleResponse<{ totalVehicules: number; totalParkings: number }>(response);
   }
 
@@ -371,7 +371,7 @@ class MobilityAPI {
         body: JSON.stringify({ email }),
       }
     );
-    
+
     return this.handleResponse<{ message: string }>(response);
   }
 
@@ -384,7 +384,7 @@ class MobilityAPI {
         body: JSON.stringify({ email, otp, password: newPassword }),
       }
     );
-    
+
     return this.handleResponse<{ message: string }>(response);
   }
 
@@ -397,7 +397,7 @@ class MobilityAPI {
         body: JSON.stringify({ email, otp }),
       }
     );
-    
+
     return this.handleResponse<{ message: string }>(response);
   }
 
@@ -409,7 +409,7 @@ class MobilityAPI {
         headers: this.getHeaders(),
       }
     );
-    
+
     return this.handleResponse<{ message: string }>(response);
   }
 
@@ -422,38 +422,44 @@ class MobilityAPI {
         body: JSON.stringify(data),
       }
     );
-    
+
     const updatedUser = await this.handleResponse<User>(response);
-    
+
     // Mettre à jour l'utilisateur local si c'est l'utilisateur courant
     if (this.user && this.user.id === userId) {
       this.user = { ...this.user, ...updatedUser };
       this.saveToStorage();
     }
-    
+
     return updatedUser;
   }
 
-  async updateCurrentUser(data: Partial<User>): Promise<User> {
+  async updateCurrentUser(data: Partial<User> | FormData): Promise<User> {
     if (!this.user) {
       throw new Error('Non authentifié');
     }
-    
+
+    const isFormData = data instanceof FormData;
+    const headers = this.getHeaders();
+    if (isFormData && (headers as any)['Content-Type']) {
+      delete (headers as any)['Content-Type'];
+    }
+
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/auth/users/me`,
       {
         method: 'PUT',
-        headers: this.getHeaders(),
-        body: JSON.stringify(data),
+        headers: headers,
+        body: isFormData ? data : JSON.stringify(data),
       }
     );
-    
+
     const updatedUser = await this.handleResponse<User>(response);
-    
+
     // Mettre à jour l'utilisateur local
     this.user = { ...this.user, ...updatedUser };
     this.saveToStorage();
-    
+
     return updatedUser;
   }
 
@@ -472,7 +478,7 @@ class MobilityAPI {
 
   async checkAuthStatus(): Promise<boolean> {
     if (!this.token) return false;
-    
+
     try {
       await this.getCurrentUser();
       return true;
@@ -513,7 +519,7 @@ class MobilityAPI {
       password: userData.password,
       role: userData.role as 'CLIENT' | 'PARKING' | 'ADMIN'
     };
-    
+
     const data = await this.register(registerData);
     return {
       token: data.accessToken,
@@ -536,14 +542,14 @@ class MobilityAPI {
     if (!this.token) {
       throw new Error('Non authentifié');
     }
-    
+
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/auth/users`,
       {
         headers: this.getHeaders(),
       }
     );
-    
+
     return this.handleResponse<User[]>(response);
   }
 
@@ -554,24 +560,7 @@ class MobilityAPI {
         headers: this.getHeaders(),
       }
     );
-    
-    return this.handleResponse<any[]>(response);
-  }
 
-  async getUserReservations(userId?: number): Promise<any[]> {
-    if (!userId && !this.user) {
-      throw new Error('Non authentifié');
-    }
-    
-    const id = userId || this.user?.id;
-    
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/reservations/user/${id}`,
-      {
-        headers: this.getHeaders(),
-      }
-    );
-    
     return this.handleResponse<any[]>(response);
   }
 
@@ -579,16 +568,16 @@ class MobilityAPI {
     if (!parkingId && !this.user?.parkingId) {
       throw new Error('Parking ID non trouvé');
     }
-    
+
     const id = parkingId || this.user?.parkingId;
-    
+
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/reservations/parking/${id}`,
       {
         headers: this.getHeaders(),
       }
     );
-    
+
     return this.handleResponse<any[]>(response);
   }
 
@@ -602,7 +591,7 @@ class MobilityAPI {
         body: JSON.stringify(reason ? { status, reason } : { status }),
       }
     );
-    
+
     return this.handleResponse(response);
   }
 
@@ -614,14 +603,14 @@ class MobilityAPI {
         headers: this.getHeaders(),
       }
     );
-    
+
     return this.handleResponse(response);
   }
 
   async updateVehicule(vehicleId: string, data: Partial<Vehicule> | FormData): Promise<Vehicule> {
     const isFormData = data instanceof FormData;
     const headers = this.getHeaders();
-    
+
     // Si c'est du FormData, on laisse le navigateur définir le Content-Type avec le boundary
     if (isFormData && (headers as any)['Content-Type']) {
       delete (headers as any)['Content-Type'];
@@ -635,10 +624,10 @@ class MobilityAPI {
         body: isFormData ? data : JSON.stringify(data),
       }
     );
-    
+
     return this.handleResponse<Vehicule>(response);
   }
-    // ==================== MÉTHODES ADMIN ====================
+  // ==================== MÉTHODES ADMIN ====================
 
   async getAdminVehicules(): Promise<any[]> {
     const response = await fetch(

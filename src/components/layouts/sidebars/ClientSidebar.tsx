@@ -32,7 +32,7 @@ export default function ClientSidebar() {
     {
       title: 'Réserver',
       icon: faCar,
-      href: '/reserve',
+      href: '/dashboard/client/search',
     },
     {
       title: 'Mes réservations',
