@@ -114,6 +114,34 @@ export default function ClientsTable() {
     );
   }
 
+  const getStatusBadge = (status: Client['status']) => {
+    switch (status) {
+      case 'APPROVED':
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            ACTIF
+          </span>
+        );
+      case 'PENDING':
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700">
+            <Clock className="w-3.5 h-3.5" />
+            EN ATTENTE
+          </span>
+        );
+      case 'BLOCKED':
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700">
+            <ShieldAlert className="w-3.5 h-3.5" />
+            BLOQUÉ
+          </span>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="relative">
       <div className="p-4 border-b border-gray-50 bg-gray-50/10 flex flex-col sm:flex-row gap-4 items-center justify-between">
