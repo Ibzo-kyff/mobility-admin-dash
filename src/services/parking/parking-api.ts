@@ -85,10 +85,19 @@ class ParkingAPI {
     return this.handleResponse<any[]>(res);
   }
 
-  // Clients (si tu l'as implémenté)
+  // Clients
   async getClients(): Promise<any[]> {
     const res = await fetch(`${this.baseUrl}/parkings/me/clients`, { headers: this.getHeaders() });
     return this.handleResponse<any[]>(res);
+  }
+
+  async updateClientStatus(clientId: number, status: string): Promise<any> {
+    const res = await fetch(`${this.baseUrl}/parkings/me/clients/${clientId}/status`, {
+      method: 'PATCH',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ status }),
+    });
+    return this.handleResponse<any>(res);
   }
 
   // Revenue & Analytics → À implémenter côté backend plus tard
