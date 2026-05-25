@@ -23,13 +23,21 @@ export default function AdminNavbar({ onMenuClick }: { onMenuClick?: () => void 
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [notifications, setNotifications] = useState<any[]>([]);
 
   useEffect(() => {
     const checkNotifications = async () => {
       try {
         if (!user) return;
         const data = await notificationAPI.getNotifications();
-        const unread = data.filter((n: any) => !n.read && n.type !== "MESSAGE").length;
+        const formatted = (Array.isArray(data) ? data : [])
+          .filter((n: any) => n.type !== "MESSAGE")
+          .map((n: any) => ({
+            ...n,
+            createdAt: n.createdAt || new Date().toISOString()
+          }));
+        setNotifications(formatted);
+        const unread = formatted.filter((n: any) => !n.read).length;
         setUnreadCount(unread);
       } catch (err) {
         console.warn('Failed to check notifications:', err);
@@ -80,23 +88,49 @@ export default function AdminNavbar({ onMenuClick }: { onMenuClick?: () => void 
             </button>
 
             {showNotifications && (
-              <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
-                <div className="px-4 py-2 border-b border-gray-200">
+              <div className="fixed inset-x-4 top-16 sm:absolute sm:right-0 sm:left-auto sm:top-auto sm:w-96 sm:mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50 max-w-md">
+                <div className="px-4 py-2 border-b border-gray-100">
                   <h3 className="font-semibold text-gray-800">Notifications</h3>
                 </div>
                 <div className="max-h-96 overflow-y-auto">
-                  {/* Liste des notifications */}
-                  <div className="px-4 py-3 hover:bg-gray-50">
-                    <p className="text-sm text-gray-800">Nouvel utilisateur inscrit</p>
-                    <p className="text-xs text-gray-500">Il y a 5 minutes</p>
-                  </div>
-                  <div className="px-4 py-3 hover:bg-gray-50">
-                    <p className="text-sm text-gray-800">Demande d'approbation en attente</p>
-                    <p className="text-xs text-gray-500">Il y a 1 heure</p>
-                  </div>
+                  {notifications.length === 0 ? (
+                    <div className="px-4 py-6 text-center text-gray-500 text-sm">
+                      Aucune notification
+                    </div>
+                  ) : (
+                    notifications.slice(0, 5).map((n) => (
+                      <Link 
+                        key={n.id} 
+                        href={`/dashboard/admin/notifications?id=${n.id}`}
+                        onClick={async () => {
+                          if (!n.read) {
+                            try {
+                              await notificationAPI.markNotificationAsRead(n.id);
+                            } catch (e) {}
+                          }
+                          setShowNotifications(false);
+                        }}
+                        className={`block px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-50 last:border-0 ${!n.read ? 'bg-orange-50/30 font-semibold' : ''}`}
+                      >
+                        <p className={`text-sm ${!n.read ? 'font-bold text-gray-900' : 'text-gray-800'}`}>
+                          {n.title || n.message}
+                        </p>
+                        {!n.title && n.message && n.title !== n.message && (
+                          <p className="text-xs text-gray-600 line-clamp-2 mt-0.5">{n.message}</p>
+                        )}
+                        <p className="text-[10px] text-gray-400 mt-1">
+                          {n.createdAt ? new Date(n.createdAt).toLocaleString('fr-FR') : 'Récemment'}
+                        </p>
+                      </Link>
+                    ))
+                  )}
                 </div>
-                <div className="px-4 py-2 border-t border-gray-200">
-                  <Link href="/dashboard/admin/notifications" className="text-sm text-orange-600 hover:text-orange-700">
+                <div className="px-4 py-2 border-t border-gray-100">
+                  <Link 
+                    href="/dashboard/admin/notifications"
+                    onClick={() => setShowNotifications(false)}
+                    className="text-sm font-bold text-orange-600 hover:text-orange-700"
+                  >
                     Voir toutes les notifications
                   </Link>
                 </div>

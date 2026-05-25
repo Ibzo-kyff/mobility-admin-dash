@@ -82,8 +82,8 @@ export default function ParkingNavbar({ onMenuClick }: { onMenuClick?: () => voi
             </button>
 
             {showNotifications && (
-              <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
-                <div className="px-4 py-2 border-b border-gray-200">
+              <div className="fixed inset-x-4 top-16 sm:absolute sm:right-0 sm:left-auto sm:top-auto sm:w-96 sm:mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50 max-w-md">
+                <div className="px-4 py-2 border-b border-gray-100">
                   <h3 className="font-semibold text-gray-800">Notifications</h3>
                 </div>
                 <div className="max-h-96 overflow-y-auto">
@@ -93,7 +93,19 @@ export default function ParkingNavbar({ onMenuClick }: { onMenuClick?: () => voi
                     </div>
                   ) : (
                     notifications.slice(0, 5).map((n) => (
-                      <div key={n.id} className={`px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-50 last:border-0 ${!n.read ? 'bg-orange-50/30' : ''}`}>
+                      <Link 
+                        key={n.id} 
+                        href={`/dashboard/parking/notifications?id=${n.id}`}
+                        onClick={async () => {
+                          if (!n.read) {
+                            try {
+                              await notificationAPI.markNotificationAsRead(n.id);
+                            } catch (e) {}
+                          }
+                          setShowNotifications(false);
+                        }}
+                        className={`block px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-50 last:border-0 ${!n.read ? 'bg-orange-50/30' : ''}`}
+                      >
                         <p className={`text-sm ${!n.read ? 'font-bold text-gray-900' : 'text-gray-800'}`}>
                           {n.title || n.message}
                         </p>
@@ -103,12 +115,16 @@ export default function ParkingNavbar({ onMenuClick }: { onMenuClick?: () => voi
                         <p className="text-[10px] text-gray-400 mt-1">
                           {n.createdAt ? new Date(n.createdAt).toLocaleString('fr-FR') : 'Récemment'}
                         </p>
-                      </div>
+                      </Link>
                     ))
                   )}
                 </div>
-                <div className="px-4 py-2 border-t border-gray-200">
-                  <Link href="/dashboard/parking/notifications" className="text-sm text-orange-600 hover:text-orange-700">
+                <div className="px-4 py-2 border-t border-gray-100">
+                  <Link 
+                    href="/dashboard/parking/notifications" 
+                    onClick={() => setShowNotifications(false)}
+                    className="text-sm font-bold text-orange-600 hover:text-orange-700"
+                  >
                     Voir toutes les notifications
                   </Link>
                 </div>

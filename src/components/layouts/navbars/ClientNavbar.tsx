@@ -22,6 +22,8 @@ import { useEffect } from 'react';
 export default function ClientNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
   const { user, logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
@@ -29,7 +31,9 @@ export default function ClientNavbar({ onMenuClick }: { onMenuClick?: () => void
       try {
         if (!user) return;
         const data = await notificationAPI.getNotifications({ userId: user.id });
-        const unread = data.filter((n: any) => !n.read && n.type !== "MESSAGE").length;
+        const formatted = (Array.isArray(data) ? data : []).filter((n: any) => n.type !== "MESSAGE");
+        setNotifications(formatted);
+        const unread = formatted.filter((n: any) => !n.read).length;
         setUnreadCount(unread);
       } catch (err) {
         console.warn('Failed to check notifications:', err);
@@ -65,14 +69,70 @@ export default function ClientNavbar({ onMenuClick }: { onMenuClick?: () => void
 
         {/* Actions utilisateur */}
         <div className="flex items-center gap-4">
-          <Link href="/dashboard/client/notifications" className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors inline-block">
-            <FontAwesomeIcon icon={faBell} className="text-xl" />
-            {unreadCount > 0 && (
-              <span className="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full z-10 shadow-sm border-white border">
-                {unreadCount > 99 ? '99+' : unreadCount}
-              </span>
+          {/* Notifications */}
+          <div className="relative">
+            <button 
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <FontAwesomeIcon icon={faBell} className="text-xl" />
+              {unreadCount > 0 && (
+                <span className="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full z-10 shadow-sm border-white border">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </button>
+
+            {showNotifications && (
+              <div className="fixed inset-x-4 top-16 sm:absolute sm:right-0 sm:left-auto sm:top-auto sm:w-96 sm:mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50 max-w-md">
+                <div className="px-4 py-2 border-b border-gray-100">
+                  <h3 className="font-semibold text-gray-800">Notifications</h3>
+                </div>
+                <div className="max-h-96 overflow-y-auto">
+                  {notifications.length === 0 ? (
+                    <div className="px-4 py-6 text-center text-gray-500 text-sm">
+                      Aucune notification
+                    </div>
+                  ) : (
+                    notifications.slice(0, 5).map((n) => (
+                      <Link 
+                        key={n.id} 
+                        href={`/dashboard/client/notifications?id=${n.id}`}
+                        onClick={async () => {
+                          if (!n.read) {
+                            try {
+                              await notificationAPI.markNotificationAsRead(n.id);
+                            } catch (e) {}
+                          }
+                          setShowNotifications(false);
+                        }}
+                        className={`block px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-50 last:border-0 ${!n.read ? 'bg-orange-50/30' : ''}`}
+                      >
+                        <p className={`text-sm ${!n.read ? 'font-bold text-gray-900' : 'text-gray-800'}`}>
+                          {n.title || n.message}
+                        </p>
+                        {!n.title && n.message && n.title !== n.message && (
+                          <p className="text-xs text-gray-600 line-clamp-2 mt-0.5">{n.message}</p>
+                        )}
+                        <p className="text-[10px] text-gray-400 mt-1">
+                          {n.createdAt ? new Date(n.createdAt).toLocaleString('fr-FR') : 'Récemment'}
+                        </p>
+                      </Link>
+                    ))
+                  )}
+                </div>
+                <div className="px-4 py-2 border-t border-gray-100">
+                  <Link 
+                    href="/dashboard/client/notifications" 
+                    onClick={() => setShowNotifications(false)}
+                    className="text-sm font-bold text-orange-600 hover:text-orange-700"
+                  >
+                    Voir toutes les notifications
+                  </Link>
+                </div>
+              </div>
             )}
-          </Link>
+          </div>
 
           {/* Menu utilisateur */}
           <div className="relative">

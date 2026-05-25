@@ -317,8 +317,130 @@ export default function AdminUsersPage() {
       </div>
 
       {/* Tableau des utilisateurs */}
+      {/* Tableau des utilisateurs */}
       <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Mobile Grid Layout for Users */}
+        <div className="block md:hidden p-4 space-y-4">
+          {loading ? (
+            <div className="bg-white rounded-2xl p-8 text-center shadow-sm">
+              <div className="flex justify-center">
+                <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            </div>
+          ) : paginatedUsers.length === 0 ? (
+            <div className="bg-white rounded-2xl p-8 text-center text-gray-500 shadow-sm font-bold">
+              Aucun utilisateur trouvé
+            </div>
+          ) : (
+            paginatedUsers.map((user) => (
+              <div key={user.id} className="bg-slate-50/50 rounded-2xl p-5 border border-slate-100/80 shadow-md shadow-slate-200/20 relative overflow-hidden flex flex-col gap-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-2xl overflow-hidden bg-slate-100 shadow-inner flex items-center justify-center border border-slate-50">
+                      {user.image ? (
+                        <img
+                          src={user.image}
+                          alt={`${user.prenom} ${user.nom}`}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.parentElement!.innerHTML = `<span class="text-sm font-black text-slate-700">${user.prenom?.[0] || ''}${user.nom?.[0] || ''}</span>`;
+                          }}
+                        />
+                      ) : (
+                        <span className="text-sm font-black text-slate-700">
+                          {user.prenom?.[0]}{user.nom?.[0]}
+                        </span>
+                      )}
+                    </div>
+                    <div>
+                      <h3 className="font-black text-sm text-slate-900 leading-snug">
+                        {user.prenom} {user.nom}
+                      </h3>
+                      <p className="text-xs text-slate-400 font-bold truncate max-w-[180px] mt-0.5">{user.email}</p>
+                    </div>
+                  </div>
+
+                  <div className="relative">
+                    <button
+                      onClick={() => setActiveMenu(activeMenu === user.id ? null : user.id)}
+                      className="w-8 h-8 rounded-xl bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center hover:bg-slate-200/70 transition-colors"
+                    >
+                      <FontAwesomeIcon icon={faEllipsisVertical} />
+                    </button>
+
+                    {/* Actions dropdown for mobile card */}
+                    {activeMenu === user.id && (
+                      <div
+                        ref={menuRef}
+                        className="absolute right-0 mt-1 w-44 bg-white rounded-xl shadow-xl z-20 border border-slate-100 py-1"
+                      >
+                        <button
+                          onClick={() => handleViewUser(user)}
+                          className="flex w-full items-center px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors"
+                        >
+                          <FontAwesomeIcon icon={faEye} className="mr-2.5 text-slate-400" />
+                          Voir détails
+                        </button>
+                        <button
+                          onClick={() => handleEditUser(user)}
+                          className="flex w-full items-center px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors"
+                        >
+                          <FontAwesomeIcon icon={faEdit} className="mr-2.5 text-slate-400" />
+                          Modifier
+                        </button>
+                        <button
+                          onClick={() => handleDeleteUser(user)}
+                          className="flex w-full items-center px-4 py-2.5 text-xs font-bold text-rose-600 hover:bg-rose-50 transition-colors"
+                        >
+                          <FontAwesomeIcon icon={faTrash} className="mr-2.5 text-rose-400" />
+                          Supprimer
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 py-3 border-y border-slate-100/50">
+                  <div className="space-y-0.5">
+                    <p className="text-[9px] font-black text-slate-300 uppercase tracking-wider">Rôle & Statut</p>
+                    <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                      <span className={`px-2 py-0.5 text-[10px] font-black uppercase tracking-wider rounded-md ${
+                        user.role === 'ADMIN' ? 'bg-purple-100 text-purple-800' :
+                        user.role === 'PARKING' ? 'bg-blue-100 text-blue-800' :
+                        'bg-green-100 text-green-800'
+                      }`}>
+                        {user.role}
+                      </span>
+                      <span className={`px-2 py-0.5 text-[10px] font-black uppercase tracking-wider rounded-md ${
+                        user.status === 'APPROVED' ? 'bg-green-100 text-green-800' :
+                        user.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'
+                      }`}>
+                        {user.status}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-0.5 text-right">
+                    <p className="text-[9px] font-black text-slate-300 uppercase tracking-wider">Email vérifié</p>
+                    <p className={`text-[11px] font-bold mt-1 ${user.emailVerified ? 'text-green-600' : 'text-yellow-600'}`}>
+                      {user.emailVerified ? 'Vérifié' : 'En attente'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-[10px] font-bold text-slate-400">
+                  <span>Inscrit le :</span>
+                  <span className="text-slate-600 font-extrabold">{new Date(user.createdAt).toLocaleDateString()}</span>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
