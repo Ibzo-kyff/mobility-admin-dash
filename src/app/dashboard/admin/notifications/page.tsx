@@ -108,6 +108,22 @@ export default function NotificationsPage() {
     return () => clearInterval(interval);
   }, [user]);
 
+  useEffect(() => {
+    if (notifications.length > 0 && typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      const notifId = searchParams.get('id');
+      if (notifId) {
+        const found = notifications.find(n => n.id === Number(notifId));
+        if (found) {
+          setSelectedNotification(found);
+          if (!found.read) {
+            handleMarkAsRead(found.id);
+          }
+        }
+      }
+    }
+  }, [notifications]);
+
   const handleMarkAsRead = async (id: number) => {
     try {
       await notificationAPI.markNotificationAsRead(id);
@@ -150,8 +166,7 @@ export default function NotificationsPage() {
     ? notifications 
     : notifications.filter(n => !n.read);
 
-  const getIcon = (type?: string, isRead?: boolean) => {
-    if (!isRead) return faEnvelope;
+  const getIcon = (type?: string) => {
     switch (type) {
       case 'RESERVATION': return faCar;
       case 'PAIEMENT': return faMoneyBillWave;
@@ -181,8 +196,8 @@ export default function NotificationsPage() {
   // Vue détail quand une notification est sélectionnée
   if (selectedNotification) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white pb-20">
-        <div className="max-w-6xl mx-auto p-6">
+      <div className="space-y-6 p-6">
+        <div className="max-w-4xl mx-auto">
           <div className="mb-8">
             <button
               onClick={() => setSelectedNotification(null)}
@@ -196,30 +211,18 @@ export default function NotificationsPage() {
           </div>
 
           <div className="max-w-2xl mx-auto">
-            <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-2xl overflow-hidden">
-              {/* Header avec gradient */}
-              <div className={`relative p-8 text-center ${!selectedNotification.read ? 'bg-gradient-to-br from-orange-500 to-orange-600' : 'bg-gradient-to-br from-gray-700 to-gray-800'}`}>
-                <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-20 -mt-20" />
-                <div className="absolute bottom-0 left-0 w-40 h-40 bg-white/10 rounded-full -ml-20 -mb-20" />
-                
-                <div className="relative">
-                  <div className={`w-20 h-20 rounded-3xl flex items-center justify-center text-white shadow-2xl mb-6 mx-auto ${!selectedNotification.read ? 'bg-white/20 backdrop-blur-sm' : 'bg-white/10 backdrop-blur-sm'}`}>
-                    <FontAwesomeIcon icon={getIcon(selectedNotification.type, selectedNotification.read)} className="text-3xl" />
-                  </div>
-                  
-                  <h2 className="text-2xl font-black text-white text-center mb-3">{selectedNotification.title}</h2>
-                  
-                  <div className="flex justify-center gap-2">
-                    <span className={`text-xs px-3 py-1.5 rounded-full font-black uppercase tracking-widest ${getTypeColor(selectedNotification.type)} bg-white/90 backdrop-blur-sm`}>
-                      {getTypeLabel(selectedNotification.type)}
-                    </span>
-                    {!selectedNotification.read && (
-                      <span className="text-xs px-3 py-1.5 rounded-full font-black uppercase tracking-widest bg-white/90 backdrop-blur-sm text-orange-600">
-                        Non lue
-                      </span>
-                    )}
-                  </div>
+            <div className="bg-white rounded-3xl border border-gray-100 shadow-xl overflow-hidden animate-fadeIn">
+              {/* Header */}
+              <div className={`p-8 text-center ${!selectedNotification.read ? 'bg-orange-600 text-white' : 'bg-gray-800 text-white'}`}>
+                <div className="w-20 h-20 rounded-3xl bg-white/20 backdrop-blur-md flex items-center justify-center mx-auto mb-6 shadow-2xl">
+                  <FontAwesomeIcon icon={getIcon(selectedNotification.type)} className="text-3xl" />
                 </div>
+                
+                <h2 className="text-2xl font-black mb-2">{selectedNotification.title}</h2>
+                
+                <span className="text-xs px-3 py-1 bg-white/20 rounded-full font-black uppercase tracking-widest">
+                  {getTypeLabel(selectedNotification.type)}
+                </span>
               </div>
 
               <div className="p-8">
@@ -294,8 +297,8 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white pb-20">
-      <div className="max-w-6xl mx-auto p-6">
+    <div className="space-y-6 p-6">
+      <div className="max-w-4xl mx-auto">
         {/* Header avec actions */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
@@ -398,7 +401,7 @@ export default function NotificationsPage() {
                         ? 'bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-lg' 
                         : 'bg-gray-100 text-gray-400'
                     }`}>
-                      <FontAwesomeIcon icon={getIcon(n.type, n.read)} className="text-xl" />
+                      <FontAwesomeIcon icon={getIcon(n.type)} className="text-xl" />
                     </div>
                     
                     <div className="flex-1 min-w-0">

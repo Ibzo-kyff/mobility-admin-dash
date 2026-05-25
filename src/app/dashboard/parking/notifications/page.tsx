@@ -88,6 +88,22 @@ export default function ParkingNotificationsPage() {
     return () => clearInterval(interval);
   }, [user]);
 
+  useEffect(() => {
+    if (notifications.length > 0 && typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      const notifId = searchParams.get('id');
+      if (notifId) {
+        const found = notifications.find(n => n.id === Number(notifId));
+        if (found) {
+          setSelectedNotification(found);
+          if (!found.read) {
+            handleMarkAsRead(found.id);
+          }
+        }
+      }
+    }
+  }, [notifications]);
+
   const handleMarkAsRead = async (id: number) => {
     try {
       await notificationAPI.markNotificationAsRead(id);

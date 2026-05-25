@@ -383,7 +383,8 @@ export default function ParkingRevenueStats() {
              Historique
           </button>
         </div>
-        <div className="overflow-x-auto">
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left">
             <thead>
               <tr className="bg-slate-50/50">
@@ -426,6 +427,43 @@ export default function ParkingRevenueStats() {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile Grid View */}
+        <div className="grid grid-cols-1 gap-4 md:hidden p-6 bg-slate-50/30">
+          {(recentTransactions || []).map((tx) => (
+            <div key={tx.id} className="bg-white rounded-3xl p-5 border border-slate-100/50 shadow-sm space-y-4 hover:shadow-md transition-all">
+              <div className="flex justify-between items-center">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">#TX-{tx.id}</span>
+                <span className={`px-3 py-1.5 rounded-full text-[8px] font-black uppercase tracking-widest ${
+                  tx.type === 'ACHAT' ? 'bg-blue-50 text-blue-600' : 'bg-orange-50 text-orange-600'
+                }`}>
+                  {tx.type}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center text-xs font-black shadow-inner">
+                  {tx.client.charAt(0)}
+                </div>
+                <div>
+                  <p className="text-sm font-black text-slate-900">{tx.client}</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{tx.date}</p>
+                </div>
+              </div>
+
+              <div className="border-t border-slate-100/50 pt-3 flex justify-between items-center">
+                <div className="space-y-0.5">
+                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Véhicule</p>
+                  <p className="text-xs font-bold text-slate-700">{tx.vehicle}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Montant brut</p>
+                  <p className="text-base font-black text-slate-900">{tx?.amount?.toLocaleString() || 0} <span className="text-[10px] text-slate-400">F</span></p>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

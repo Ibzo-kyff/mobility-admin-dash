@@ -131,6 +131,17 @@ export default function ClientReservationTabs() {
     fetchReservations();
   }, [user]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setViewMode('grid');
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const filteredReservations = useMemo(() => {
     let result = reservations;
 
@@ -294,7 +305,7 @@ export default function ClientReservationTabs() {
             </div>
 
             {/* View Toggle */}
-            <div className="flex p-1 bg-slate-100 rounded-xl">
+            <div className="hidden md:flex p-1 bg-slate-100 rounded-xl">
               <button
                 onClick={() => setViewMode('grid')}
                 className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all ${

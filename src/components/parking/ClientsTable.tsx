@@ -169,7 +169,8 @@ export default function ClientsTable() {
         </div>
       </div>
 
-      <div className="overflow-x-auto">
+      {/* Desktop Table View */}
+      <div className="hidden md:block overflow-x-auto">
         {!filteredClients || filteredClients.length === 0 ? (
           <div className="p-12 text-center">
             <div className="bg-gray-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -253,6 +254,64 @@ export default function ClientsTable() {
               ))}
             </tbody>
           </table>
+        )}
+      </div>
+
+      {/* Mobile Grid View */}
+      <div className="grid grid-cols-1 gap-4 md:hidden p-4 sm:p-6 bg-slate-50/10">
+        {!filteredClients || filteredClients.length === 0 ? (
+          <div className="p-12 text-center bg-white rounded-3xl border border-slate-100">
+            <div className="bg-gray-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+              <User className="w-8 h-8 text-gray-300" />
+            </div>
+            <h3 className="text-gray-900 font-semibold">Aucun résultat</h3>
+            <p className="text-gray-500 text-sm mt-1">Aucun client ne correspond à votre recherche.</p>
+          </div>
+        ) : (
+          filteredClients.map((client) => (
+            <div 
+              key={client.id} 
+              onClick={() => {
+                setSelectedClient(client);
+                setIsPanelOpen(true);
+              }}
+              className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm space-y-4 hover:shadow-md transition-all cursor-pointer"
+            >
+              <div className="flex justify-between items-start">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-sm">
+                    {client.prenom[0]}{client.nom[0]}
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">{client.prenom} {client.nom}</h3>
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">ID: #{client.id}</p>
+                  </div>
+                </div>
+                {getStatusBadge(client.status)}
+              </div>
+
+              <div className="space-y-1.5 text-sm text-gray-600">
+                <div className="flex items-center gap-2">
+                  <Mail className="w-3.5 h-3.5 text-gray-400" />
+                  <span className="truncate">{client.email}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Phone className="w-3.5 h-3.5 text-gray-400" />
+                  <span>{client.phone}</span>
+                </div>
+              </div>
+
+              <div className="border-t border-slate-100/50 pt-3 flex justify-between items-center text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                <span className="flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-gray-400" />
+                  {new Date(client.createdAt).toLocaleDateString('fr-FR')}
+                </span>
+                <span className="text-sm font-black text-slate-900">
+                  {client.totalSpent ? client.totalSpent.toLocaleString('fr-FR') : '0'} <span className="text-[9px] text-gray-400 font-bold">FCFA</span>
+                </span>
+              </div>
+            </div>
+          ))
         )}
       </div>
       

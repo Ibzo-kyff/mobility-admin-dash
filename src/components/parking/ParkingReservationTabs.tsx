@@ -146,7 +146,7 @@ export interface Reservation {
 
 export default function ParkingReservationTabs() {
   const [activeTab, setActiveTab] = useState<'pending' | 'ongoing' | 'history'>('pending');
-  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('grid');
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -215,6 +215,17 @@ export default function ParkingReservationTabs() {
 
   useEffect(() => {
     fetchReservations();
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setViewMode('grid');
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   useEffect(() => {
@@ -1359,7 +1370,7 @@ export default function ParkingReservationTabs() {
           <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-2.5 text-gray-400 text-sm" />
         </div>
         <div className="flex gap-2 justify-end">
-          <div className="flex bg-gray-200 p-1 rounded-lg">
+          <div className="hidden md:flex bg-gray-200 p-1 rounded-lg">
             <button
               onClick={() => setViewMode('list')}
               className={`px-2 sm:px-3 py-1 rounded-md text-sm transition-colors ${viewMode === 'list' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
