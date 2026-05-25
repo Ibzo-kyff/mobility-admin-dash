@@ -65,11 +65,12 @@ class MobilityAPI {
 
     if (this.token) {
       setCookie('accessToken', this.token, {
-        maxAge: 15 * 60,           // 15 minutes
+        maxAge: 7 * 24 * 60 * 60, // Augmenté à 7 jours pour plus de stabilité
         secure: isProd,
         sameSite: 'strict',
         path: '/',
       });
+      localStorage.setItem('accessToken', this.token);
     }
 
     if (this.refreshToken) {
@@ -79,15 +80,18 @@ class MobilityAPI {
         sameSite: 'strict',
         path: '/',
       });
+      localStorage.setItem('refreshToken', this.refreshToken);
     }
 
     if (this.user) {
-      setCookie('user', JSON.stringify(this.user), {
+      const userStr = JSON.stringify(this.user);
+      setCookie('user', userStr, {
         maxAge: 7 * 24 * 60 * 60,
         secure: isProd,
         sameSite: 'strict',
         path: '/',
       });
+      localStorage.setItem('user', userStr);
     }
   }
 
@@ -95,6 +99,11 @@ class MobilityAPI {
     deleteCookie('accessToken');
     deleteCookie('refreshToken');
     deleteCookie('user');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
+    }
   }
 
   // ==================== Méthodes d'authentification ====================
@@ -473,6 +482,9 @@ class MobilityAPI {
   }
 
   getToken(): string | null {
+    if (!this.token && typeof window !== 'undefined') {
+      this.token = getCookie('accessToken') as string | null || localStorage.getItem('accessToken');
+    }
     return this.token;
   }
 

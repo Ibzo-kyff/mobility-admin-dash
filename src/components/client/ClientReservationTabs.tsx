@@ -73,26 +73,54 @@ export interface Reservation {
   };
 }
 
+const getVehicle = (res: any) => res?.vehicle || res?.vehicule;
+
+const getParkingName = (res: any, parkings: any[] = []) => {
+  if (!res) return 'Parking Privé';
+  const p1 = res.parking?.nom || res.parking?.name;
+  const veh = getVehicle(res);
+  const p2 = veh?.parking?.nom || veh?.parking?.name;
+  if (p1 || p2) return p1 || p2;
+  
+  const parkingId = res.parkingId || veh?.parkingId;
+  if (parkingId && parkings.length > 0) {
+    const found = parkings.find((p: any) => p.id === parkingId || p.id === Number(parkingId));
+    if (found) return found.nom || found.name || 'Parking Privé';
+  }
+  
+  return 'Parking Privé';
+};
+
 export default function ClientReservationTabs() {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<'all' | 'pending' | 'confirmed' | 'canceled' | 'history'>('all');
+  const [activeTab, setActiveTab] = useState<'pending' | 'confirmed' | 'canceled'>('pending');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(6);
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
   const [viewModeTab, setViewModeTab] = useState<'list' | 'details'>('list');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [parkings, setParkings] = useState<any[]>([]);
 
   const fetchReservations = async () => {
     if (!user) return;
     setLoading(true);
     try {
-      const data = await clientAPI.getUserReservations(user.id);
+      const [data, parkingsData] = await Promise.all([
+        clientAPI.getUserReservations(user.id),
+        clientAPI.getParkings()
+      ]);
       setReservations(data as Reservation[]);
-    } catch (error) {
-      console.error('Erreur lors de la récupération des réservations', error);
+      setParkings(parkingsData || []);
+    } catch (error: any) {
+      if (error?.message?.includes('Token invalide') || error?.status === 401) {
+        console.warn('Session expirée ou token invalide. Veuillez vous reconnecter.');
+      } else {
+        console.warn('Erreur lors de la récupération des réservations:', error?.message || error);
+      }
       setReservations([]);
     } finally {
       setLoading(false);
@@ -118,19 +146,22 @@ export default function ClientReservationTabs() {
 
     if (search) {
       const lowerSearch = search.toLowerCase();
-      result = result.filter(r =>
-        r.vehicle?.marque?.toLowerCase().includes(lowerSearch) ||
-        r.vehicle?.model?.toLowerCase().includes(lowerSearch) ||
-        r.parking?.nom?.toLowerCase().includes(lowerSearch) ||
-        r.parking?.name?.toLowerCase().includes(lowerSearch) ||
-        r.id.toString().includes(lowerSearch)
-      );
+      result = result.filter((r: any) => {
+        const veh = getVehicle(r);
+        const parkingName = getParkingName(r, parkings);
+        return (
+          veh?.marque?.toLowerCase().includes(lowerSearch) ||
+          veh?.model?.toLowerCase().includes(lowerSearch) ||
+          veh?.modele?.toLowerCase().includes(lowerSearch) ||
+          parkingName.toLowerCase().includes(lowerSearch) ||
+          r.id.toString().includes(lowerSearch)
+        );
+      });
     }
 
     return result;
   }, [reservations, activeTab, search]);
 
-  const itemsPerPage = viewMode === 'list' ? 10 : 6;
   const totalPages = Math.ceil(filteredReservations.length / itemsPerPage) || 1;
   const paginatedReservations = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -196,7 +227,7 @@ export default function ClientReservationTabs() {
           <div className="relative w-full lg:w-auto">
              {/* Desktop Tabs */}
             <div className="hidden md:flex p-1.5 bg-slate-100 rounded-[1.5rem] w-fit">
-              {(['all', 'pending', 'confirmed', 'canceled', 'history'] as const).map((tab) => (
+              {(['pending', 'confirmed', 'canceled'] as const).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -206,11 +237,9 @@ export default function ClientReservationTabs() {
                       : 'text-slate-400 hover:text-slate-600'
                   }`}
                 >
-                  {tab === 'all' ? 'Toutes' : 
-                   tab === 'pending' ? 'En attente' : 
+                  {tab === 'pending' ? 'En attente' : 
                    tab === 'confirmed' ? 'Confirmées' : 
-                   tab === 'canceled' ? 'Annulées' : 
-                   'Historique'}
+                   'Annulées'}
                 </button>
               ))}
             </div>
@@ -222,17 +251,15 @@ export default function ClientReservationTabs() {
                 className="w-full px-5 py-4 bg-slate-50 rounded-2xl flex items-center justify-between border border-slate-100"
               >
                 <span className="font-black text-[10px] uppercase tracking-widest text-slate-900">
-                  {activeTab === 'all' ? 'Toutes' : 
-                   activeTab === 'pending' ? 'En attente' : 
+                  {activeTab === 'pending' ? 'En attente' : 
                    activeTab === 'confirmed' ? 'Confirmées' : 
-                   activeTab === 'canceled' ? 'Annulées' : 
-                   'Historique'}
+                   'Annulées'}
                 </span>
                 <FontAwesomeIcon icon={mobileMenuOpen ? faXmark : faBars} className="text-slate-400" />
               </button>
               {mobileMenuOpen && (
                 <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-slate-100 z-30 overflow-hidden animate-slideDown">
-                  {(['all', 'pending', 'confirmed', 'canceled', 'history'] as const).map((tab) => (
+                  {(['pending', 'confirmed', 'canceled'] as const).map((tab) => (
                     <button
                       key={tab}
                       onClick={() => {
@@ -243,11 +270,9 @@ export default function ClientReservationTabs() {
                         activeTab === tab ? 'bg-orange-50 text-orange-500' : 'text-slate-500'
                       }`}
                     >
-                      {tab === 'all' ? 'Toutes' : 
-                       tab === 'pending' ? 'En attente' : 
+                      {tab === 'pending' ? 'En attente' : 
                        tab === 'confirmed' ? 'Confirmées' : 
-                       tab === 'canceled' ? 'Annulées' : 
-                       'Historique'}
+                       'Annulées'}
                     </button>
                   ))}
                 </div>
@@ -298,7 +323,7 @@ export default function ClientReservationTabs() {
             <div key={res.id} className="bg-white rounded-[2rem] border border-slate-100 shadow-lg shadow-slate-200/40 overflow-hidden group hover:shadow-xl transition-all">
               <div className="h-40 bg-slate-100 relative overflow-hidden">
                 <img 
-                  src={getPhotoUrl(res.vehicle?.photos)} 
+                  src={getPhotoUrl(getVehicle(res)?.photos)} 
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   alt="Vehicule"
                 />
@@ -312,11 +337,11 @@ export default function ClientReservationTabs() {
               <div className="p-6 space-y-4">
                 <div>
                   <h3 className="font-black text-lg text-slate-900 group-hover:text-orange-500 transition-colors truncate">
-                    {res.vehicle?.marque} {res.vehicle?.model}
+                    {getVehicle(res)?.marque} {getVehicle(res)?.model || getVehicle(res)?.modele}
                   </h3>
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.15em] mt-1 flex items-center gap-2">
                     <FontAwesomeIcon icon={faMapMarkerAlt} className="text-orange-500" />
-                    {res.parking?.nom || res.parking?.name || 'Parking Privé'}
+                    {getParkingName(res, parkings)}
                   </p>
                 </div>
 
@@ -338,7 +363,7 @@ export default function ClientReservationTabs() {
 
                 <div className="flex items-center justify-between pt-2">
                   <div className="text-lg font-black text-orange-600">
-                    {(res.montant || res.prix || res.vehicle?.prix || 0).toLocaleString()} F
+                    {(res.montant || res.prix || getVehicle(res)?.prix || 0).toLocaleString()} F
                   </div>
                   <button 
                     onClick={() => {
@@ -376,15 +401,15 @@ export default function ClientReservationTabs() {
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-100 shadow-inner">
-                          <img src={getPhotoUrl(res.vehicle?.photos)} className="w-full h-full object-cover" />
+                          <img src={getPhotoUrl(getVehicle(res)?.photos)} className="w-full h-full object-cover" />
                         </div>
                         <div className="font-black text-sm text-slate-900 group-hover:text-orange-500 transition-colors">
-                          {res.vehicle?.marque} {res.vehicle?.model}
+                          {getVehicle(res)?.marque} {getVehicle(res)?.model || getVehicle(res)?.modele}
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-5">
-                      <span className="font-bold text-xs text-slate-600">{res.parking?.nom || res.parking?.name || 'Parking Privé'}</span>
+                      <span className="font-bold text-xs text-slate-600">{getParkingName(res, parkings)}</span>
                     </td>
                     <td className="px-6 py-5">
                       <span className="font-bold text-xs text-slate-600">{formatDate(res.dateDebut)}</span>
@@ -425,38 +450,60 @@ export default function ClientReservationTabs() {
         </div>
       )}
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-3 pt-6">
-          <button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-            className="w-12 h-12 rounded-2xl bg-white border border-slate-100 text-slate-400 flex items-center justify-center hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-          >
-            <FontAwesomeIcon icon={faChevronLeft} />
-          </button>
-          <div className="flex items-center gap-2">
-            {[...Array(totalPages)].map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrentPage(i + 1)}
-                className={`w-12 h-12 rounded-2xl font-black text-sm transition-all ${
-                  currentPage === i + 1
-                    ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
-                    : 'bg-white border border-slate-100 text-slate-400 hover:bg-slate-50'
-                }`}
-              >
-                {i + 1}
-              </button>
-            ))}
+      {/* Pagination Style Administrateur */}
+      {filteredReservations.length > 0 && (
+        <div className="mt-8 px-6 py-4 bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-700 font-medium">
+              Affichage de <span className="font-bold">{(currentPage - 1) * itemsPerPage + 1}</span> à <span className="font-bold">{Math.min(currentPage * itemsPerPage, filteredReservations.length)}</span> sur <span className="font-bold text-orange-600">{filteredReservations.length}</span> réservations
+            </span>
+            <select
+              title="Nombre d'éléments par page"
+              value={itemsPerPage}
+              onChange={(e) => {
+                setItemsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm font-bold text-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500/20 cursor-pointer transition-all hover:bg-gray-100"
+            >
+              <option value={6}>6 par page</option>
+              <option value={10}>10 par page</option>
+              <option value={24}>24 par page</option>
+              <option value={48}>48 par page</option>
+            </select>
           </div>
-          <button
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-            className="w-12 h-12 rounded-2xl bg-white border border-slate-100 text-slate-400 flex items-center justify-center hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-          >
-            <FontAwesomeIcon icon={faChevronRight} />
-          </button>
+
+          <div className="flex items-center gap-2">
+            <button
+              title="Page précédente"
+              onClick={() => {
+                setCurrentPage(prev => Math.max(prev - 1, 1));
+                window.scrollTo({ top: 300, behavior: 'smooth' });
+              }}
+              disabled={currentPage === 1}
+              className="w-10 h-10 border border-gray-200 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-50 hover:text-orange-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+            >
+              <FontAwesomeIcon icon={faChevronLeft} />
+            </button>
+
+            <div className="px-4 py-2 bg-gray-50 rounded-lg border border-gray-100">
+              <span className="text-sm font-bold text-gray-700">
+                Page <span className="text-orange-600">{currentPage}</span> sur {Math.ceil(filteredReservations.length / itemsPerPage) || 1}
+              </span>
+            </div>
+
+            <button
+              title="Page suivante"
+              onClick={() => {
+                setCurrentPage(prev => Math.min(prev + 1, Math.ceil(filteredReservations.length / itemsPerPage)));
+                window.scrollTo({ top: 300, behavior: 'smooth' });
+              }}
+              disabled={currentPage === Math.ceil(filteredReservations.length / itemsPerPage) || filteredReservations.length === 0}
+              className="w-10 h-10 border border-gray-200 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-50 hover:text-orange-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+            >
+              <FontAwesomeIcon icon={faChevronRight} />
+            </button>
+          </div>
         </div>
       )}
 
@@ -485,7 +532,7 @@ export default function ClientReservationTabs() {
                 <div className="space-y-6">
                   <div className="aspect-video rounded-[2rem] bg-slate-100 overflow-hidden shadow-2xl relative group">
                     <img 
-                      src={getPhotoUrl(selectedReservation.vehicle?.photos)} 
+                      src={getPhotoUrl(getVehicle(selectedReservation)?.photos)} 
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     />
                     <div className="absolute top-6 right-6">
@@ -497,7 +544,7 @@ export default function ClientReservationTabs() {
                     <div className="flex justify-between items-end">
                       <div>
                         <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Véhicule</p>
-                        <h4 className="text-xl font-black text-slate-900">{selectedReservation.vehicle?.marque} {selectedReservation.vehicle?.model}</h4>
+                        <h4 className="text-xl font-black text-slate-900">{getVehicle(selectedReservation)?.marque} {getVehicle(selectedReservation)?.model || getVehicle(selectedReservation)?.modele}</h4>
                       </div>
                       <div className="text-right">
                         <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Total</p>
@@ -512,7 +559,7 @@ export default function ClientReservationTabs() {
                    <div className="grid grid-cols-2 gap-4">
                       <DetailBlock icon={faCalendarAlt} label="Date Début" value={formatDate(selectedReservation.dateDebut)} />
                       <DetailBlock icon={faCalendarAlt} label="Date Fin" value={formatDate(selectedReservation.dateFin)} />
-                      <DetailBlock icon={faMapMarkerAlt} label="Parking" value={selectedReservation.parking?.nom || selectedReservation.parking?.name || 'Parking Privé'} />
+                      <DetailBlock icon={faMapMarkerAlt} label="Parking" value={getParkingName(selectedReservation, parkings)} />
                       <DetailBlock icon={faInfoCircle} label="Type" value={selectedReservation.type} />
                       {selectedReservation.motifLocation && (
                         <DetailBlock icon={faTag} label="Motif" value={selectedReservation.motifLocation} />

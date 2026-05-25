@@ -18,7 +18,13 @@ import {
   faEuroSign
 } from '@fortawesome/free-solid-svg-icons';
 
-export default function ParkingSidebar() {
+export default function ParkingSidebar({ 
+  mobileOpen, 
+  setMobileOpen 
+}: { 
+  mobileOpen?: boolean; 
+  setMobileOpen?: (open: boolean) => void; 
+}) {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
 
@@ -30,14 +36,14 @@ export default function ParkingSidebar() {
       exact: true
     },
     {
-      title: 'Ma flotte',
+      title: 'Ma Flotte',
       icon: faCar,
-      href: '/dashboard/parking/vehicles',
+      href: '/dashboard/parking/fleet',
     },
     {
-      title: 'Ajouter véhicule',
-      icon: faPlusCircle,
-      href: '/dashboard/parking/vehicles/add',
+      title: 'Véhicules',
+      icon: faCar,
+      href: '/dashboard/parking/vehicles',
     },
     {
       title: 'Réservations',
@@ -74,9 +80,20 @@ export default function ParkingSidebar() {
   };
 
   return (
-    <aside className={`bg-white border-r border-gray-200 transition-all duration-300 flex flex-col ${
-      collapsed ? 'w-20' : 'w-64'
-    }`}>
+    <>
+      {/* Mobile Overlay */}
+      {mobileOpen && (
+        <div 
+          className="fixed inset-0 bg-gray-900/50 z-40 lg:hidden"
+          onClick={() => setMobileOpen?.(false)}
+        />
+      )}
+
+      <aside className={`bg-white border-r border-gray-200 transition-all duration-300 flex flex-col fixed lg:static inset-y-0 left-0 z-50 transform ${
+        mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+      } ${
+        collapsed ? 'w-20' : 'w-64'
+      }`}>
       <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200">
         {!collapsed && (
           <Link href="/dashboard/parking" className="flex items-center gap-2">
@@ -107,6 +124,7 @@ export default function ParkingSidebar() {
             <li key={item.href}>
               <Link
                 href={item.href}
+                onClick={() => setMobileOpen?.(false)}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
                   isActive(item)
                     ? 'bg-orange-50 text-orange-600'
@@ -121,5 +139,6 @@ export default function ParkingSidebar() {
         </ul>
       </nav>
     </aside>
+    </>
   );
 }

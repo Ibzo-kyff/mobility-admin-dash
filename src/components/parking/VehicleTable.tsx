@@ -16,7 +16,16 @@ export default function VehicleTable() {
     parkingAPI.getMyVehicles()
       .then((data) => {
         if (!mounted) return;
-        setVehicles(data || []);
+        // Ensure we have an array even if the API returns an object with a data property or something else
+        if (Array.isArray(data)) {
+          setVehicles(data);
+        } else if (data && typeof data === 'object' && Array.isArray((data as any).vehicles)) {
+          setVehicles((data as any).vehicles);
+        } else if (data && typeof data === 'object' && Array.isArray((data as any).data)) {
+          setVehicles((data as any).data);
+        } else {
+          setVehicles([]);
+        }
       })
       .catch((err) => setError(err.message || 'Erreur'))
       .finally(() => mounted && setLoading(false));

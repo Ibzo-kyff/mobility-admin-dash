@@ -10,7 +10,6 @@ import {
   faCar,
   faCalendarCheck,
   faHeart,
-  faHistory,
   faUser,
   faCog,
   faQuestionCircle,
@@ -18,7 +17,13 @@ import {
   faChevronRight
 } from '@fortawesome/free-solid-svg-icons';
 
-export default function ClientSidebar() {
+export default function ClientSidebar({ 
+  mobileOpen, 
+  setMobileOpen 
+}: { 
+  mobileOpen?: boolean; 
+  setMobileOpen?: (open: boolean) => void; 
+}) {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
 
@@ -44,11 +49,11 @@ export default function ClientSidebar() {
       icon: faHeart,
       href: '/dashboard/client/favorites',
     },
-    {
-      title: 'Historique',
-      icon: faHistory,
-      href: '/dashboard/client/history',
-    },
+    // {
+    //   title: 'Historique',
+    //   icon: faHistory,
+    //   href: '/dashboard/client/history',
+    // },
     {
       title: 'Mon profil',
       icon: faUser,
@@ -74,9 +79,20 @@ export default function ClientSidebar() {
   };
 
   return (
-    <aside className={`bg-white border-r border-gray-200 transition-all duration-300 flex flex-col ${
-      collapsed ? 'w-20' : 'w-64'
-    }`}>
+    <>
+      {/* Mobile Overlay */}
+      {mobileOpen && (
+        <div 
+          className="fixed inset-0 bg-gray-900/50 z-40 lg:hidden"
+          onClick={() => setMobileOpen?.(false)}
+        />
+      )}
+
+      <aside className={`bg-white border-r border-gray-200 transition-all duration-300 flex flex-col fixed lg:static inset-y-0 left-0 z-50 transform ${
+        mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+      } ${
+        collapsed ? 'w-20' : 'w-64'
+      }`}>
       <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200">
         {!collapsed && (
           <Link href="/dashboard/client" className="flex items-center gap-2">
@@ -95,6 +111,8 @@ export default function ClientSidebar() {
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
+          title={collapsed ? "Développer le menu" : "Réduire le menu"}
+          aria-label={collapsed ? "Développer le menu" : "Réduire le menu"}
           className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500"
         >
           <FontAwesomeIcon icon={collapsed ? faChevronRight : faChevronLeft} />
@@ -107,6 +125,7 @@ export default function ClientSidebar() {
             <li key={item.href}>
               <Link
                 href={item.href}
+                onClick={() => setMobileOpen?.(false)}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
                   isActive(item)
                     ? 'bg-orange-50 text-orange-600'
@@ -121,5 +140,6 @@ export default function ClientSidebar() {
         </ul>
       </nav>
     </aside>
+    </>
   );
 }

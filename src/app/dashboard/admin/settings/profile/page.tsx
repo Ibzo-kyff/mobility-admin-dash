@@ -175,7 +175,7 @@ export default function AdminProfilePage() {
 
         {/* Formulaire */}
         <div className="lg:col-span-2">
-          <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 lg:p-8">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">Informations personnelles</h2>
             
             <div className="grid md:grid-cols-2 gap-6">

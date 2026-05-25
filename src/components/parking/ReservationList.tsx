@@ -12,7 +12,18 @@ export default function ReservationList() {
     let mounted = true;
     setLoading(true);
     parkingAPI.getReservations()
-      .then((data) => mounted && setItems(data || []))
+      .then((data) => {
+        if (!mounted) return;
+        if (Array.isArray(data)) {
+          setItems(data);
+        } else if (data && typeof data === 'object' && Array.isArray((data as any).reservations)) {
+          setItems((data as any).reservations);
+        } else if (data && typeof data === 'object' && Array.isArray((data as any).data)) {
+          setItems((data as any).data);
+        } else {
+          setItems([]);
+        }
+      })
       .catch((err) => mounted && setError(err.message || 'Erreur'))
       .finally(() => mounted && setLoading(false));
     return () => { mounted = false; };

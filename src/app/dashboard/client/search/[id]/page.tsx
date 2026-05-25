@@ -100,8 +100,13 @@ export default function ParkingDetailsPage() {
       alert('Réservation confirmée avec succès !');
       router.push('/dashboard/client/reservations');
     } catch (err: any) {
-      console.error('Error creating reservation:', err);
-      alert(`Erreur: ${err.message || 'Impossible de créer la réservation'}`);
+      if (err?.message?.includes('token manquant') || err?.message?.includes('Token invalide') || err?.status === 401) {
+        console.warn('Session expirée. Redirection ou reconnexion requise.');
+        alert('Votre session a expiré ou le jeton de sécurité est manquant. Veuillez vous déconnecter puis vous reconnecter pour réserver.');
+      } else {
+        console.warn('Erreur lors de la création de la réservation:', err?.message || err);
+        alert(`Erreur: ${err?.message || 'Impossible de créer la réservation'}`);
+      }
     } finally {
       setProcessing(false);
     }

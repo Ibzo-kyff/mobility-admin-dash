@@ -66,6 +66,8 @@ export interface Vehicule {
   annee?: number;
   year?: number;
   categorie?: string;
+  plate?: string;
+  immatriculation?: string;
 }
 
 export interface ApiError {

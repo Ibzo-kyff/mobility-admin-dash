@@ -18,7 +18,7 @@ import Image from 'next/image';
 import { notificationAPI } from '@/services/notification-api';
 import { useEffect } from 'react';
 
-export default function AdminNavbar() {
+export default function AdminNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
   const { user, logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -32,7 +32,7 @@ export default function AdminNavbar() {
         const unread = data.filter((n: any) => !n.read && n.type !== "MESSAGE").length;
         setUnreadCount(unread);
       } catch (err) {
-        console.error(err);
+        console.warn('Failed to check notifications:', err);
       }
     };
     checkNotifications();
@@ -44,7 +44,7 @@ export default function AdminNavbar() {
     <nav className="bg-white border-b border-gray-200 px-6 py-3">
       <div className="flex items-center justify-between">
         {/* Menu hamburger pour mobile */}
-        <button className="lg:hidden text-gray-600 hover:text-gray-900">
+        <button onClick={onMenuClick} className="lg:hidden text-gray-600 hover:text-gray-900 p-2 -ml-2">
           <FontAwesomeIcon icon={faBars} className="text-xl" />
         </button>
 
@@ -96,7 +96,7 @@ export default function AdminNavbar() {
                   </div>
                 </div>
                 <div className="px-4 py-2 border-t border-gray-200">
-                  <Link href="/dasboard/admin/notifications" className="text-sm text-orange-600 hover:text-orange-700">
+                  <Link href="/dashboard/admin/notifications" className="text-sm text-orange-600 hover:text-orange-700">
                     Voir toutes les notifications
                   </Link>
                 </div>

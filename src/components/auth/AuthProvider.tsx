@@ -67,7 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 });
               }
             } catch (refreshError) {
-              console.error('Refresh failed:', refreshError);
+              console.warn('Refresh failed:', refreshError);
               // Ne pas déconnecter, garder l'utilisateur actuel
             }
           } catch (e) {
@@ -212,7 +212,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         });
       }
     } catch (error) {
-      console.error('Error refreshing user:', error);
+      console.warn('Error refreshing user:', error);
     }
   };
 

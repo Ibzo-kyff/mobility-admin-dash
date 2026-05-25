@@ -18,9 +18,13 @@ export default function SearchPage() {
   const [marques, setMarques] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState<'parkings' | 'vehicles'>('parkings');
+  const [activeTab, setActiveTab] = useState<'parkings' | 'vehicles'>('vehicles');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
+
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
 
   // Filters State
   const [filters, setFilters] = useState({
@@ -29,11 +33,17 @@ export default function SearchPage() {
     transmission: 'all',
     minPrice: '',
     maxPrice: '',
+    transactionType: 'all', // 'all', 'rent', 'buy'
   });
 
   useEffect(() => {
     fetchData();
+    setCurrentPage(1);
   }, [activeTab]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filters]);
 
   const fetchData = async () => {
     try {
@@ -86,8 +96,12 @@ export default function SearchPage() {
       const price = Number(v.prix || v.prixJour || 0);
       const matchesMinPrice = filters.minPrice === '' || price >= Number(filters.minPrice);
       const matchesMaxPrice = filters.maxPrice === '' || price <= Number(filters.maxPrice);
+      
+      const matchesTransaction = filters.transactionType === 'all' || 
+                                 (filters.transactionType === 'rent' && v.forRent) || 
+                                 (filters.transactionType === 'buy' && v.forSale);
 
-      return matchesSearch && matchesType && matchesMarque && matchesTrans && matchesMinPrice && matchesMaxPrice;
+      return matchesSearch && matchesType && matchesMarque && matchesTrans && matchesMinPrice && matchesMaxPrice && matchesTransaction;
     });
   }, [vehicles, searchTerm, filters]);
 
@@ -98,12 +112,30 @@ export default function SearchPage() {
       transmission: 'all',
       minPrice: '',
       maxPrice: '',
+      transactionType: 'all',
     });
   };
 
   const isFilterActive = useMemo(() => {
-    return filters.marque !== 'all' || filters.transmission !== 'all' || filters.minPrice !== '' || filters.maxPrice !== '';
+    return filters.marque !== 'all' || filters.transmission !== 'all' || filters.minPrice !== '' || filters.maxPrice !== '' || filters.transactionType !== 'all';
   }, [filters]);
+
+  const maxSliderValue = filters.transactionType === 'rent' ? 200000 : 20000000;
+  const sliderStep = filters.transactionType === 'rent' ? 5000 : 500000;
+
+  const paginatedParkings = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredParkings.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredParkings, currentPage, itemsPerPage]);
+
+  const paginatedVehicles = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredVehicles.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredVehicles, currentPage, itemsPerPage]);
+
+  const totalPages = activeTab === 'parkings' 
+    ? Math.ceil(filteredParkings.length / itemsPerPage) 
+    : Math.ceil(filteredVehicles.length / itemsPerPage);
 
   return (
     <div className="space-y-6 min-h-screen">
@@ -118,15 +150,6 @@ export default function SearchPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="flex p-1 bg-gray-100 rounded-2xl w-fit">
           <button 
-            onClick={() => setActiveTab('parkings')}
-            className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${
-              activeTab === 'parkings' ? 'bg-white text-orange-500 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            <FontAwesomeIcon icon={faParking} className="mr-2" />
-            Parkings
-          </button>
-          <button 
             onClick={() => setActiveTab('vehicles')}
             className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${
               activeTab === 'vehicles' ? 'bg-white text-orange-500 shadow-sm' : 'text-gray-500 hover:text-gray-700'
@@ -134,6 +157,15 @@ export default function SearchPage() {
           >
             <FontAwesomeIcon icon={faCar} className="mr-2" />
             Véhicules
+          </button>
+          <button 
+            onClick={() => setActiveTab('parkings')}
+            className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${
+              activeTab === 'parkings' ? 'bg-white text-orange-500 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            <FontAwesomeIcon icon={faParking} className="mr-2" />
+            Parkings
           </button>
         </div>
 
@@ -175,17 +207,6 @@ export default function SearchPage() {
           />
         </div>
         <div className="flex gap-2">
-          {activeTab === 'vehicles' && (
-            <button 
-              onClick={() => setShowFilters(true)}
-              className={`px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${
-                isFilterActive ? 'bg-slate-900 text-white shadow-lg' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              <FontAwesomeIcon icon={faFilter} />
-              Filtres
-            </button>
-          )}
           <button 
             onClick={fetchData}
             className="p-3 bg-gray-100 text-gray-500 rounded-xl hover:text-orange-500 transition-all active:scale-95"
@@ -195,149 +216,188 @@ export default function SearchPage() {
         </div>
       </div>
 
-      {/* Advanced Filters Drawer - Fixed Right Anchor */}
-      {showFilters && (
-        <div className="fixed inset-0 z-[200] flex justify-end">
-          {/* Overlay */}
-          <div 
-            className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm animate-fadeIn" 
-            onClick={() => setShowFilters(false)} 
-          />
-          
-          {/* Side Panel */}
-          <div className="relative w-full max-w-sm h-full bg-white shadow-2xl flex flex-col animate-slideLeft">
-            <div className="p-6 sm:p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-              <div>
-                <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Filtres</h3>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Personnalisez votre recherche</p>
-              </div>
-              <button
-                onClick={() => setShowFilters(false)}
-                className="w-10 h-10 rounded-full bg-white border border-slate-100 text-slate-400 hover:text-rose-500 transition-all flex items-center justify-center shadow-sm hover:shadow-lg active:scale-95"
-              >
-                <FontAwesomeIcon icon={faXmark} />
-              </button>
+      {/* Main Content Area: Flex Row for left items and right filters */}
+      <div className="flex flex-col lg:flex-row gap-6">
+        
+        {/* Left Area: Results */}
+        <div className="flex-1">
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-20 space-y-4">
+              <div className="w-12 h-12 border-4 border-orange-500/20 border-t-orange-500 rounded-full animate-spin"></div>
+              <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Chargement en cours...</p>
             </div>
-
-            <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-8 custom-scrollbar">
-              <div className="space-y-4">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                  <FontAwesomeIcon icon={faEuroSign} className="text-orange-500" />
-                  Budget (FCFA)
-                </label>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                     <span className="text-[9px] font-bold text-slate-300 uppercase ml-1">Minimum</span>
-                     <input
-                      type="number"
-                      placeholder="0"
-                      className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:border-orange-500 font-bold text-slate-700 transition-all"
-                      value={filters.minPrice}
-                      onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <span className="text-[9px] font-bold text-slate-300 uppercase ml-1">Maximum</span>
-                    <input
-                      type="number"
-                      placeholder="Illimité"
-                      className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:border-orange-500 font-bold text-slate-700 transition-all"
-                      value={filters.maxPrice}
-                      onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                  <FontAwesomeIcon icon={faCar} className="text-blue-500" />
-                  Marque du véhicule
-                </label>
-                <select 
-                  value={filters.marque}
-                  onChange={(e) => setFilters({ ...filters, marque: e.target.value })}
-                  className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:border-orange-500 font-bold text-slate-700 transition-all appearance-none cursor-pointer"
-                >
-                  <option value="all">Toutes les marques</option>
-                  {marques.map(m => (
-                    <option key={m.id} value={m.name}>{m.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="space-y-4">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                  <FontAwesomeIcon icon={faCogs} className="text-purple-500" />
-                  Type de boîte
-                </label>
-                <div className="flex gap-2 p-1.5 bg-slate-50 rounded-2xl border border-slate-100">
-                  {(['all', 'auto', 'manual'] as const).map((t) => (
-                    <button
-                      key={t}
-                      onClick={() => setFilters({ ...filters, transmission: t })}
-                      className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-                        filters.transmission === t 
-                        ? 'bg-white text-orange-500 shadow-md shadow-orange-500/5' 
-                        : 'text-slate-400 hover:text-slate-600'
-                      }`}
-                    >
-                      {t === 'all' ? 'Tout' : t === 'auto' ? 'Auto' : 'Manu'}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="p-6 sm:p-8 border-t border-slate-100 bg-slate-50/50 flex flex-col gap-4">
-              <button
-                onClick={resetFilters}
-                className="w-full py-4 text-slate-400 hover:text-rose-500 font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2"
-              >
-                <FontAwesomeIcon icon={faSync} className="text-[8px]" />
-                Réinitialiser les filtres
-              </button>
-              <button
-                onClick={() => setShowFilters(false)}
-                className="w-full py-5 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-slate-900/20 active:scale-[0.98] transition-all flex items-center justify-center gap-3"
-              >
-                Voir les résultats
-                <FontAwesomeIcon icon={faArrowRight} className="text-xs" />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Main Content Area */}
-      {loading ? (
-        <div className="flex flex-col items-center justify-center py-20 space-y-4">
-          <div className="w-12 h-12 border-4 border-orange-500/20 border-t-orange-500 rounded-full animate-spin"></div>
-          <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Chargement en cours...</p>
-        </div>
-      ) : (
-        <div className={
-          activeTab === 'vehicles' && viewMode === 'list' 
-            ? "flex flex-col gap-4" 
-            : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-        }>
-          {activeTab === 'parkings' ? (
-            <>
-              {filteredParkings.map((parking) => (
-                <ParkingCard key={parking.id} parking={parking} />
-              ))}
-              {filteredParkings.length === 0 && <EmptyState message="Aucun parking ne correspond à vos critères." />}
-            </>
           ) : (
             <>
-              {filteredVehicles.map((vehicle) => (
-                <VehicleCard key={vehicle.id} vehicle={vehicle} viewMode={viewMode} />
-              ))}
-              {filteredVehicles.length === 0 && <EmptyState message="Aucun véhicule ne correspond à vos critères." />}
-            </>
+              <div className={
+                activeTab === 'vehicles' && viewMode === 'list' 
+                  ? "flex flex-col gap-4" 
+                : activeTab === 'vehicles'
+                ? "grid grid-cols-1 md:grid-cols-2 gap-6" // 2 cards for vehicles as requested
+                : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            }>
+              {activeTab === 'parkings' ? (
+                <>
+                  {paginatedParkings.map((parking) => (
+                    <ParkingCard key={parking.id} parking={parking} />
+                  ))}
+                  {filteredParkings.length === 0 && <EmptyState message="Aucun parking ne correspond à vos critères." />}
+                </>
+              ) : (
+                <>
+                  {paginatedVehicles.map((vehicle) => (
+                    <VehicleCard key={vehicle.id} vehicle={vehicle} viewMode={viewMode} />
+                  ))}
+                  {filteredVehicles.length === 0 && <EmptyState message="Aucun véhicule ne correspond à vos critères." />}
+                </>
+              )}
+            </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-4 mt-8 pt-6 border-t border-gray-100">
+                <button 
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 rounded-xl text-sm font-bold bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
+                >
+                  Précédent
+                </button>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-black text-slate-700">
+                    Page {currentPage} <span className="text-slate-400 font-medium">sur {totalPages}</span>
+                  </span>
+                </div>
+                <button 
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="px-4 py-2 rounded-xl text-sm font-bold bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
+                >
+                  Suivant
+                </button>
+              </div>
+            )}
+          </>
           )}
         </div>
-      )}
+
+        {/* Right Area: Permanent Filter Panel (Only for vehicles) */}
+        {activeTab === 'vehicles' && (
+          <div className="w-full lg:w-80 flex-shrink-0">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sticky top-6">
+              <div className="mb-6 border-b border-slate-100 pb-4">
+                <h3 className="text-xl font-black text-slate-900 tracking-tight">Filtres</h3>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Personnalisez votre recherche</p>
+              </div>
+
+              <div className="space-y-8">
+                {/* Type de transaction */}
+                <div className="space-y-4">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                    <FontAwesomeIcon icon={faMoneyBillWave} className="text-green-500" />
+                    Type d'annonce
+                  </label>
+                  <div className="flex gap-2 p-1 bg-slate-50 rounded-2xl border border-slate-100">
+                    {(['all', 'rent', 'buy'] as const).map((t) => (
+                      <button
+                        key={t}
+                        onClick={() => {
+                          setFilters({ ...filters, transactionType: t, maxPrice: '' });
+                        }}
+                        className={`flex-1 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                          filters.transactionType === t 
+                          ? 'bg-white text-orange-500 shadow-sm border border-slate-100' 
+                          : 'text-slate-400 hover:text-slate-600 border border-transparent'
+                        }`}
+                      >
+                        {t === 'all' ? 'Tout' : t === 'rent' ? 'Location' : 'Achat'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Échelle de prix (Slider) */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                      <FontAwesomeIcon icon={faEuroSign} className="text-orange-500" />
+                      Échelle de prix {filters.transactionType === 'rent' && '(Par jour)'}
+                    </label>
+                    <span className="text-xs font-bold text-orange-600 bg-orange-50 px-2 py-1 rounded-lg">
+                      Max: {filters.maxPrice ? `${Number(filters.maxPrice).toLocaleString()} F` : 'Illimité'}
+                    </span>
+                  </div>
+                  <div className="space-y-4">
+                    <input 
+                      type="range" 
+                      min="0" 
+                      max={maxSliderValue} 
+                      step={sliderStep}
+                      value={filters.maxPrice || maxSliderValue} 
+                      onChange={(e) => setFilters({ ...filters, maxPrice: Number(e.target.value) === maxSliderValue ? '' : e.target.value })}
+                      className="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-orange-500 hover:accent-orange-600 transition-all"
+                    />
+                    <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase">
+                      <span>0 F</span>
+                      <span>{maxSliderValue.toLocaleString()}+ F</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Marque */}
+                <div className="space-y-4">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                    <FontAwesomeIcon icon={faCar} className="text-blue-500" />
+                    Marque du véhicule
+                  </label>
+                  <select 
+                    value={filters.marque}
+                    onChange={(e) => setFilters({ ...filters, marque: e.target.value })}
+                    className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:border-orange-500 font-bold text-slate-700 transition-all appearance-none cursor-pointer"
+                  >
+                    <option value="all">Toutes les marques</option>
+                    {marques.map(m => (
+                      <option key={m.id} value={m.name}>{m.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Boîte */}
+                <div className="space-y-4">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                    <FontAwesomeIcon icon={faCogs} className="text-purple-500" />
+                    Type de boîte
+                  </label>
+                  <div className="flex gap-2 p-1 bg-slate-50 rounded-2xl border border-slate-100">
+                    {(['all', 'auto', 'manual'] as const).map((t) => (
+                      <button
+                        key={t}
+                        onClick={() => setFilters({ ...filters, transmission: t })}
+                        className={`flex-1 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                          filters.transmission === t 
+                          ? 'bg-white text-orange-500 shadow-sm border border-slate-100' 
+                          : 'text-slate-400 hover:text-slate-600 border border-transparent'
+                        }`}
+                      >
+                        {t === 'all' ? 'Tout' : t === 'auto' ? 'Auto' : 'Manu'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-slate-100">
+                  <button
+                    onClick={resetFilters}
+                    className="w-full py-3.5 bg-slate-50 hover:bg-rose-50 text-slate-500 hover:text-rose-600 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2"
+                  >
+                    <FontAwesomeIcon icon={faSync} className="text-[10px]" />
+                    Réinitialiser
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -414,22 +474,62 @@ function ParkingCard({ parking }: { parking: any }) {
 }
 
 function VehicleCard({ vehicle, viewMode = 'grid' }: { vehicle: any, viewMode?: 'grid' | 'list' }) {
+  const [isFav, setIsFav] = useState(false);
+
+  useEffect(() => {
+    const checkFav = async () => {
+      // dynamic import or use existing service if imported above
+      const { favorisService } = await import('@/services/client/favoris-service');
+      const isFavorite = await favorisService.isInFavoris(vehicle.id);
+      setIsFav(isFavorite);
+    };
+    checkFav();
+    
+    const handleUpdate = () => checkFav();
+    window.addEventListener('favorisUpdated', handleUpdate);
+    return () => window.removeEventListener('favorisUpdated', handleUpdate);
+  }, [vehicle.id]);
+
+  const toggleFavorite = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const { favorisService } = await import('@/services/client/favoris-service');
+    if (isFav) {
+      await favorisService.removeFromFavoris(vehicle.id);
+    } else {
+      await favorisService.addToFavoris(vehicle);
+    }
+  };
+
   const photoUrl = Array.isArray(vehicle.photos) ? vehicle.photos[0] : vehicle.photos;
   const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'https://parkapp-pi.vercel.app';
-  const fullPhotoUrl = photoUrl?.startsWith('http') ? photoUrl : `${baseUrl}${photoUrl?.startsWith('/') ? '' : '/'}${photoUrl}`;
+  let cleanUrl = photoUrl;
+  if (typeof photoUrl === 'string' && photoUrl.trim().startsWith('[')) {
+    try { const parsed = JSON.parse(photoUrl); if (parsed.length) cleanUrl = parsed[0]; } catch(e) {}
+  }
+  const fullPhotoUrl = cleanUrl?.startsWith('http') ? cleanUrl : `${baseUrl}${cleanUrl?.startsWith('/') ? '' : '/'}${cleanUrl}`;
 
   if (viewMode === 'list') {
     return (
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all overflow-hidden flex items-center p-3 gap-6 group">
-        <div className="w-24 h-20 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0 shadow-inner">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all overflow-hidden flex items-center p-3 gap-6 group relative">
+        <div className="w-24 h-20 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0 shadow-inner relative">
           <img 
-            src={photoUrl ? fullPhotoUrl : 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b'} 
+            src={cleanUrl ? fullPhotoUrl : 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b'} 
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
             alt={`${vehicle.marque} ${vehicle.model}`}
+            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
           />
         </div>
         
-        <div className="flex-1 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <button 
+          onClick={toggleFavorite}
+          className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all z-10 shadow-sm ${isFav ? 'bg-rose-50 text-rose-500' : 'bg-gray-50 text-gray-400 hover:text-rose-400 hover:bg-rose-50'}`}
+          title={isFav ? "Retirer des favoris" : "Ajouter aux favoris"}
+        >
+          <FontAwesomeIcon icon={faStar} className={isFav ? 'text-rose-500' : ''} />
+        </button>
+        
+        <div className="flex-1 flex flex-col md:flex-row md:items-center justify-between gap-4 pr-8">
           <div className="space-y-1">
             <h3 className="font-bold text-gray-900 group-hover:text-orange-500 transition-colors">
               {vehicle.marque || vehicle.marqueRef?.name} {vehicle.model || vehicle.modele}
@@ -475,12 +575,13 @@ function VehicleCard({ vehicle, viewMode = 'grid' }: { vehicle: any, viewMode?: 
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col group">
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col group relative">
       <div className="h-44 bg-gray-100 relative overflow-hidden">
         <img 
-          src={photoUrl ? fullPhotoUrl : 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b'} 
+          src={cleanUrl ? fullPhotoUrl : 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b'} 
           className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
           alt={`${vehicle.marque} ${vehicle.model}`}
+          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
         />
         <div className="absolute top-3 left-3 px-3 py-1 bg-white/90 backdrop-blur rounded-full text-[10px] font-black text-gray-900 shadow-sm uppercase tracking-widest">
           {vehicle.forRent ? 'À Louer' : 'À Vendre'}
@@ -493,14 +594,23 @@ function VehicleCard({ vehicle, viewMode = 'grid' }: { vehicle: any, viewMode?: 
       <div className="p-5 flex-1 space-y-4">
         <div>
           <div className="flex justify-between items-start gap-2">
-            <h3 className="font-bold text-lg text-gray-900 leading-tight truncate group-hover:text-orange-500 transition-colors">
-              {vehicle.marque || vehicle.marqueRef?.name} {vehicle.model || vehicle.modele}
-            </h3>
-            {vehicle.stats?.reservations > 0 && (
-              <span className="text-[8px] bg-orange-50 text-orange-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">
-                Populaire
-              </span>
-            )}
+            <div className="flex-1 min-w-0">
+              <h3 className="font-bold text-lg text-gray-900 leading-tight truncate group-hover:text-orange-500 transition-colors">
+                {vehicle.marque || vehicle.marqueRef?.name} {vehicle.model || vehicle.modele}
+              </h3>
+              {vehicle.stats?.reservations > 0 && (
+                <span className="text-[8px] bg-orange-50 text-orange-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest mt-1 inline-block">
+                  Populaire
+                </span>
+              )}
+            </div>
+            <button 
+              onClick={toggleFavorite}
+              className={`w-8 h-8 rounded-full flex items-center justify-center transition-all flex-shrink-0 ${isFav ? 'bg-rose-50 text-rose-500 shadow-sm' : 'bg-gray-50 text-gray-400 hover:text-rose-500 hover:bg-rose-50'}`}
+              title={isFav ? "Retirer des favoris" : "Ajouter aux favoris"}
+            >
+              <FontAwesomeIcon icon={faStar} />
+            </button>
           </div>
           <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1 flex items-center gap-1.5">
             <FontAwesomeIcon icon={faParking} className="text-orange-500 text-[8px]" />

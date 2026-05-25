@@ -1,15 +1,18 @@
-"use client";
+'use client';
 
-import VehicleForm from '@/components/parking/VehicleForm';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
-export default function AddVehiclePage() {
+export default function AddVehicleRedirect() {
+  const router = useRouter();
+
+  useEffect(() => {
+    router.replace('/dashboard/parking/vehicles');
+  }, [router]);
+
   return (
-    <div>
-      <h1 className="text-2xl font-semibold mb-4">Ajouter un véhicule</h1>
-      <p className="text-gray-600">Formulaire pour ajouter un nouveau véhicule à la flotte.</p>
-      <div className="mt-6">
-        <VehicleForm />
-      </div>
+    <div className="flex items-center justify-center min-h-[400px]">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
     </div>
   );
 }
