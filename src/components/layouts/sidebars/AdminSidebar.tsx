@@ -24,9 +24,16 @@ import {
   faHistory,           // logs
   faChevronDown,
   faChevronUp,
+  faTag,
 } from '@fortawesome/free-solid-svg-icons';
 
-export default function AdminSidebar() {
+export default function AdminSidebar({ 
+  mobileOpen, 
+  setMobileOpen 
+}: { 
+  mobileOpen?: boolean; 
+  setMobileOpen?: (open: boolean) => void; 
+}) {
   const [collapsed, setCollapsed] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false); // état du sous-menu Paramètres
 
@@ -36,6 +43,7 @@ export default function AdminSidebar() {
     { title: 'Tableau de bord', icon: faTachometerAlt, href: '/dashboard/admin', exact: true },
     { title: 'Utilisateurs', icon: faUsers, href: '/dashboard/admin/users' },
     { title: 'Véhicules', icon: faCar, href: '/dashboard/admin/vehicles' },
+    { title: 'Marques', icon: faTag, href: '/dashboard/admin/marques' },
     { title: 'Parkings', icon: faParking, href: '/dashboard/admin/parkings' },
     { title: 'Réservations', icon: faCalendarCheck, href: '/dashboard/admin/reservations' },
     { title: 'Rapports', icon: faFileAlt, href: '/dashboard/admin/reports' },
@@ -56,11 +64,22 @@ export default function AdminSidebar() {
   const isSettingsActive = settingsSubmenu.some(item => isActive(item.href));
 
   return (
-    <aside
-      className={`bg-white border-r border-gray-200 transition-all duration-300 flex flex-col h-screen ${
-        collapsed ? 'w-20' : 'w-64'
-      }`}
-    >
+    <>
+      {/* Mobile Overlay */}
+      {mobileOpen && (
+        <div 
+          className="fixed inset-0 bg-gray-900/50 z-40 lg:hidden"
+          onClick={() => setMobileOpen?.(false)}
+        />
+      )}
+
+      <aside
+        className={`bg-white border-r border-gray-200 transition-all duration-300 flex flex-col h-screen fixed lg:static inset-y-0 left-0 z-50 transform ${
+          mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        } ${
+          collapsed ? 'w-20' : 'w-64'
+        }`}
+      >
       {/* Header / Logo + Collapse button */}
       <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200">
         {!collapsed && (
@@ -92,6 +111,7 @@ export default function AdminSidebar() {
             <li key={item.href}>
               <Link
                 href={item.href}
+                onClick={() => setMobileOpen?.(false)}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
                   isActive(item.href, item.exact)
                     ? 'bg-orange-50 text-orange-600'
@@ -133,6 +153,7 @@ export default function AdminSidebar() {
                   <li key={sub.href}>
                     <Link
                       href={sub.href}
+                      onClick={() => setMobileOpen?.(false)}
                       className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
                         isActive(sub.href)
                           ? 'bg-orange-50/70 text-orange-700'
@@ -165,5 +186,6 @@ export default function AdminSidebar() {
         </div>
       </div>
     </aside>
+    </>
   );
 }

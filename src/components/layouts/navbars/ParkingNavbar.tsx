@@ -15,17 +15,38 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
 import Image from 'next/image';
+import { notificationAPI } from '@/services/notification-api';
+import { useEffect } from 'react';
 
-export default function ParkingNavbar() {
+export default function ParkingNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
   const { user, logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    const checkNotifications = async () => {
+      try {
+        if (!user) return;
+        const data = await notificationAPI.getNotifications();
+        setNotifications(data);
+        const unread = data.filter((n: any) => !n.read).length;
+        setUnreadCount(unread);
+      } catch (err) {
+        console.warn('Failed to check notifications:', err);
+      }
+    };
+    checkNotifications();
+    const interval = setInterval(checkNotifications, 30000);
+    return () => clearInterval(interval);
+  }, [user]);
 
   return (
     <nav className="bg-white border-b border-gray-200 px-6 py-3">
       <div className="flex items-center justify-between">
         {/* Menu hamburger pour mobile */}
-        <button className="lg:hidden text-gray-600 hover:text-gray-900">
+        <button onClick={onMenuClick} className="lg:hidden text-gray-600 hover:text-gray-900 p-2 -ml-2">
           <FontAwesomeIcon icon={faBars} className="text-xl" />
         </button>
 
@@ -53,7 +74,11 @@ export default function ParkingNavbar() {
               className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <FontAwesomeIcon icon={faBell} className="text-xl" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              {unreadCount > 0 && (
+                <span className="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full z-10">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
             </button>
 
             {showNotifications && (
@@ -62,18 +87,28 @@ export default function ParkingNavbar() {
                   <h3 className="font-semibold text-gray-800">Notifications</h3>
                 </div>
                 <div className="max-h-96 overflow-y-auto">
-                  {/* Liste des notifications */}
-                  <div className="px-4 py-3 hover:bg-gray-50">
-                    <p className="text-sm text-gray-800">Nouvel utilisateur inscrit</p>
-                    <p className="text-xs text-gray-500">Il y a 5 minutes</p>
-                  </div>
-                  <div className="px-4 py-3 hover:bg-gray-50">
-                    <p className="text-sm text-gray-800">Demande d'approbation en attente</p>
-                    <p className="text-xs text-gray-500">Il y a 1 heure</p>
-                  </div>
+                  {notifications.length === 0 ? (
+                    <div className="px-4 py-6 text-center text-gray-500 text-sm">
+                      Aucune notification
+                    </div>
+                  ) : (
+                    notifications.slice(0, 5).map((n) => (
+                      <div key={n.id} className={`px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-50 last:border-0 ${!n.read ? 'bg-orange-50/30' : ''}`}>
+                        <p className={`text-sm ${!n.read ? 'font-bold text-gray-900' : 'text-gray-800'}`}>
+                          {n.title || n.message}
+                        </p>
+                        {!n.title && n.message && n.title !== n.message && (
+                          <p className="text-xs text-gray-600 line-clamp-2 mt-0.5">{n.message}</p>
+                        )}
+                        <p className="text-[10px] text-gray-400 mt-1">
+                          {n.createdAt ? new Date(n.createdAt).toLocaleString('fr-FR') : 'Récemment'}
+                        </p>
+                      </div>
+                    ))
+                  )}
                 </div>
                 <div className="px-4 py-2 border-t border-gray-200">
-                  <Link href="/dasboard/parking/notifications" className="text-sm text-orange-600 hover:text-orange-700">
+                  <Link href="/dashboard/parking/notifications" className="text-sm text-orange-600 hover:text-orange-700">
                     Voir toutes les notifications
                   </Link>
                 </div>

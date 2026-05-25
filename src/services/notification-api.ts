@@ -59,30 +59,35 @@ class NotificationAPI {
 
     const url = `${this.baseUrl}/notifications${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     
-    const response = await fetch(url, {
-      headers: this.getHeaders(),
-    });
+    try {
+      const response = await fetch(url, {
+        headers: this.getHeaders(),
+      });
 
-    const data = await this.handleResponse<any>(response);
-    
-    // Essayer de trouver le tableau de notifications dans la réponse
-    let notifications = [];
-    if (Array.isArray(data)) {
-      notifications = data;
-    } else if (data && typeof data === 'object') {
-      notifications = data.notifications || data.data || Object.values(data).find(Array.isArray) || [];
+      const data = await this.handleResponse<any>(response);
+      
+      // Essayer de trouver le tableau de notifications dans la réponse
+      let notifications = [];
+      if (Array.isArray(data)) {
+        notifications = data;
+      } else if (data && typeof data === 'object') {
+        notifications = data.notifications || data.data || Object.values(data).find(Array.isArray) || [];
+      }
+      
+      // Déduplication (pour éviter les doublons intempestifs) identique à l'app mobile
+      const uniqueNotifications = notifications.filter((notification: any, index: number, self: any[]) => {
+        const key = `${notification.title}_${notification.message}_${notification.type}`;
+        const firstIndex = self.findIndex(n =>
+          `${n.title}_${n.message}_${n.type}` === key
+        );
+        return firstIndex === index;
+      });
+      
+      return uniqueNotifications;
+    } catch (error) {
+      console.warn('Failed to fetch notifications:', error);
+      return [];
     }
-    
-    // Déduplication (pour éviter les doublons intempestifs) identique à l'app mobile
-    const uniqueNotifications = notifications.filter((notification: any, index: number, self: any[]) => {
-      const key = `${notification.title}_${notification.message}_${notification.type}`;
-      const firstIndex = self.findIndex(n =>
-        `${n.title}_${n.message}_${n.type}` === key
-      );
-      return firstIndex === index;
-    });
-    
-    return uniqueNotifications;
   }
 
   async markNotificationAsRead(id: number): Promise<any> {

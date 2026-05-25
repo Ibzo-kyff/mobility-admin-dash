@@ -1,9 +1,33 @@
 "use client";
 
+import { useEffect, useState } from 'react';
 import { Users, UserCheck, UserPlus } from 'lucide-react';
 import ClientsTable from '@/components/parking/ClientsTable';
+import { parkingAPI } from '@/services/parking/parking-api';
 
 export default function ClientsPage() {
+  const [stats, setStats] = useState({
+    total: 0,
+    active: 0,
+    newThisWeek: 0,
+  });
+
+  useEffect(() => {
+    parkingAPI.getClients().then((clientsData) => {
+      if (!clientsData || clientsData.length === 0) return;
+      
+      const total = clientsData.length;
+      const active = clientsData.filter((c: any) => c.status === 'APPROVED').length;
+      
+      // Calculate new this week (last 7 days)
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+      const newThisWeek = clientsData.filter((c: any) => new Date(c.createdAt || Date.now()) > oneWeekAgo).length;
+
+      setStats({ total, active, newThisWeek });
+    }).catch(console.error);
+  }, []);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -22,12 +46,12 @@ export default function ClientsPage() {
             </div>
             <div>
               <p className="text-sm text-gray-500 font-medium">Total Clients</p>
-              <h3 className="text-2xl font-bold text-gray-900">1,284</h3>
+              <h3 className="text-2xl font-bold text-gray-900">{stats.total}</h3>
             </div>
           </div>
           <div className="mt-4 flex items-center gap-2 text-xs font-medium text-emerald-600">
-            <span className="bg-emerald-50 px-2 py-0.5 rounded-full">+12%</span>
-            <span className="text-gray-400 font-normal text-[11px]">depuis le mois dernier</span>
+            <span className="bg-emerald-50 px-2 py-0.5 rounded-full">Total</span>
+            <span className="text-gray-400 font-normal text-[11px]">base de données complète</span>
           </div>
         </div>
 
@@ -38,12 +62,12 @@ export default function ClientsPage() {
             </div>
             <div>
               <p className="text-sm text-gray-500 font-medium">Clients Actifs</p>
-              <h3 className="text-2xl font-bold text-gray-900">856</h3>
+              <h3 className="text-2xl font-bold text-gray-900">{stats.active}</h3>
             </div>
           </div>
           <div className="mt-4 flex items-center gap-2 text-xs font-medium text-emerald-600">
-            <span className="bg-emerald-50 px-2 py-0.5 rounded-full">67%</span>
-            <span className="text-gray-400 font-normal text-[11px]">taux d'engagement</span>
+            <span className="bg-emerald-50 px-2 py-0.5 rounded-full">{stats.total > 0 ? Math.round((stats.active / stats.total) * 100) : 0}%</span>
+            <span className="text-gray-400 font-normal text-[11px]">taux d'approbation</span>
           </div>
         </div>
 
@@ -54,12 +78,12 @@ export default function ClientsPage() {
             </div>
             <div>
               <p className="text-sm text-gray-500 font-medium">Nouveaux</p>
-              <h3 className="text-2xl font-bold text-gray-900">42</h3>
+              <h3 className="text-2xl font-bold text-gray-900">{stats.newThisWeek}</h3>
             </div>
           </div>
           <div className="mt-4 flex items-center gap-2 text-xs font-medium text-emerald-600">
-            <span className="bg-emerald-50 px-2 py-0.5 rounded-full">+5%</span>
-            <span className="text-gray-400 font-normal text-[11px]">cette semaine</span>
+            <span className="bg-emerald-50 px-2 py-0.5 rounded-full">Récent</span>
+            <span className="text-gray-400 font-normal text-[11px]">inscrits cette semaine</span>
           </div>
         </div>
       </div>

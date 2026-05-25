@@ -1,11 +1,18 @@
 import { getCookie } from 'cookies-next';
+import { mobilityAPI } from '../mobility-api';
 
 class ParkingAPI {
   private get token(): string | null {
     if (typeof window !== 'undefined') {
+      // 1. Essayer de récupérer le token depuis mobilityAPI (source de vérité)
+      const mobilityToken = mobilityAPI.getToken();
+      if (mobilityToken) return mobilityToken;
+
+      // 2. Fallback sur les cookies
       const cookieToken = getCookie('accessToken') as string | null;
       if (cookieToken) return cookieToken;
 
+      // 3. Fallback sur localStorage
       try {
         return localStorage.getItem('accessToken');
       } catch (e) {
@@ -50,8 +57,14 @@ class ParkingAPI {
 
   // Véhicules
   async getMyVehicles(): Promise<any[]> {
-    const res = await fetch(`${this.baseUrl}/vehicules/parking/my-vehicles`, { headers: this.getHeaders() });
-    return this.handleResponse<any[]>(res);
+    try {
+      const res = await fetch(`${this.baseUrl}/vehicules/parking/my-vehicles`, { headers: this.getHeaders() });
+      if (res.status === 404) return [];
+      return this.handleResponse<any[]>(res);
+    } catch (error) {
+      console.warn('Erreur getMyVehicles:', error);
+      return [];
+    }
   }
 
   async createVehicle(vehicleData: any) {
@@ -81,23 +94,40 @@ class ParkingAPI {
 
   // Réservations du parking
   async getReservations(): Promise<any[]> {
-    const res = await fetch(`${this.baseUrl}/reservations/parking/all`, { headers: this.getHeaders() });
-    return this.handleResponse<any[]>(res);
+    try {
+      const res = await fetch(`${this.baseUrl}/reservations/parking/all`, { headers: this.getHeaders() });
+      if (res.status === 404) return [];
+      return this.handleResponse<any[]>(res);
+    } catch (error) {
+      console.warn('Erreur getReservations:', error);
+      return [];
+    }
   }
 
   // Clients
   async getClients(): Promise<any[]> {
-    const res = await fetch(`${this.baseUrl}/parkings/me/clients`, { headers: this.getHeaders() });
-    return this.handleResponse<any[]>(res);
+    try {
+      const res = await fetch(`${this.baseUrl}/parkings/me/clients`, { headers: this.getHeaders() });
+      if (res.status === 404) return [];
+      return this.handleResponse<any[]>(res);
+    } catch (error) {
+      console.warn('Erreur getClients:', error);
+      return [];
+    }
   }
 
   async updateClientStatus(clientId: number, status: string): Promise<any> {
-    const res = await fetch(`${this.baseUrl}/parkings/me/clients/${clientId}/status`, {
-      method: 'PATCH',
-      headers: this.getHeaders(),
-      body: JSON.stringify({ status }),
-    });
-    return this.handleResponse<any>(res);
+    try {
+      const res = await fetch(`${this.baseUrl}/parkings/me/clients/${clientId}/status`, {
+        method: 'PATCH',
+        headers: this.getHeaders(),
+        body: JSON.stringify({ status }),
+      });
+      return this.handleResponse<any>(res);
+    } catch (error) {
+      console.error('Erreur updateClientStatus:', error);
+      throw error;
+    }
   }
 
   // Revenue & Analytics → À implémenter côté backend plus tard

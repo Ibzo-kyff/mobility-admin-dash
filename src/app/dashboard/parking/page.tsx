@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { parkingAPI } from '@/services/parking/parking-api';
+import { parkingDashboardService } from '@/services/parking/dashboard';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faEuroSign,
@@ -50,12 +50,16 @@ export default function ParkingDashboardPage() {
       setLoading(true);
       setError(null);
 
-      const [revenueSummary, analyticsData, reservations, vehicles] = await Promise.all([
-        parkingAPI.getRevenueSummary(),
-        parkingAPI.getAnalytics(),
-        parkingAPI.getReservations(),
-        parkingAPI.getMyVehicles(),
-      ]);
+      const data = await parkingDashboardService.getDashboardData();
+      const { revenueSummary, analyticsData, reservations: reservationsRaw, vehicles: vehiclesRaw } = data;
+
+      const reservations = Array.isArray(reservationsRaw) ? reservationsRaw : 
+                         (reservationsRaw && typeof reservationsRaw === 'object' && Array.isArray((reservationsRaw as any).reservations)) ? (reservationsRaw as any).reservations :
+                         (reservationsRaw && typeof reservationsRaw === 'object' && Array.isArray((reservationsRaw as any).data)) ? (reservationsRaw as any).data : [];
+
+      const vehicles = Array.isArray(vehiclesRaw) ? vehiclesRaw : 
+                      (vehiclesRaw && typeof vehiclesRaw === 'object' && Array.isArray((vehiclesRaw as any).vehicles)) ? (vehiclesRaw as any).vehicles :
+                      (vehiclesRaw && typeof vehiclesRaw === 'object' && Array.isArray((vehiclesRaw as any).data)) ? (vehiclesRaw as any).data : [];
 
       const todayStr = new Date().toISOString().split('T')[0];
 
@@ -84,7 +88,7 @@ export default function ParkingDashboardPage() {
         upcomingReservations,
       });
 
-      // Graphique revenu (si l'API renvoie daily)
+      // Graphique revenu
       const chartRaw = revenueSummary.daily || revenueSummary.revenueByDay || [];
       setRevenueChartData(chartRaw.map((item: any) => ({
         date: item.date || item.day || 'Date inconnue',
@@ -124,8 +128,8 @@ export default function ParkingDashboardPage() {
   }
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-6 p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-2xl font-bold text-gray-800">Tableau de bord Parking</h1>
         <button
           onClick={loadDashboardData}
@@ -166,10 +170,7 @@ export default function ParkingDashboardPage() {
                     if (typeof value === 'number') {
                       return [`${value.toLocaleString('fr-FR')} €`, 'Revenu'];
                     }
-                    if (typeof value === 'string') {
-                      return [`${value} €`, 'Revenu'];
-                    }
-                    return ['0 €', 'Revenu'];
+                    return [`${value} €`, 'Revenu'];
                   }}
                 />
                 <Line type="monotone" dataKey="amount" stroke="#f97316" strokeWidth={4} dot={{ r: 5 }} />
@@ -193,21 +194,27 @@ export default function ParkingDashboardPage() {
                   </div>
                   <div className="flex-1">
                     <p className="font-medium">
-                      {res.client?.prenom || res.user?.prenom} {res.client?.nom || res.user?.nom}
+                      {res.user?.prenom || res.client?.prenom} {res.user?.nom || res.client?.nom}
                     </p>
                     <p className="text-sm text-gray-500">
-                      {res.vehicle?.marque} {res.vehicle?.modele}
+                      {res.vehicule?.marque || res.vehicle?.marque} {res.vehicule?.modele || res.vehicle?.modele}
                     </p>
                   </div>
                   <div className="text-right">
                     <div className={`text-xs px-3 py-1 rounded-full font-medium ${
                       res.status === 'CONFIRMED' ? 'bg-green-100 text-green-700' : 
-                      res.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100'
+                      res.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' : 
+                      res.status === 'COMPLETED' || res.status === 'TERMINÉE' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100'
                     }`}>
                       {res.status}
                     </div>
                     <p className="text-xs text-gray-500 mt-1">
-                      {new Date(res.createdAt || res.startDate).toLocaleDateString('fr-FR')}
+                      {new Date(res.createdAt || res.startDate || Date.now()).toLocaleDateString('fr-FR', {
+                        day: 'numeric',
+                        month: 'short',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
                     </p>
                   </div>
                 </div>

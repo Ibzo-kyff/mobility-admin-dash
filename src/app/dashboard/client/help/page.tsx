@@ -82,20 +82,26 @@ export default function HelpCenterPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <div className="space-y-6 p-6 animate-fadeIn">
       {/* En-tête */}
-      <div className="text-center mb-12">
-        <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-orange-100 to-orange-200 rounded-2xl mb-4">
-          <FontAwesomeIcon icon={faHeadset} className="text-4xl text-orange-500" />
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 flex items-center gap-4">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/10">
+              <FontAwesomeIcon icon={faHeadset} className="text-xl sm:text-2xl" />
+            </div>
+            Centre d'Aide
+          </h1>
+          <p className="text-[10px] sm:text-xs font-black text-slate-400 mt-2 ml-1 uppercase tracking-widest">
+            Trouvez des réponses à vos questions ou contactez notre support
+          </p>
         </div>
-        <h1 className="text-3xl font-bold text-gray-800">Centre d'Aide</h1>
-        <p className="text-gray-500 mt-2">Trouvez des réponses à vos questions ou contactez notre support</p>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-8">
         {/* FAQ Section */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-gray-800">
                 <FontAwesomeIcon icon={faQuestionCircle} className="mr-2 text-orange-500" />
@@ -140,7 +146,7 @@ export default function HelpCenterPage() {
 
         {/* Support Section */}
         <div>
-          <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl p-6 text-white mb-6">
+          <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl p-4 sm:p-6 text-white mb-6">
             <FontAwesomeIcon icon={faMessage} className="text-3xl mb-3" />
             <h3 className="text-xl font-semibold mb-2">Support Prioritaire</h3>
             <p className="text-orange-100 text-sm mb-4">Réponse sous 24h ouvrées</p>
@@ -156,7 +162,7 @@ export default function HelpCenterPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6">
             <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
               <FontAwesomeIcon icon={faTicket} className="text-orange-500" />
               Ouvrir un ticket
@@ -187,7 +193,7 @@ export default function HelpCenterPage() {
                 />
                 <button
                   type="submit"
-                  className="w-full bg-orange-500 text-white py-2 rounded-xl hover:bg-orange-600 transition-colors"
+                  className="w-full bg-orange-500 text-white py-2.5 rounded-xl hover:bg-orange-600 transition-colors font-bold shadow-sm"
                 >
                   Envoyer
                 </button>

@@ -120,20 +120,32 @@ class ClientAPI {
   // === DASHBOARD STATS & ACTIVITY ===
 
   async getDashboardStats(userId: number) {
-    const [reservations, vehicles] = await Promise.all([
+    const [reservationsRaw, vehiclesRaw] = await Promise.all([
       this.getUserReservations(userId),
       this.getUserVehicles(userId)
     ]);
 
-    const activeReservations = reservations.filter(r => 
-      ['APPROVED', 'CONFIRMED', 'PENDING'].includes(r.status)
+    const reservations = Array.isArray(reservationsRaw) ? reservationsRaw : 
+                         (reservationsRaw && typeof reservationsRaw === 'object' && Array.isArray((reservationsRaw as any).reservations)) ? (reservationsRaw as any).reservations :
+                         (reservationsRaw && typeof reservationsRaw === 'object' && Array.isArray((reservationsRaw as any).data)) ? (reservationsRaw as any).data : [];
+
+    const vehicles = Array.isArray(vehiclesRaw) ? vehiclesRaw : 
+                     (vehiclesRaw && typeof vehiclesRaw === 'object' && Array.isArray((vehiclesRaw as any).vehicles)) ? (vehiclesRaw as any).vehicles :
+                     (vehiclesRaw && typeof vehiclesRaw === 'object' && Array.isArray((vehiclesRaw as any).data)) ? (vehiclesRaw as any).data : [];
+
+    const activeReservations = reservations.filter((r: any) => 
+      ['APPROVED', 'CONFIRMED', 'PENDING'].includes(r.status?.toUpperCase())
     ).length;
 
     const totalSpent = reservations
-      .filter(r => ['APPROVED', 'CONFIRMED', 'COMPLETED'].includes(r.status))
-      .reduce((sum, r) => sum + (Number(r.prix) || 0), 0);
+      .filter((r: any) => ['APPROVED', 'CONFIRMED', 'COMPLETED', 'ACTIVE'].includes(r.status?.toUpperCase()))
+      .reduce((sum: number, r: any) => {
+        // Nettoyage de la chaîne de prix (ex: "2 500 F" -> 2500)
+        const prixStr = String(r.prix || r.prixJour || '0').replace(/[^0-9.-]+/g, '');
+        return sum + (Number(prixStr) || 0);
+      }, 0);
 
-    // Mock loyalty points logic for now, or fetch from user if available
+    // Points de fidélité = 1 point pour chaque 100 F dépensés (ou ajustez selon vos besoins)
     const loyaltyPoints = Math.floor(totalSpent / 100);
 
     return {

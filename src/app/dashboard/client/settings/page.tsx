@@ -27,22 +27,24 @@ export default function SettingsPage() {
   });
 
   return (
-    <div className="max-w-5xl mx-auto space-y-10 animate-fadeIn p-2 sm:p-0">
+    <div className="space-y-6 p-6 animate-fadeIn">
       {/* Header */}
-      <div className="px-4 sm:px-0">
-        <h1 className="text-3xl font-black text-slate-900 flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/10">
-            <FontAwesomeIcon icon={faSlidersH} className="text-2xl" />
-          </div>
-          Paramètres
-        </h1>
-        <p className="text-sm font-bold text-slate-400 mt-2 ml-1 uppercase tracking-widest">
-          Personnalisez votre expérience et gérez votre sécurité
-        </p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 flex items-center gap-4">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/10">
+              <FontAwesomeIcon icon={faSlidersH} className="text-xl sm:text-2xl" />
+            </div>
+            Paramètres
+          </h1>
+          <p className="text-[10px] sm:text-xs font-black text-slate-400 mt-2 ml-1 uppercase tracking-widest">
+            Personnalisez votre expérience et gérez votre sécurité
+          </p>
+        </div>
       </div>
 
       {/* Profile Shortcut Card */}
-      <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-8 flex flex-col md:flex-row items-center justify-between gap-6 group hover:shadow-2xl transition-all">
+      <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-4 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 group hover:shadow-2xl transition-all">
         <div className="flex items-center gap-6">
           <div className="w-20 h-20 rounded-2xl bg-slate-100 overflow-hidden shadow-inner">
             {user?.image ? (
@@ -63,7 +65,7 @@ export default function SettingsPage() {
         </div>
         <Link 
           href="/dashboard/client/profile"
-          className="px-8 py-3 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-500 transition-all flex items-center gap-3"
+          className="px-5 py-2.5 bg-orange-500 text-white rounded-xl font-bold hover:bg-orange-600 transition-all flex items-center gap-3 shadow-md shadow-orange-500/20"
         >
           Voir le profil complet
           <FontAwesomeIcon icon={faChevronRight} className="text-[10px]" />
@@ -159,7 +161,7 @@ export default function SettingsPage() {
 
       {/* Danger Zone */}
       <div className="pt-10 border-t border-slate-100">
-        <div className="bg-rose-50 rounded-[2.5rem] border border-rose-100 p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="bg-rose-50 rounded-[2.5rem] border border-rose-100 p-4 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-6">
             <div className="w-16 h-16 rounded-2xl bg-white text-rose-500 flex items-center justify-center text-2xl shadow-sm">
               <FontAwesomeIcon icon={faExclamationTriangle} />
@@ -169,7 +171,7 @@ export default function SettingsPage() {
               <p className="text-sm font-bold text-rose-600/70">Ces actions sont irréversibles. Soyez prudent.</p>
             </div>
           </div>
-          <button className="px-10 py-4 bg-rose-500 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-rose-600 transition-all shadow-xl shadow-rose-500/20 flex items-center gap-3">
+          <button className="px-6 py-3 bg-rose-500 text-white rounded-xl font-bold hover:bg-rose-600 transition-all shadow-md flex items-center gap-3">
             <FontAwesomeIcon icon={faTrashAlt} />
             Supprimer mon compte
           </button>

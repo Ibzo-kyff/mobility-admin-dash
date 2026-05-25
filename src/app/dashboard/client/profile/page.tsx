@@ -87,12 +87,17 @@ export default function ProfilePage() {
   if (!user) return null;
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 animate-fadeIn">
+    <div className="space-y-6 p-6 animate-fadeIn">
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-4 sm:px-0">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-black text-slate-900">Mon Profil</h1>
-          <p className="text-sm font-bold text-slate-400 mt-1 uppercase tracking-widest">
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 flex items-center gap-4">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/10">
+              <FontAwesomeIcon icon={faUser} className="text-xl sm:text-2xl" />
+            </div>
+            Mon Profil
+          </h1>
+          <p className="text-[10px] sm:text-xs font-black text-slate-400 mt-2 ml-1 uppercase tracking-widest">
             Gérez vos informations et préférences de compte
           </p>
         </div>
@@ -101,7 +106,7 @@ export default function ProfilePage() {
       <div className="grid lg:grid-cols-3 gap-8">
         {/* Left Column: Profile Card */}
         <div className="lg:col-span-1 space-y-6">
-          <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-8 sticky top-24">
+          <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-4 sm:p-8 sticky top-24">
             <div className="text-center">
               <div className="relative inline-block">
                 <div className="w-32 h-32 rounded-[2rem] bg-gradient-to-br from-orange-400 to-orange-600 p-1 shadow-lg shadow-orange-500/20">
@@ -140,7 +145,7 @@ export default function ProfilePage() {
 
         {/* Right Column: Edit Form */}
         <div className="lg:col-span-2 space-y-6">
-          <form onSubmit={handleSubmit} className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-8 sm:p-10">
+          <form onSubmit={handleSubmit} className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-4 sm:p-8 lg:p-10">
             <div className="flex items-center gap-4 mb-10">
               <div className="w-12 h-12 rounded-2xl bg-orange-50 text-orange-500 flex items-center justify-center text-lg shadow-inner">
                 <FontAwesomeIcon icon={faUser} />
@@ -195,11 +200,11 @@ export default function ProfilePage() {
               </div>
             )}
 
-            <div className="mt-10 flex flex-col sm:flex-row gap-4">
+            <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-4">
               <button 
                 type="submit"
                 disabled={saving}
-                className="flex-1 py-4 bg-orange-500 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-orange-500/20 hover:bg-orange-600 transition-all active:scale-95 disabled:bg-slate-200 disabled:shadow-none flex items-center justify-center gap-3"
+                className="px-6 py-2.5 bg-orange-500 text-white rounded-xl font-bold shadow-md hover:bg-orange-600 transition-all active:scale-95 disabled:bg-slate-200 disabled:shadow-none flex items-center justify-center gap-3 w-full sm:w-auto"
               >
                 {saving ? (
                   <>
@@ -214,7 +219,7 @@ export default function ProfilePage() {
                 )}
               </button>
               
-              <div className="flex-1 p-4 bg-slate-50 rounded-2xl border border-slate-100 flex items-center gap-4">
+              <div className="w-full sm:w-auto p-3 bg-slate-50 rounded-2xl border border-slate-100 flex items-center gap-4">
                 <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-emerald-500 shadow-sm">
                   <FontAwesomeIcon icon={faShieldAlt} />
                 </div>
@@ -230,10 +235,10 @@ export default function ProfilePage() {
           <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-8">
              <h4 className="text-sm font-black text-slate-900 uppercase tracking-[0.2em] mb-6">Paramètres de sécurité</h4>
              <div className="flex flex-col sm:flex-row gap-4">
-                <button className="flex-1 py-4 bg-slate-50 text-slate-600 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-100 transition-all">
+                <button className="flex-1 py-3 bg-slate-100 text-slate-700 rounded-xl font-bold hover:bg-slate-200 transition-all">
                   Changer le mot de passe
                 </button>
-                <button className="flex-1 py-4 bg-rose-50 text-rose-600 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-rose-100 transition-all">
+                <button className="flex-1 py-3 bg-rose-50 text-rose-600 rounded-xl font-bold hover:bg-rose-100 transition-all">
                   Supprimer le compte
                 </button>
              </div>

@@ -74,17 +74,17 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-10 animate-fadeIn">
+    <div className="space-y-10 animate-fadeIn p-2 sm:p-0">
       {/* Header & Stats */}
-      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 px-4 sm:px-0">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-black text-slate-900 flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-slate-900 text-white flex items-center justify-center shadow-xl shadow-slate-900/20">
-              <FontAwesomeIcon icon={faHistory} className="text-2xl" />
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 flex items-center gap-4">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/10">
+              <FontAwesomeIcon icon={faHistory} className="text-xl sm:text-2xl" />
             </div>
             Historique des Activités
           </h1>
-          <p className="text-sm font-bold text-slate-400 mt-2 ml-1 uppercase tracking-widest">
+          <p className="text-[10px] sm:text-xs font-black text-slate-400 mt-2 ml-1 uppercase tracking-widest">
             Retrouvez toutes vos transactions et réservations passées
           </p>
         </div>

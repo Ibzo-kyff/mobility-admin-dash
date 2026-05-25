@@ -145,7 +145,7 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Utilisateurs en attente */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 overflow-hidden">
         <h2 className="text-lg font-semibold mb-4">Utilisateurs en attente</h2>
         <RecentUsersTable users={pendingUsers} />
       </div>
