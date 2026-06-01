@@ -193,17 +193,17 @@ export default function SearchPage() {
 
       {/* Search Bar Container */}
       <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4">
-        <div className="flex-1 relative group">
+        <div className="flex-1 relative">
           <FontAwesomeIcon 
             icon={faSearch} 
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors" 
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" 
           />
           <input 
             type="text" 
             placeholder={activeTab === 'parkings' ? "Rechercher un parking..." : "Rechercher une marque, un modèle..."} 
-            className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-transparent rounded-xl focus:bg-white focus:border-orange-500/20 focus:ring-4 focus:ring-orange-500/5 outline-none transition-all font-medium"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
           />
         </div>
         <div className="flex gap-2">
@@ -219,67 +219,6 @@ export default function SearchPage() {
       {/* Main Content Area: Flex Row for left items and right filters */}
       <div className="flex flex-col lg:flex-row gap-6">
         
-        {/* Left Area: Results */}
-        <div className="flex-1">
-          {loading ? (
-            <div className="flex flex-col items-center justify-center py-20 space-y-4">
-              <div className="w-12 h-12 border-4 border-orange-500/20 border-t-orange-500 rounded-full animate-spin"></div>
-              <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Chargement en cours...</p>
-            </div>
-          ) : (
-            <>
-              <div className={
-                activeTab === 'vehicles' && viewMode === 'list' 
-                  ? "flex flex-col gap-4" 
-                : activeTab === 'vehicles'
-                ? "grid grid-cols-1 md:grid-cols-2 gap-6" // 2 cards for vehicles as requested
-                : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-            }>
-              {activeTab === 'parkings' ? (
-                <>
-                  {paginatedParkings.map((parking) => (
-                    <ParkingCard key={parking.id} parking={parking} />
-                  ))}
-                  {filteredParkings.length === 0 && <EmptyState message="Aucun parking ne correspond à vos critères." />}
-                </>
-              ) : (
-                <>
-                  {paginatedVehicles.map((vehicle) => (
-                    <VehicleCard key={vehicle.id} vehicle={vehicle} viewMode={viewMode} />
-                  ))}
-                  {filteredVehicles.length === 0 && <EmptyState message="Aucun véhicule ne correspond à vos critères." />}
-                </>
-              )}
-            </div>
-
-            {/* Pagination Controls */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-4 mt-8 pt-6 border-t border-gray-100">
-                <button 
-                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                  className="px-4 py-2 rounded-xl text-sm font-bold bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
-                >
-                  Précédent
-                </button>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-black text-slate-700">
-                    Page {currentPage} <span className="text-slate-400 font-medium">sur {totalPages}</span>
-                  </span>
-                </div>
-                <button 
-                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
-                  className="px-4 py-2 rounded-xl text-sm font-bold bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
-                >
-                  Suivant
-                </button>
-              </div>
-            )}
-          </>
-          )}
-        </div>
-
         {/* Right Area: Permanent Filter Panel (Only for vehicles) */}
         {activeTab === 'vehicles' && (
           <div className="w-full lg:w-80 flex-shrink-0">
@@ -397,7 +336,68 @@ export default function SearchPage() {
             </div>
           </div>
         )}
-      </div>
+{/* Left Area: Results */}
+        <div className="flex-1">
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-20 space-y-4">
+              <div className="w-12 h-12 border-4 border-orange-500/20 border-t-orange-500 rounded-full animate-spin"></div>
+              <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Chargement en cours...</p>
+            </div>
+          ) : (
+            <>
+              <div className={
+                activeTab === 'vehicles' && viewMode === 'list' 
+                  ? "flex flex-col gap-4" 
+                : activeTab === 'vehicles'
+                ? "grid grid-cols-1 md:grid-cols-2 gap-6" // 2 cards for vehicles as requested
+                : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            }>
+              {activeTab === 'parkings' ? (
+                <>
+                  {paginatedParkings.map((parking) => (
+                    <ParkingCard key={parking.id} parking={parking} />
+                  ))}
+                  {filteredParkings.length === 0 && <EmptyState message="Aucun parking ne correspond à vos critères." />}
+                </>
+              ) : (
+                <>
+                  {paginatedVehicles.map((vehicle) => (
+                    <VehicleCard key={vehicle.id} vehicle={vehicle} viewMode={viewMode} />
+                  ))}
+                  {filteredVehicles.length === 0 && <EmptyState message="Aucun véhicule ne correspond à vos critères." />}
+                </>
+              )}
+            </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-4 mt-8 pt-6 border-t border-gray-100">
+                <button 
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 rounded-xl text-sm font-bold bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
+                >
+                  Précédent
+                </button>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-black text-slate-700">
+                    Page {currentPage} <span className="text-slate-400 font-medium">sur {totalPages}</span>
+                  </span>
+                </div>
+                <button 
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="px-4 py-2 rounded-xl text-sm font-bold bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
+                >
+                  Suivant
+                </button>
+              </div>
+            )}
+          </>
+          )}
+        </div>
+
+              </div>
     </div>
   );
 }

@@ -67,7 +67,7 @@ export default function ClientVehiclesPage() {
   }
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-4 sm:space-y-6 w-full max-w-full">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Mes Véhicules</h1>
@@ -79,17 +79,17 @@ export default function ClientVehiclesPage() {
         </button>
       </div>
 
-      <div className="relative group">
+      <div className="flex-1 relative">
         <FontAwesomeIcon 
           icon={faSearch} 
-          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors" 
+          className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" 
         />
         <input 
           type="text" 
           placeholder="Rechercher par marque, modèle ou plaque..."
-          className="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-200 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/10 focus:border-orange-500 transition-all font-medium"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
         />
       </div>
 

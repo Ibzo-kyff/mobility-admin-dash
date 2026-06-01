@@ -9,7 +9,7 @@ export default function ReserveRedirect() {
 
   useEffect(() => {
     // Redirect to the dashboard search/reserve flow which is more integrated
-    router.replace(`/dashboard/client/search`);
+    router.replace(`/dashboard/client/search/${params.id}`);
   }, [params.id]);
 
   return (

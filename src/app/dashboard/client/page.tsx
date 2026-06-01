@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from 'react';
+import { redirect } from 'next/navigation';
 import { clientAPI } from '@/services/client/client-api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -58,6 +59,7 @@ interface MarqueItem {
 }
 
 export default function ClientDashboard() {
+  redirect('/dashboard/client/search');
   const { user } = useAuth();
   const [stats, setStats] = useState<ClientStats>({
     activeReservations: 0,
@@ -78,7 +80,7 @@ export default function ClientDashboard() {
       setLoading(true);
       setError(null);
       const [dashboardData, marquesData] = await Promise.all([
-        clientAPI.getDashboardStats(user.id),
+        clientAPI.getDashboardStats(user!.id),
         clientAPI.getMarques()
       ]);
       

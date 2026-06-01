@@ -91,7 +91,7 @@ export default function LogsPage() {
   };
 
   return (
-    <div className="p-8 max-w-[1400px] mx-auto">
+    <div className="p-2 sm:p-4 md:p-8 max-w-[1400px] mx-auto">
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-4xl font-bold text-gray-900">Journaux d'Activité</h1>
@@ -109,14 +109,14 @@ export default function LogsPage() {
       <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 mb-8">
         <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="lg:col-span-2">
-            <div className="relative">
-              <FontAwesomeIcon icon={faSearch} className="absolute left-4 top-3.5 text-gray-400" />
+            <div className="flex-1 relative">
+              <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
                 placeholder="Rechercher par utilisateur ou détails..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:border-orange-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
             </div>
           </div>
