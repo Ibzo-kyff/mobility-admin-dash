@@ -33,6 +33,9 @@ export default function ParkingDetailsPage() {
       if (vehicleData) {
         setEntity(vehicleData);
         setType('vehicle');
+        if (vehicleData.forRent === false && vehicleData.forSale === true) {
+          setResType('ACHAT');
+        }
       } else {
         // Fetch as parking
         const parkingData = await clientAPI.getParkingById(params.id as string);
@@ -238,13 +241,15 @@ export default function ParkingDetailsPage() {
                 <div className="flex p-1 bg-gray-50 rounded-xl">
                   <button 
                     onClick={() => setResType('LOCATION')}
-                    className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${resType === 'LOCATION' ? 'bg-white text-orange-500 shadow-sm' : 'text-gray-400'}`}
+                    disabled={entity.forRent === false}
+                    className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${entity.forRent === false ? 'opacity-40 cursor-not-allowed text-gray-300' : resType === 'LOCATION' ? 'bg-white text-orange-500 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
                   >
                     Location
                   </button>
                   <button 
                     onClick={() => setResType('ACHAT')}
-                    className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${resType === 'ACHAT' ? 'bg-white text-orange-500 shadow-sm' : 'text-gray-400'}`}
+                    disabled={entity.forSale === false}
+                    className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${entity.forSale === false ? 'opacity-40 cursor-not-allowed text-gray-300' : resType === 'ACHAT' ? 'bg-white text-orange-500 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
                   >
                     Achat
                   </button>

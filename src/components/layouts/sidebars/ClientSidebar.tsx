@@ -28,12 +28,12 @@ export default function ClientSidebar({
   const pathname = usePathname();
 
   const menuItems = [
-    {
-      title: 'Tableau de bord',
-      icon: faTachometerAlt,
-      href: '/dashboard/client',
-      exact: true
-    },
+    // {
+    //   title: 'Tableau de bord',
+    //   icon: faTachometerAlt,
+    //   href: '/dashboard/client',
+    //   exact: true
+    // },
     {
       title: 'Réserver',
       icon: faCar,
@@ -71,7 +71,7 @@ export default function ClientSidebar({
     },
   ];
 
-  const isActive = (item: typeof menuItems[0]) => {
+  const isActive = (item: typeof menuItems[0] & { exact?: boolean }) => {
     if (item.exact) {
       return pathname === item.href;
     }

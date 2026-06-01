@@ -196,7 +196,7 @@ const Home: React.FC = () => {
     if (!mobilityAPI) return;
     try {
       if (!mobilityAPI.getToken?.() && !user) {
-        router.push('/auth/login');
+        router.push(`/auth/login?callbackUrl=/reserve/${vehiculeId}`);
         showToast('Veuillez vous connecter pour réserver', 'info');
         return;
       }

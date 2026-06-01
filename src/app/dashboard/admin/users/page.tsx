@@ -241,8 +241,8 @@ export default function AdminUsersPage() {
   };
 
   return (
-    <div className="p-6">
-      <div className="mb-6 flex justify-between items-center">
+    <div className="p-2 sm:p-6 w-full max-w-full overflow-hidden">
+      <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Gestion des utilisateurs</h1>
           <p className="text-gray-600">Gérez tous les utilisateurs de la plateforme</p>
@@ -317,10 +317,9 @@ export default function AdminUsersPage() {
       </div>
 
       {/* Tableau des utilisateurs */}
-      {/* Tableau des utilisateurs */}
       <div className="bg-white rounded-lg shadow-sm overflow-hidden">
         {/* Mobile Grid Layout for Users */}
-        <div className="block md:hidden p-4 space-y-4">
+        <div className="block md:hidden p-2 sm:p-4 space-y-3">
           {loading ? (
             <div className="bg-white rounded-2xl p-8 text-center shadow-sm">
               <div className="flex justify-center">
@@ -333,9 +332,9 @@ export default function AdminUsersPage() {
             </div>
           ) : (
             paginatedUsers.map((user) => (
-              <div key={user.id} className="bg-slate-50/50 rounded-2xl p-5 border border-slate-100/80 shadow-md shadow-slate-200/20 relative overflow-hidden flex flex-col gap-4">
+              <div key={user.id} className="bg-slate-50/50 rounded-2xl p-3 sm:p-5 border border-slate-100/80 shadow-md shadow-slate-200/20 relative overflow-hidden flex flex-col gap-3">
                 <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3">
                     <div className="w-12 h-12 rounded-2xl overflow-hidden bg-slate-100 shadow-inner flex items-center justify-center border border-slate-50">
                       {user.image ? (
                         <img
