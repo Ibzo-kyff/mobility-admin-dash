@@ -14,7 +14,8 @@ import {
   faCheckCircle,
   faSpinner,
   faEye,
-  faEyeSlash
+  faEyeSlash,
+  faArrowLeft
 } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
 
@@ -57,8 +58,12 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white flex items-center justify-center p-4">
-      <div className="max-w-2xl w-full">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white flex items-center justify-center p-4 relative">
+      <Link href="/" className="absolute top-6 left-6 sm:top-8 sm:left-8 flex items-center gap-2 text-gray-600 hover:text-orange-600 transition-colors font-medium">
+        <FontAwesomeIcon icon={faArrowLeft} />
+        Retour au site
+      </Link>
+      <div className="max-w-2xl w-full mt-12 sm:mt-0">
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-500 rounded-2xl mb-4">
