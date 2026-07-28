@@ -178,6 +178,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
     message: '',
   });
   const notificationTimer = useRef<NodeJS.Timeout | null>(null);
+  const galleryTrackRef = useRef<HTMLDivElement | null>(null);
 
   const showNotification = (type: 'success' | 'error' | 'warning' | 'info', message: string, details?: string) => {
     console.log(`[Notification] ${type}: ${message}`, details);
@@ -352,6 +353,12 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
     window.addEventListener('open-add-vehicle-modal', handleOpenAdd);
     return () => window.removeEventListener('open-add-vehicle-modal', handleOpenAdd);
   }, []);
+
+  useEffect(() => {
+    if (galleryTrackRef.current) {
+      galleryTrackRef.current.style.setProperty('--gallery-offset', String(currentImageIndex));
+    }
+  }, [currentImageIndex]);
 
   const resetAddForm = () => {
     setAddStep(1);
@@ -1793,8 +1800,8 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
               {photos.length > 0 ? (
                 <>
                   <div
-                    className="absolute inset-0 flex transition-transform duration-700 ease-in-out"
-                    style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}
+                    ref={galleryTrackRef}
+                    className="gallery-track absolute inset-0 flex transition-transform duration-700 ease-in-out"
                   >
                     {photos.map((photo, idx) => (
                       <div key={idx} className="relative min-w-full h-full">

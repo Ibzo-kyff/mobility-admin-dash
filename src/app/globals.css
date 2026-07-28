@@ -155,6 +155,11 @@ body {
     border-top-color: #FD6A00;
     animation: spin 1s ease-in-out infinite;
   }
+
+  .gallery-track {
+    transform: translateX(calc(var(--gallery-offset, 0) * -100%));
+    will-change: transform;
+  }
   
   .bg-light {
     background-color: #F8F9FA;

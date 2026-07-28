@@ -1,6 +1,24 @@
 //services/mobility-api.ts
 import { setCookie, getCookie, deleteCookie } from 'cookies-next';
-import type { User, Vehicule, LoginResponse, RegisterData, RegisterResponse, ReservationData, ApiError } from '@/types';
+import type { User, Vehicule, LoginResponse, RegisterData, RegisterResponse, ReservationData, Parking } from '@/types';
+
+interface ApiErrorWithDetails extends Error {
+  details?: string;
+  status?: number;
+}
+
+interface Reservation {
+  id?: number | string;
+  status?: string;
+  reason?: string;
+  [key: string]: unknown;
+}
+
+interface ReservationUpdateData {
+  status?: string;
+  reason?: string;
+  [key: string]: unknown;
+}
 
 class MobilityAPI {
   private token: string | null = null;
@@ -37,7 +55,7 @@ class MobilityAPI {
         } catch { }
       }
 
-      const error = new Error(errorMessage) as any;
+      const error = new Error(errorMessage) as ApiErrorWithDetails;
       error.details = errorDetails;
       error.status = response.status;
       throw error;
@@ -278,7 +296,7 @@ class MobilityAPI {
           this.saveToStorage();
 
           return this.user;
-        } catch (refreshError) {
+        } catch {
           this.logout();
           throw new Error('Session expirée. Veuillez vous reconnecter.');
         }
@@ -303,9 +321,16 @@ class MobilityAPI {
     }
   }
 
-  async getVehicules(filters: Record<string, any> = {}): Promise<Vehicule[]> {
-    const queryParams = new URLSearchParams(filters).toString();
-    const url = `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/vehicules${queryParams ? `?${queryParams}` : ''}`;
+  async getVehicules(filters: Record<string, string | number | boolean | null | undefined> = {}): Promise<Vehicule[]> {
+    const queryParams = new URLSearchParams();
+
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        queryParams.set(key, String(value));
+      }
+    });
+
+    const url = `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/vehicules${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
 
     const response = await fetch(url, {
       headers: this.getHeaders()
@@ -336,7 +361,7 @@ class MobilityAPI {
     return this.handleResponse<{ name: string }[]>(response);
   }
 
-  async createReservation(reservationData: ReservationData): Promise<any> {
+  async createReservation(reservationData: ReservationData): Promise<Reservation> {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/reservations`,
       {
@@ -346,10 +371,10 @@ class MobilityAPI {
       }
     );
 
-    return this.handleResponse(response);
+    return this.handleResponse<Reservation>(response);
   }
 
-  async getParkings(): Promise<any[]> {
+  async getParkings(): Promise<Parking[]> {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/parkings`,
       {
@@ -357,7 +382,7 @@ class MobilityAPI {
       }
     );
 
-    return this.handleResponse<any[]>(response);
+    return this.handleResponse<Parking[]>(response);
   }
 
   async getStats(): Promise<{ totalVehicules: number; totalParkings: number }> {
@@ -450,8 +475,13 @@ class MobilityAPI {
 
     const isFormData = data instanceof FormData;
     const headers = this.getHeaders();
-    if (isFormData && (headers as any)['Content-Type']) {
-      delete (headers as any)['Content-Type'];
+
+    if (isFormData) {
+      if (headers instanceof Headers) {
+        headers.delete('Content-Type');
+      } else if (typeof headers === 'object' && headers !== null) {
+        delete (headers as Record<string, string>)['Content-Type'];
+      }
     }
 
     const response = await fetch(
@@ -565,7 +595,7 @@ class MobilityAPI {
     return this.handleResponse<User[]>(response);
   }
 
-  async getAllReservations(): Promise<any[]> {
+  async getAllReservations(): Promise<Reservation[]> {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/reservations/all`,
       {
@@ -573,10 +603,10 @@ class MobilityAPI {
       }
     );
 
-    return this.handleResponse<any[]>(response);
+    return this.handleResponse<Reservation[]>(response);
   }
 
-  async getParkingReservations(parkingId?: number | null): Promise<any[]> {
+  async getParkingReservations(parkingId?: number | null): Promise<Reservation[]> {
     if (!parkingId && !this.user?.parkingId) {
       throw new Error('Parking ID non trouvé');
     }
@@ -590,10 +620,10 @@ class MobilityAPI {
       }
     );
 
-    return this.handleResponse<any[]>(response);
+    return this.handleResponse<Reservation[]>(response);
   }
 
-  async updateReservationStatus(reservationId: string, status: string, reason?: string): Promise<any> {
+  async updateReservationStatus(reservationId: string, status: string, reason?: string): Promise<Reservation> {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api';
     const response = await fetch(
       `${baseUrl}/reservations/${reservationId}/status`,
@@ -624,8 +654,12 @@ class MobilityAPI {
     const headers = this.getHeaders();
 
     // Si c'est du FormData, on laisse le navigateur définir le Content-Type avec le boundary
-    if (isFormData && (headers as any)['Content-Type']) {
-      delete (headers as any)['Content-Type'];
+    if (isFormData) {
+      if (headers instanceof Headers) {
+        headers.delete('Content-Type');
+      } else if (typeof headers === 'object' && headers !== null) {
+        delete (headers as Record<string, string>)['Content-Type'];
+      }
     }
 
     const response = await fetch(
@@ -641,23 +675,23 @@ class MobilityAPI {
   }
   // ==================== MÉTHODES ADMIN ====================
 
-  async getAdminVehicules(): Promise<any[]> {
+  async getAdminVehicules(): Promise<Vehicule[]> {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/vehicules/admin`,
       { headers: this.getHeaders() }
     );
-    return this.handleResponse<any[]>(response);
+    return this.handleResponse<Vehicule[]>(response);
   }
 
-  async getAdminReservations(): Promise<any[]> {
+  async getAdminReservations(): Promise<Reservation[]> {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/reservations/admin/all`,
       { headers: this.getHeaders() }
     );
-    return this.handleResponse<any[]>(response);
+    return this.handleResponse<Reservation[]>(response);
   }
 
-  async updateReservation(id: number | string, data: any): Promise<any> {
+  async updateReservation(id: number | string, data: ReservationUpdateData): Promise<Reservation> {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/reservations/admin/${id}`,
       {
@@ -666,7 +700,7 @@ class MobilityAPI {
         body: JSON.stringify(data),
       }
     );
-    return this.handleResponse(response);
+    return this.handleResponse<Reservation>(response);
   }
 }
 

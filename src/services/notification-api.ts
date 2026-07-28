@@ -2,6 +2,14 @@ import { getCookie } from 'cookies-next';
 import type { ApiError } from '@/types';
 import { mobilityAPI } from './mobility-api';
 
+interface NotificationItem {
+  id?: number;
+  title?: string;
+  message?: string;
+  type?: string;
+  [key: string]: unknown;
+}
+
 class NotificationAPI {
   private get baseUrl() {
     return process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api';
@@ -35,7 +43,7 @@ class NotificationAPI {
         } catch {}
       }
 
-      const error = new Error(errorMessage) as any;
+      const error = new Error(errorMessage) as Error & ApiError;
       error.details = errorDetails;
       error.status = response.status;
       throw error;
@@ -48,7 +56,7 @@ class NotificationAPI {
     return response.text() as unknown as T;
   }
 
-  async getNotifications(params: { userId?: number; parkingId?: number } = {}): Promise<any[]> {
+  async getNotifications(params: { userId?: number; parkingId?: number } = {}): Promise<NotificationItem[]> {
     if (!this.token) {
       return [];
     }
@@ -64,21 +72,24 @@ class NotificationAPI {
         headers: this.getHeaders(),
       });
 
-      const data = await this.handleResponse<any>(response);
-      
+      const data = await this.handleResponse<unknown>(response);
+
       // Essayer de trouver le tableau de notifications dans la réponse
-      let notifications = [];
+      let notifications: NotificationItem[] = [];
       if (Array.isArray(data)) {
-        notifications = data;
+        notifications = data as NotificationItem[];
       } else if (data && typeof data === 'object') {
-        notifications = data.notifications || data.data || Object.values(data).find(Array.isArray) || [];
+        const payload = data as Record<string, unknown>;
+        notifications = (payload.notifications as NotificationItem[] | undefined)
+          || (payload.data as NotificationItem[] | undefined)
+          || (Object.values(payload).find((value): value is NotificationItem[] => Array.isArray(value)) ?? []);
       }
-      
+
       // Déduplication (pour éviter les doublons intempestifs) identique à l'app mobile
-      const uniqueNotifications = notifications.filter((notification: any, index: number, self: any[]) => {
-        const key = `${notification.title}_${notification.message}_${notification.type}`;
-        const firstIndex = self.findIndex(n =>
-          `${n.title}_${n.message}_${n.type}` === key
+      const uniqueNotifications = notifications.filter((notification, index, self) => {
+        const key = `${notification.title ?? ''}_${notification.message ?? ''}_${notification.type ?? ''}`;
+        const firstIndex = self.findIndex((n) =>
+          `${n.title ?? ''}_${n.message ?? ''}_${n.type ?? ''}` === key
         );
         return firstIndex === index;
       });
@@ -90,7 +101,7 @@ class NotificationAPI {
     }
   }
 
-  async markNotificationAsRead(id: number): Promise<any> {
+  async markNotificationAsRead(id: number): Promise<void> {
     if (!this.token) return;
     const url = `${this.baseUrl}/notifications/${id}/read`;
     
@@ -102,7 +113,7 @@ class NotificationAPI {
     return this.handleResponse(response);
   }
 
-  async deleteNotification(id: number): Promise<any> {
+  async deleteNotification(id: number): Promise<void> {
     if (!this.token) return;
     const url = `${this.baseUrl}/notifications/${id}`;
     
