@@ -65,9 +65,8 @@ export default function LoginForm() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white flex items-center justify-center p-4 relative">
-      <Link href="/" className="absolute top-6 left-6 sm:top-8 sm:left-8 flex items-center gap-2 text-gray-600 hover:text-orange-600 transition-colors font-medium">
-        <FontAwesomeIcon icon={faArrowLeft} />
-        Retour au site
+      <Link href="/" className="absolute top-6 left-6 sm:top-8 sm:left-8 w-10 h-10 sm:w-12 sm:h-12 bg-orange-500 flex items-center justify-center text-white hover:bg-orange-600 rounded-full shadow-md transition-all group z-10" title="Retour au site">
+        <FontAwesomeIcon icon={faArrowLeft} className="group-hover:-translate-x-1 transition-transform" />
       </Link>
       <div className="max-w-md w-full mt-12 sm:mt-0">
         {/* Logo */}

@@ -7,15 +7,19 @@ interface ApiErrorWithDetails extends Error {
   status?: number;
 }
 
+type ReservationStatus = 'PENDING' | 'ACCEPTED' | 'COMPLETED' | 'CANCELED';
+type ReservationType = 'ACHAT' | 'LOCATION';
+
 interface Reservation {
   id?: number | string;
-  status?: string;
+  status?: ReservationStatus;
   reason?: string;
+  type?: ReservationType;
   [key: string]: unknown;
 }
 
 interface ReservationUpdateData {
-  status?: string;
+  status?: ReservationStatus;
   reason?: string;
   [key: string]: unknown;
 }
