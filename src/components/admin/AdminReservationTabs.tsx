@@ -27,7 +27,6 @@ import {
   faMapMarkerAlt,
   faGasPump,
   faCogs,
-  faChartBar,
   faShieldAlt,
   faTrash,
   faTag,
@@ -40,7 +39,8 @@ import {
   faInfoCircle,
   faInfo,
   faBars,
-  faXmark
+  faXmark,
+  faChartBar
 } from '@fortawesome/free-solid-svg-icons';
 import { faClock as faClockRegular } from '@fortawesome/free-regular-svg-icons';
 import { mobilityAPI } from '@/services/mobility-api';
@@ -58,13 +58,10 @@ const MOTIFS_LOCATION = [
   { id: 'autre', label: 'Autre', icon: faList },
 ];
 
-const LOCALISATIONS = [
-  { id: 'bamako', label: 'À Bamako' },
-  { id: 'hors_bamako', label: 'Hors Bamako' },
-];
+
 
 export interface Reservation {
-  id: number;
+  id: number | string;
   status: ReservationStatus;
   type: ReservationType;
   dateDebut: string | null;
@@ -157,6 +154,7 @@ export default function AdminReservationTabs() {
   const [isCommissionModalOpen, setIsCommissionModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [statusModalConfig, setStatusModalConfig] = useState<any>({
     id: 0,
     newStatus: 'PENDING',
@@ -167,10 +165,12 @@ export default function AdminReservationTabs() {
     color: 'emerald'
   });
   const [statusReason, setStatusReason] = useState('');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [editReservationData, setEditReservationData] = useState<any>(null);
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
   const [commissionAmount, setCommissionAmount] = useState('');
   const [updating, setUpdating] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [allParkings, setAllParkings] = useState<any[]>([]);
 
   // Advanced Filters State
@@ -187,7 +187,7 @@ export default function AdminReservationTabs() {
     setLoading(true);
     try {
       const data = await mobilityAPI.getAdminReservations();
-      setReservations(data as Reservation[]);
+      setReservations(data as unknown as Reservation[]);
     } catch (error) {
       console.error('Erreur lors de la récupération des réservations', error);
       setReservations([]);
@@ -242,7 +242,7 @@ export default function AdminReservationTabs() {
   }, [selectedReservation, isGalleryHovered, viewModeTab]);
 
   const handleStatusChange = async (id: number, newStatus: ReservationStatus, reason?: string) => {
-    let finalReason = reason || statusReason;
+    const finalReason = reason || statusReason;
 
     setUpdating(true);
     try {
@@ -257,8 +257,8 @@ export default function AdminReservationTabs() {
       }
       setIsStatusModalOpen(false);
       setStatusReason('');
-    } catch (firstError: any) {
-      console.warn('Endpoint admin échoué, essai de l\'endpoint status:', firstError?.message);
+    } catch (firstError: unknown) {
+      console.warn('Endpoint admin échoué, essai de l\'endpoint status:', (firstError as Error)?.message);
       try {
         await mobilityAPI.updateReservationStatus(id.toString(), newStatus, finalReason);
         setReservations(prev => prev.map(res => res.id === id ? { ...res, status: newStatus } : res));
@@ -267,9 +267,9 @@ export default function AdminReservationTabs() {
         }
         setIsStatusModalOpen(false);
         setStatusReason('');
-      } catch (secondError: any) {
+      } catch (secondError: unknown) {
         console.error('Erreur lors du changement de statut', secondError);
-        const msg = secondError?.details || secondError?.message || 'Impossible de modifier le statut.';
+        const msg = (secondError as { details?: string })?.details || (secondError as Error)?.message || 'Impossible de modifier le statut.';
         alert(msg);
       }
     } finally {
@@ -277,7 +277,7 @@ export default function AdminReservationTabs() {
     }
   };
 
-  const openStatusModal = (id: number, newStatus: ReservationStatus) => {
+  const openStatusModal = (id: number | string, newStatus: ReservationStatus) => {
     const reservation = reservations.find(r => r.id === id);
     if (!reservation) return;
 
@@ -380,7 +380,7 @@ export default function AdminReservationTabs() {
       const selectedMotifObj = MOTIFS_LOCATION.find(m => m.id === editReservationData.motifLocation);
       const motifFinal = selectedMotifObj && selectedMotifObj.id !== 'autre' ? selectedMotifObj.label : editReservationData.autreMotif;
 
-      const payload: any = {
+      const payload: Record<string, string | number | null> = {
         type: editReservationData.type,
         motifLocation: motifFinal || null,
         localisation: editReservationData.localisation === 'bamako' ? 'BAMAKO' : 
@@ -397,12 +397,12 @@ export default function AdminReservationTabs() {
 
       const updated = await mobilityAPI.updateReservation(selectedReservation.id, payload);
 
-      setReservations(prev => prev.map(res => res.id === selectedReservation.id ? { ...res, ...updated } : res));
+      setReservations(prev => prev.map(res => res.id === selectedReservation.id ? { ...res, ...(updated as unknown as Reservation) } : res));
       setIsEditModalOpen(false);
       alert('Réservation mise à jour avec succès');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Erreur lors de la mise à jour', error);
-      alert('Erreur lors de la mise à jour: ' + (error.message || 'Erreur serveur'));
+      alert('Erreur lors de la mise à jour: ' + ((error as Error).message || 'Erreur serveur'));
     } finally {
       setUpdating(false);
     }
@@ -528,20 +528,20 @@ export default function AdminReservationTabs() {
   };
 
   const getParkingDisplay = (res: Reservation) => {
-    const p = res.parking || res.vehicle?.parking || (res as any).Parking || (res.vehicle as any)?.Parking;
+    const p = res.parking || res.vehicle?.parking || (res as unknown as Record<string, unknown>).Parking || (res.vehicle as unknown as Record<string, unknown>)?.Parking;
     
     if (p && typeof p === 'object') {
-      const name = p.name || p.nom || (p as any).name_parking || (p as any).nom_parking;
+      const name = (p as { name?: string }).name || (p as { nom?: string }).nom || (p as { name_parking?: string }).name_parking || (p as { nom_parking?: string }).nom_parking;
       if (name) return name;
       
-      const u = p.user || (p as any).owner || (p as any).User;
+      const u = (p as { user?: { prenom?: string, nom?: string } }).user || (p as { owner?: { prenom?: string, nom?: string } }).owner || (p as { User?: { prenom?: string, nom?: string } }).User;
       if (u) {
         const userName = `${u.prenom || ''} ${u.nom || ''}`.trim();
         if (userName) return userName;
       }
     }
 
-    const pId = res.vehicle?.parkingId || res.parking?.id || (p && typeof p === 'object' ? p.id : (typeof p === 'number' ? p : null));
+    const pId = res.vehicle?.parkingId || res.parking?.id || (p && typeof p === 'object' ? (p as { id?: number | string }).id : (typeof p === 'number' ? p : null));
     if (pId && allParkings.length > 0) {
       const foundParking = allParkings.find(parking => parking.id === pId);
       if (foundParking) {
@@ -549,7 +549,7 @@ export default function AdminReservationTabs() {
       }
     }
 
-    const directName = (res as any).parkingName || (res.vehicle as any)?.parkingName || (res.vehicle as any)?.nom_parking;
+    const directName = (res as unknown as Record<string, unknown>).parkingName || (res.vehicle as unknown as Record<string, unknown>)?.parkingName || (res.vehicle as unknown as Record<string, unknown>)?.nom_parking;
     if (directName) return directName;
 
     return 'Parking Privé';

@@ -1,5 +1,5 @@
 import { getCookie } from 'cookies-next';
-import type { Vehicule, ApiError } from '@/types';
+import type { Vehicule, Parking } from '@/types';
 
 class VehiclesAPI {
     private get token(): string | null {
@@ -10,7 +10,7 @@ class VehiclesAPI {
             // Fallback sur le localStorage si le cookie est absent (certains navigateurs ou config)
             try {
                 return localStorage.getItem('accessToken');
-            } catch (e) {
+            } catch {
                 return null;
             }
         }
@@ -41,7 +41,7 @@ class VehiclesAPI {
                 } catch { }
             }
 
-            const error = new Error(errorMessage) as any;
+            const error = new Error(errorMessage) as Error & { details?: string; status?: number };
             error.details = errorDetails;
             error.status = response.status;
             throw error;
@@ -74,10 +74,14 @@ class VehiclesAPI {
 
     async createVehicule(data: Partial<Vehicule> | FormData): Promise<Vehicule> {
         const isFormData = data instanceof FormData;
-        const headers: any = this.getHeaders();
+        const headers = this.getHeaders();
 
         if (isFormData) {
-            delete headers['Content-Type'];
+            if (headers instanceof Headers) {
+                headers.delete('Content-Type');
+            } else if (typeof headers === 'object' && headers !== null) {
+                delete (headers as Record<string, string>)['Content-Type'];
+            }
         }
 
         const response = await fetch(`${this.baseUrl}/vehicules`, {
@@ -92,8 +96,12 @@ class VehiclesAPI {
         const isFormData = data instanceof FormData;
         const headers = this.getHeaders();
 
-        if (isFormData && (headers as any)['Content-Type']) {
-            delete (headers as any)['Content-Type'];
+        if (isFormData) {
+            if (headers instanceof Headers) {
+                headers.delete('Content-Type');
+            } else if (typeof headers === 'object' && headers !== null) {
+                delete (headers as Record<string, string>)['Content-Type'];
+            }
         }
 
         const response = await fetch(`${this.baseUrl}/vehicules/${id}`, {
@@ -112,9 +120,16 @@ class VehiclesAPI {
         return this.handleResponse(response);
     }
 
-    async getVehicules(filters: Record<string, any> = {}): Promise<Vehicule[]> {
-        const queryParams = new URLSearchParams(filters).toString();
-        const url = `${this.baseUrl}/vehicules${queryParams ? `?${queryParams}` : ''}`;
+    async getVehicules(filters: Record<string, string | number | boolean | null | undefined> = {}): Promise<Vehicule[]> {
+        const queryParams = new URLSearchParams();
+
+        Object.entries(filters).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) {
+                queryParams.set(key, String(value));
+            }
+        });
+
+        const url = `${this.baseUrl}/vehicules${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
         const response = await fetch(url, {
             headers: this.getHeaders(),
         });
@@ -140,12 +155,12 @@ class VehiclesAPI {
             return { totalVehicules: 500, totalParkings: 50 };
         }
     }
-    async getMyParking(): Promise<any> {
+    async getMyParking(): Promise<Parking> {
         const response = await fetch(`${this.baseUrl}/parkings/me`, {
             method: 'GET',
             headers: this.getHeaders(),
         });
-        return this.handleResponse(response);
+        return this.handleResponse<Parking>(response);
     }
 }
 

@@ -402,7 +402,7 @@ export default function ParkingReservationTabs() {
 
       const updated = await mobilityAPI.updateReservation(selectedReservation.id, payload);
 
-      setReservations(prev => prev.map(res => res.id === selectedReservation.id ? { ...res, ...updated } : res));
+      setReservations(prev => prev.map(res => res.id === selectedReservation.id ? { ...res, ...(updated as unknown as Reservation) } : res));
       setIsEditModalOpen(false);
       alert('Réservation mise à jour avec succès');
     } catch (error: any) {
