@@ -56,7 +56,7 @@ export default function AnalyticsCharts() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Taux d'occupation */}
         <div className="flex flex-col items-center">
-          <p className="text-sm text-gray-500 mb-2">Répartition par catégorie</p>
+          <p className="text-sm text-black mb-2">Répartition par catégorie</p>
           <div className="h-48 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -83,7 +83,7 @@ export default function AnalyticsCharts() {
 
         {/* Occupation Rate */}
         <div className="flex flex-col items-center justify-center border-l pl-6">
-          <p className="text-sm text-gray-500 mb-4">Taux d'occupation actuel</p>
+          <p className="text-sm text-black mb-4">Taux d'occupation actuel</p>
           <div className="relative w-32 h-32 flex items-center justify-center rounded-full border-8 border-gray-100">
              <div className="text-2xl font-bold text-orange-500">{data.occupancyRate || 0}%</div>
              <div 
@@ -91,7 +91,7 @@ export default function AnalyticsCharts() {
                style={{ clipPath: `inset(0 0 0 0)` }}
              ></div>
           </div>
-          <p className="text-xs text-gray-400 mt-4 text-center italic">Basé sur votre capacité totale</p>
+          <p className="text-xs text-black mt-4 text-center italic">Basé sur votre capacité totale</p>
         </div>
       </div>
     </div>

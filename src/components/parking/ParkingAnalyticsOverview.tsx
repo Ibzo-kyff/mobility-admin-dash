@@ -78,7 +78,7 @@ export default function ParkingAnalyticsOverview() {
     return (
       <div className="flex flex-col items-center justify-center py-20 space-y-4">
         <div className="w-12 h-12 border-4 border-orange-500/20 border-t-orange-500 rounded-full animate-spin"></div>
-        <p className="text-slate-500 font-bold animate-pulse uppercase tracking-widest text-xs">Génération des rapports...</p>
+        <p className="text-black font-bold animate-pulse uppercase tracking-widest text-xs">Génération des rapports...</p>
       </div>
     );
   }
@@ -110,13 +110,13 @@ export default function ParkingAnalyticsOverview() {
               </PieChart>
             </ResponsiveContainer>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-3xl font-black text-slate-900 leading-none">{stats.occupancyRate}%</span>
-              <span className="text-[8px] font-black uppercase text-slate-400 mt-1">Occupé</span>
+              <span className="text-3xl font-black text-black leading-none">{stats.occupancyRate}%</span>
+              <span className="text-[8px] font-black uppercase text-black mt-1">Occupé</span>
             </div>
           </div>
           <div className="flex-1 space-y-4 text-center md:text-left">
-            <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Taux d'Occupation</h3>
-            <p className="text-slate-500 text-sm font-medium">Votre parking est actuellement utilisé à {stats.occupancyRate}% de sa capacité totale.</p>
+            <h3 className="text-xl font-black text-black uppercase tracking-tight">Taux d'Occupation</h3>
+            <p className="text-black text-sm font-medium">Votre parking est actuellement utilisé à {stats.occupancyRate}% de sa capacité totale.</p>
             <div className="flex items-center gap-2 justify-center md:justify-start text-emerald-500 font-bold text-xs uppercase tracking-widest">
               <FontAwesomeIcon icon={faArrowTrendUp} />
               +5% depuis hier
@@ -126,7 +126,7 @@ export default function ParkingAnalyticsOverview() {
 
         {/* Categories Distribution */}
         <div className="bg-white rounded-[40px] p-8 border border-slate-100 shadow-sm">
-           <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-6">Répartition par Catégorie</h3>
+           <h3 className="text-xl font-black text-black uppercase tracking-tight mb-6">Répartition par Catégorie</h3>
            <div className="h-48">
               <ResponsiveContainer width="100%" height="100%">
                 <RadialBarChart 
@@ -159,8 +159,8 @@ export default function ParkingAnalyticsOverview() {
         {/* Peak Hours */}
         <div className="bg-white rounded-[40px] p-8 border border-slate-100 shadow-sm">
            <div className="flex justify-between items-center mb-8">
-             <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Pics d'Affluence</h3>
-             <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400">
+             <h3 className="text-xl font-black text-black uppercase tracking-tight">Pics d'Affluence</h3>
+             <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-black">
                <FontAwesomeIcon icon={faClock} />
              </div>
            </div>
@@ -178,12 +178,12 @@ export default function ParkingAnalyticsOverview() {
 
         {/* Top Performing Vehicles */}
         <div className="bg-white rounded-[40px] p-8 border border-slate-100 shadow-sm">
-          <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-8">Top Véhicules</h3>
+          <h3 className="text-xl font-black text-black uppercase tracking-tight mb-8">Top Véhicules</h3>
           <div className="space-y-6">
             {stats.topVehicles.map((v: any, i: number) => (
               <div key={i} className="space-y-2">
                 <div className="flex justify-between items-center text-xs font-black uppercase tracking-widest">
-                   <span className="text-slate-900">{v.name}</span>
+                   <span className="text-black">{v.name}</span>
                    <span className="text-orange-500">{v.value} rés.</span>
                 </div>
                 <div className="w-full h-2.5 bg-slate-50 rounded-full overflow-hidden">

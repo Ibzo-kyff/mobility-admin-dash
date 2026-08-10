@@ -68,7 +68,7 @@ export default function HistoryPage() {
     return (
       <div className="flex flex-col items-center justify-center py-20 space-y-4">
         <div className="w-12 h-12 border-4 border-orange-500/20 border-t-orange-500 rounded-full animate-spin"></div>
-        <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Chargement de votre historique...</p>
+        <p className="text-black font-bold uppercase tracking-widest text-xs">Chargement de votre historique...</p>
       </div>
     );
   }
@@ -78,13 +78,13 @@ export default function HistoryPage() {
       {/* Header & Stats */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 flex items-center gap-4">
+          <h1 className="text-2xl sm:text-3xl font-black text-black flex items-center gap-4">
             <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/10">
               <FontAwesomeIcon icon={faHistory} className="text-xl sm:text-2xl" />
             </div>
             Historique des Activités
           </h1>
-          <p className="text-[10px] sm:text-xs font-black text-slate-400 mt-2 ml-1 uppercase tracking-widest">
+          <p className="text-[10px] sm:text-xs font-black text-black mt-2 ml-1 uppercase tracking-widest">
             Retrouvez toutes vos transactions et réservations passées
           </p>
         </div>
@@ -108,7 +108,7 @@ export default function HistoryPage() {
       {/* Filters & Search */}
       <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-6 flex flex-col md:flex-row items-center gap-6">
         <div className="flex-1 relative w-full">
-          <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black" />
           <input 
             type="text" 
             placeholder="Rechercher par véhicule ou ID..." 
@@ -126,7 +126,7 @@ export default function HistoryPage() {
 
         <button 
           onClick={fetchHistory}
-          className="p-4 bg-slate-50 text-slate-400 rounded-2xl hover:text-orange-500 transition-all active:scale-95 border border-slate-50"
+          className="p-4 bg-slate-50 text-black rounded-2xl hover:text-orange-500 transition-all active:scale-95 border border-slate-50"
         >
           <FontAwesomeIcon icon={faSync} className={loading ? 'animate-spin' : ''} />
         </button>
@@ -140,11 +140,11 @@ export default function HistoryPage() {
           ))
         ) : (
           <div className="bg-white rounded-[3rem] p-20 text-center border border-dashed border-slate-200">
-            <div className="w-20 h-20 bg-slate-50 text-slate-200 rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="w-20 h-20 bg-slate-50 text-black rounded-full flex items-center justify-center mx-auto mb-6">
               <FontAwesomeIcon icon={faInfoCircle} className="text-3xl" />
             </div>
-            <h3 className="text-xl font-black text-slate-900">Aucun historique trouvé</h3>
-            <p className="text-slate-400 font-bold text-sm mt-2">Vos activités apparaîtront ici dès que vous aurez effectué des réservations.</p>
+            <h3 className="text-xl font-black text-black">Aucun historique trouvé</h3>
+            <p className="text-black font-bold text-sm mt-2">Vos activités apparaîtront ici dès que vous aurez effectué des réservations.</p>
             <Link 
               href="/dashboard/client/search"
               className="inline-flex items-center gap-3 px-8 py-4 bg-orange-500 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest mt-8 shadow-xl shadow-orange-500/20 hover:bg-orange-600 transition-all"
@@ -166,8 +166,8 @@ function StatCard({ icon, label, value, color }: { icon: any, label: string, val
         <FontAwesomeIcon icon={icon} />
       </div>
       <div>
-        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</p>
-        <p className="text-lg font-black text-slate-900 leading-tight">{value}</p>
+        <p className="text-[10px] font-black text-black uppercase tracking-widest">{label}</p>
+        <p className="text-lg font-black text-black leading-tight">{value}</p>
       </div>
     </div>
   );
@@ -180,7 +180,7 @@ function FilterButton({ active, label, onClick }: { active: boolean, label: stri
       className={`px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all whitespace-nowrap ${
         active 
         ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/20' 
-        : 'bg-white text-slate-400 hover:bg-slate-50 border border-slate-50'
+        : 'bg-white text-black hover:bg-slate-50 border border-slate-50'
       }`}
     >
       {label}
@@ -229,29 +229,29 @@ function HistoryItem({ item }: { item: any }) {
 
       <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-6 w-full">
         <div>
-          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Véhicule</p>
-          <h4 className="text-sm font-black text-slate-900 group-hover:text-orange-500 transition-colors">
+          <p className="text-[9px] font-black text-black uppercase tracking-widest mb-1">Véhicule</p>
+          <h4 className="text-sm font-black text-black group-hover:text-orange-500 transition-colors">
             {item.vehicle?.marque} {item.vehicle?.model}
           </h4>
-          <p className="text-[10px] font-bold text-slate-400 flex items-center gap-1.5 mt-0.5">
+          <p className="text-[10px] font-bold text-black flex items-center gap-1.5 mt-0.5">
             <FontAwesomeIcon icon={faMapMarkerAlt} className="text-orange-500" />
             {item.parking?.nom || item.parking?.name || 'Dakar'}
           </p>
         </div>
 
         <div>
-          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Date</p>
-          <p className="text-sm font-bold text-slate-700">{dateStr}</p>
-          <p className="text-[10px] font-bold text-slate-400 flex items-center gap-1.5 mt-0.5">
+          <p className="text-[9px] font-black text-black uppercase tracking-widest mb-1">Date</p>
+          <p className="text-sm font-bold text-black">{dateStr}</p>
+          <p className="text-[10px] font-bold text-black flex items-center gap-1.5 mt-0.5">
             <FontAwesomeIcon icon={faClock} />
             #{item.id}
           </p>
         </div>
 
         <div>
-          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Montant</p>
-          <p className="text-sm font-black text-slate-900">{(item.montant || item.prix || 0).toLocaleString()} F</p>
-          <p className="text-[10px] font-bold text-slate-400 flex items-center gap-1.5 mt-0.5">
+          <p className="text-[9px] font-black text-black uppercase tracking-widest mb-1">Montant</p>
+          <p className="text-sm font-black text-black">{(item.montant || item.prix || 0).toLocaleString()} F</p>
+          <p className="text-[10px] font-bold text-black flex items-center gap-1.5 mt-0.5">
             <FontAwesomeIcon icon={faFileInvoiceDollar} className="text-emerald-500" />
             Payé
           </p>
@@ -268,7 +268,7 @@ function HistoryItem({ item }: { item: any }) {
       <div className="w-full md:w-auto flex justify-end pt-4 md:pt-0 border-t md:border-t-0 border-slate-50">
         <Link 
           href={`/dashboard/client/search/${item.vehicle?.id || item.id}`}
-          className="w-12 h-12 rounded-2xl bg-slate-50 text-slate-300 hover:bg-orange-500 hover:text-white transition-all flex items-center justify-center shadow-sm"
+          className="w-12 h-12 rounded-2xl bg-slate-50 text-black hover:bg-orange-500 hover:text-white transition-all flex items-center justify-center shadow-sm"
         >
           <FontAwesomeIcon icon={faChevronRight} />
         </Link>

@@ -46,7 +46,7 @@ export default function ParkingNavbar({ onMenuClick }: { onMenuClick?: () => voi
     <nav className="bg-white border-b border-gray-200 px-6 py-3">
       <div className="flex items-center justify-between">
         {/* Menu hamburger pour mobile */}
-        <button onClick={onMenuClick} className="lg:hidden text-gray-600 hover:text-gray-900 p-2 -ml-2">
+        <button onClick={onMenuClick} className="lg:hidden text-black hover:text-black p-2 -ml-2">
           <FontAwesomeIcon icon={faBars} className="text-xl" />
         </button>
 
@@ -55,7 +55,7 @@ export default function ParkingNavbar({ onMenuClick }: { onMenuClick?: () => voi
           <div className="relative w-full">
             <FontAwesomeIcon 
               icon={faSearch} 
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" 
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black text-sm" 
             />
             <input
               type="text"
@@ -71,7 +71,7 @@ export default function ParkingNavbar({ onMenuClick }: { onMenuClick?: () => voi
           <div className="relative">
             <button 
               onClick={() => setShowNotifications(!showNotifications)}
-              className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              className="relative p-2 text-black hover:text-black hover:bg-gray-100 rounded-lg transition-colors"
             >
               <FontAwesomeIcon icon={faBell} className="text-xl" />
               {unreadCount > 0 && (
@@ -84,11 +84,11 @@ export default function ParkingNavbar({ onMenuClick }: { onMenuClick?: () => voi
             {showNotifications && (
               <div className="fixed inset-x-4 top-16 sm:absolute sm:right-0 sm:left-auto sm:top-auto sm:w-96 sm:mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50 max-w-md">
                 <div className="px-4 py-2 border-b border-gray-100">
-                  <h3 className="font-semibold text-gray-800">Notifications</h3>
+                  <h3 className="font-semibold text-black">Notifications</h3>
                 </div>
                 <div className="max-h-96 overflow-y-auto">
                   {notifications.length === 0 ? (
-                    <div className="px-4 py-6 text-center text-gray-500 text-sm">
+                    <div className="px-4 py-6 text-center text-black text-sm">
                       Aucune notification
                     </div>
                   ) : (
@@ -106,13 +106,13 @@ export default function ParkingNavbar({ onMenuClick }: { onMenuClick?: () => voi
                         }}
                         className={`block px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-50 last:border-0 ${!n.read ? 'bg-orange-50/30' : ''}`}
                       >
-                        <p className={`text-sm ${!n.read ? 'font-bold text-gray-900' : 'text-gray-800'}`}>
+                        <p className={`text-sm ${!n.read ? 'font-bold text-black' : 'text-black'}`}>
                           {n.title || n.message}
                         </p>
                         {!n.title && n.message && n.title !== n.message && (
-                          <p className="text-xs text-gray-600 line-clamp-2 mt-0.5">{n.message}</p>
+                          <p className="text-xs text-black line-clamp-2 mt-0.5">{n.message}</p>
                         )}
-                        <p className="text-[10px] text-gray-400 mt-1">
+                        <p className="text-[10px] text-black mt-1">
                           {n.createdAt ? new Date(n.createdAt).toLocaleString('fr-FR') : 'Récemment'}
                         </p>
                       </Link>
@@ -144,19 +144,19 @@ export default function ParkingNavbar({ onMenuClick }: { onMenuClick?: () => voi
                 </span>
               </div>
               <div className="hidden md:block text-left">
-                <p className="text-sm font-medium text-gray-800">
+                <p className="text-sm font-medium text-black">
                   {user?.prenom} {user?.nom}
                 </p>
-                <p className="text-xs text-gray-500">Parking partenaire</p>
+                <p className="text-xs text-black">Parking partenaire</p>
               </div>
-              <FontAwesomeIcon icon={faChevronDown} className="text-xs text-gray-500" />
+              <FontAwesomeIcon icon={faChevronDown} className="text-xs text-black" />
             </button>
 
             {showUserMenu && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
                 <Link
                   href="/dashboard/parking/profile"
-                  className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                  className="flex items-center gap-3 px-4 py-2 text-sm text-black hover:bg-gray-50"
                   onClick={() => setShowUserMenu(false)}
                 >
                   <FontAwesomeIcon icon={faUser} className="w-4 h-4" />
@@ -164,7 +164,7 @@ export default function ParkingNavbar({ onMenuClick }: { onMenuClick?: () => voi
                 </Link>
                 <Link
                   href="/dashboard/parking/settings"
-                  className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                  className="flex items-center gap-3 px-4 py-2 text-sm text-black hover:bg-gray-50"
                   onClick={() => setShowUserMenu(false)}
                 >
                   <FontAwesomeIcon icon={faCog} className="w-4 h-4" />

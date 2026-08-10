@@ -77,7 +77,7 @@ export default function EditParkingInline({ parking }: { parking: Parking }) {
   return (
     <div className="bg-white rounded-xl shadow-lg p-6 border-2 border-orange-200 mt-4 w-full">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-gray-800">Modifier le parking</h2>
+        <h2 className="text-xl font-bold text-black">Modifier le parking</h2>
         <button
           onClick={() => setIsEditing(false)}
           className="p-2 hover:bg-gray-100 rounded-lg"
@@ -95,7 +95,7 @@ export default function EditParkingInline({ parking }: { parking: Parking }) {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nom du parking *</label>
+            <label className="block text-sm font-medium text-black mb-1">Nom du parking *</label>
             <input
               type="text"
               name="name"
@@ -106,7 +106,7 @@ export default function EditParkingInline({ parking }: { parking: Parking }) {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Capacité (places) *</label>
+            <label className="block text-sm font-medium text-black mb-1">Capacité (places) *</label>
             <input
               type="number"
               name="capacity"
@@ -118,7 +118,7 @@ export default function EditParkingInline({ parking }: { parking: Parking }) {
             />
           </div>
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Adresse *</label>
+            <label className="block text-sm font-medium text-black mb-1">Adresse *</label>
             <input
               type="text"
               name="address"
@@ -129,7 +129,7 @@ export default function EditParkingInline({ parking }: { parking: Parking }) {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Ville *</label>
+            <label className="block text-sm font-medium text-black mb-1">Ville *</label>
             <input
               type="text"
               name="city"
@@ -140,7 +140,7 @@ export default function EditParkingInline({ parking }: { parking: Parking }) {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label className="block text-sm font-medium text-black mb-1">Email</label>
             <input
               type="email"
               name="email"
@@ -150,7 +150,7 @@ export default function EditParkingInline({ parking }: { parking: Parking }) {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Téléphone</label>
+            <label className="block text-sm font-medium text-black mb-1">Téléphone</label>
             <input
               type="tel"
               name="phone"
@@ -160,7 +160,7 @@ export default function EditParkingInline({ parking }: { parking: Parking }) {
             />
           </div>
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <label className="block text-sm font-medium text-black mb-1">Description</label>
             <textarea
               name="description"
               value={formData.description}
@@ -174,7 +174,7 @@ export default function EditParkingInline({ parking }: { parking: Parking }) {
           <button
             type="button"
             onClick={() => setIsEditing(false)}
-            className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+            className="px-6 py-2 border border-gray-300 rounded-lg text-black hover:bg-gray-50"
           >
             Annuler
           </button>

@@ -141,7 +141,7 @@ export default function AnalyticsPage() {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-orange-500/20 border-t-orange-500 rounded-full animate-spin"></div>
-          <p className="text-slate-400 font-black text-xs uppercase tracking-widest">Analyse des données...</p>
+          <p className="text-black font-black text-xs uppercase tracking-widest">Analyse des données...</p>
         </div>
       </div>
     );
@@ -152,20 +152,20 @@ export default function AnalyticsPage() {
       {/* Header Premium */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tighter flex items-center gap-4">
+          <h1 className="text-4xl font-black text-black tracking-tighter flex items-center gap-4">
             <div className="w-14 h-14 rounded-2xl bg-slate-900 text-white flex items-center justify-center shadow-2xl">
               <FontAwesomeIcon icon={faChartLine} />
             </div>
             Statistiques & Insights
           </h1>
-          <p className="text-slate-400 font-bold text-sm uppercase tracking-widest mt-3 ml-1">
+          <p className="text-black font-bold text-sm uppercase tracking-widest mt-3 ml-1">
             Analyse approfondie de votre performance opérationnelle
           </p>
         </div>
         
         <div className="flex items-center gap-3 bg-white p-2 rounded-2xl border border-slate-100 shadow-sm">
-          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-3">Période :</span>
-          <select className="bg-slate-50 border-none text-xs font-black text-slate-900 rounded-xl px-4 py-2 outline-none cursor-pointer">
+          <span className="text-[10px] font-black text-black uppercase tracking-widest ml-3">Période :</span>
+          <select className="bg-slate-50 border-none text-xs font-black text-black rounded-xl px-4 py-2 outline-none cursor-pointer">
             <option>7 derniers jours</option>
             <option>30 derniers jours</option>
             <option>Cette année</option>
@@ -195,12 +195,12 @@ export default function AnalyticsPage() {
               
               <div className="relative z-10">
                 <div className="flex items-end justify-between mb-2">
-                  <h3 className="text-3xl font-black text-slate-900 leading-none">{kpi.value}</h3>
+                  <h3 className="text-3xl font-black text-black leading-none">{kpi.value}</h3>
                   <span className="text-emerald-500 text-[10px] font-black bg-emerald-50 px-2 py-1 rounded-lg">
                     {kpi.trend}
                   </span>
                 </div>
-                <p className="text-slate-400 font-black text-[10px] uppercase tracking-widest">{kpi.label}</p>
+                <p className="text-black font-black text-[10px] uppercase tracking-widest">{kpi.label}</p>
               </div>
             </div>
           );
@@ -212,8 +212,8 @@ export default function AnalyticsPage() {
         <div className="lg:col-span-2 bg-white p-8 rounded-[3rem] border border-slate-100 shadow-xl relative overflow-hidden">
           <div className="flex items-center justify-between mb-10">
             <div>
-              <h3 className="text-2xl font-black text-slate-900 tracking-tight">Activité Hebdomadaire</h3>
-              <p className="text-slate-400 font-bold text-xs uppercase tracking-widest mt-1">Volume de réservations par jour</p>
+              <h3 className="text-2xl font-black text-black tracking-tight">Activité Hebdomadaire</h3>
+              <p className="text-black font-bold text-xs uppercase tracking-widest mt-1">Volume de réservations par jour</p>
             </div>
             <div className="w-10 h-10 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center">
               <FontAwesomeIcon icon={faClock} />
@@ -267,7 +267,7 @@ export default function AnalyticsPage() {
         <div className="space-y-8">
           {/* Distribution */}
           <div className="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-xl">
-            <h3 className="text-xl font-black text-slate-900 mb-8 tracking-tight">Répartition Flotte</h3>
+            <h3 className="text-xl font-black text-black mb-8 tracking-tight">Répartition Flotte</h3>
             <div className="h-[200px] relative">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -286,8 +286,8 @@ export default function AnalyticsPage() {
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute inset-0 flex items-center justify-center flex-col pointer-events-none">
-                <span className="text-2xl font-black text-slate-900 leading-none">100%</span>
-                <span className="text-[8px] font-black text-slate-400 uppercase">Capacité</span>
+                <span className="text-2xl font-black text-black leading-none">100%</span>
+                <span className="text-[8px] font-black text-black uppercase">Capacité</span>
               </div>
             </div>
             <div className="space-y-3 mt-6">
@@ -295,9 +295,9 @@ export default function AnalyticsPage() {
                 <div key={i} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-2 h-2 rounded-full" style={{ backgroundColor: cat.color }} />
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{cat.name}</span>
+                    <span className="text-[10px] font-black text-black uppercase tracking-widest">{cat.name}</span>
                   </div>
-                  <span className="text-xs font-black text-slate-900">{cat.value}</span>
+                  <span className="text-xs font-black text-black">{cat.value}</span>
                 </div>
               ))}
             </div>
@@ -317,7 +317,7 @@ export default function AnalyticsPage() {
                   </div>
                   <div>
                     <h4 className="text-sm font-black tracking-tight">{alert.title}</h4>
-                    <p className="text-[10px] text-slate-400 font-bold mt-1 leading-relaxed">{alert.desc}</p>
+                    <p className="text-[10px] text-black font-bold mt-1 leading-relaxed">{alert.desc}</p>
                   </div>
                 </div>
               ))}

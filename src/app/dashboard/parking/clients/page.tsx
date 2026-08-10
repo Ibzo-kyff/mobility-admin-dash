@@ -32,8 +32,8 @@ export default function ClientsPage() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Gestion des Clients</h1>
-          <p className="text-gray-500 mt-1">Gérez et suivez l'activité de vos clients fidèles.</p>
+          <h1 className="text-3xl font-bold text-black tracking-tight">Gestion des Clients</h1>
+          <p className="text-black mt-1">Gérez et suivez l'activité de vos clients fidèles.</p>
         </div>
       </div>
 
@@ -45,13 +45,13 @@ export default function ClientsPage() {
               <Users className="w-6 h-6 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-500 font-medium">Total Clients</p>
-              <h3 className="text-2xl font-bold text-gray-900">{stats.total}</h3>
+              <p className="text-sm text-black font-medium">Total Clients</p>
+              <h3 className="text-2xl font-bold text-black">{stats.total}</h3>
             </div>
           </div>
           <div className="mt-4 flex items-center gap-2 text-xs font-medium text-emerald-600">
             <span className="bg-emerald-50 px-2 py-0.5 rounded-full">Total</span>
-            <span className="text-gray-400 font-normal text-[11px]">base de données complète</span>
+            <span className="text-black font-normal text-[11px]">base de données complète</span>
           </div>
         </div>
 
@@ -61,13 +61,13 @@ export default function ClientsPage() {
               <UserCheck className="w-6 h-6 text-emerald-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-500 font-medium">Clients Actifs</p>
-              <h3 className="text-2xl font-bold text-gray-900">{stats.active}</h3>
+              <p className="text-sm text-black font-medium">Clients Actifs</p>
+              <h3 className="text-2xl font-bold text-black">{stats.active}</h3>
             </div>
           </div>
           <div className="mt-4 flex items-center gap-2 text-xs font-medium text-emerald-600">
             <span className="bg-emerald-50 px-2 py-0.5 rounded-full">{stats.total > 0 ? Math.round((stats.active / stats.total) * 100) : 0}%</span>
-            <span className="text-gray-400 font-normal text-[11px]">taux d'approbation</span>
+            <span className="text-black font-normal text-[11px]">taux d'approbation</span>
           </div>
         </div>
 
@@ -77,20 +77,20 @@ export default function ClientsPage() {
               <UserPlus className="w-6 h-6 text-amber-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-500 font-medium">Nouveaux</p>
-              <h3 className="text-2xl font-bold text-gray-900">{stats.newThisWeek}</h3>
+              <p className="text-sm text-black font-medium">Nouveaux</p>
+              <h3 className="text-2xl font-bold text-black">{stats.newThisWeek}</h3>
             </div>
           </div>
           <div className="mt-4 flex items-center gap-2 text-xs font-medium text-emerald-600">
             <span className="bg-emerald-50 px-2 py-0.5 rounded-full">Récent</span>
-            <span className="text-gray-400 font-normal text-[11px]">inscrits cette semaine</span>
+            <span className="text-black font-normal text-[11px]">inscrits cette semaine</span>
           </div>
         </div>
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="p-6 border-b border-gray-50 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">Liste des Clients</h2>
+          <h2 className="text-lg font-semibold text-black">Liste des Clients</h2>
           <div className="flex items-center gap-2">
             <select className="bg-gray-50 border-none text-sm rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500/20">
               <option>Tous les statuts</option>

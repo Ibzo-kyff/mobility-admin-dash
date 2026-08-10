@@ -23,9 +23,9 @@ export default function Button({
   
   const variantClasses = {
     primary: 'bg-orange-500 text-white hover:bg-orange-600 shadow-md hover:shadow-lg disabled:bg-orange-300',
-    secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300',
+    secondary: 'bg-gray-200 text-black hover:bg-gray-300',
     outline: 'border-2 border-orange-500 text-orange-600 hover:bg-orange-50',
-    ghost: 'text-gray-600 hover:bg-gray-100'
+    ghost: 'text-black hover:bg-gray-100'
   };
   
   const sizeClasses = {

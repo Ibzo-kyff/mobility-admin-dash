@@ -127,7 +127,7 @@ export default function ParkingDetailsPage() {
     <div className="space-y-6">
       <button 
         onClick={() => router.back()}
-        className="flex items-center gap-2 text-gray-600 hover:text-orange-600 transition-colors font-medium"
+        className="flex items-center gap-2 text-black hover:text-orange-600 transition-colors font-medium"
       >
         <FontAwesomeIcon icon={faArrowLeft} />
         Retour à la recherche
@@ -154,10 +154,10 @@ export default function ParkingDetailsPage() {
             <div className="p-8">
               <div className="flex justify-between items-start mb-6">
                 <div>
-                  <h1 className="text-3xl font-bold text-gray-900">
+                  <h1 className="text-3xl font-bold text-black">
                     {type === 'parking' ? (entity.nom || entity.name) : `${entity.marque || entity.marqueRef?.name} ${entity.model || entity.modele}`}
                   </h1>
-                  <p className="text-gray-500 flex items-center gap-2 mt-2">
+                  <p className="text-black flex items-center gap-2 mt-2">
                     <FontAwesomeIcon icon={faMapMarkerAlt} className="text-orange-500" />
                     {type === 'parking' ? (entity.adresse || entity.address || 'Dakar, Sénégal') : (entity.parking?.adresse || entity.parking?.address || 'Dakar, Sénégal')}
                   </p>
@@ -165,7 +165,7 @@ export default function ParkingDetailsPage() {
                 <div className="text-right">
                   <div className="text-2xl font-black text-orange-600">
                     {(type === 'parking' ? (entity.prixHeure || '500') : (entity.prix || entity.prixJour || '---'))?.toLocaleString()} F
-                    <span className="text-sm font-normal text-gray-500"> {type === 'parking' ? '/ heure' : (entity.forRent ? '/ jour' : '')}</span>
+                    <span className="text-sm font-normal text-black"> {type === 'parking' ? '/ heure' : (entity.forRent ? '/ jour' : '')}</span>
                   </div>
                   <div className="flex items-center justify-end text-amber-500 font-bold mt-1">
                     <FontAwesomeIcon icon={faStar} className="mr-1" />
@@ -191,8 +191,8 @@ export default function ParkingDetailsPage() {
               )}
 
               <div className="space-y-4">
-                <h2 className="text-xl font-bold text-gray-900">Description</h2>
-                <p className="text-gray-600 leading-relaxed">
+                <h2 className="text-xl font-bold text-black">Description</h2>
+                <p className="text-black leading-relaxed">
                   {entity.description || "Aucune description disponible pour cet élément."}
                 </p>
               </div>
@@ -202,7 +202,7 @@ export default function ParkingDetailsPage() {
           {/* Available Vehicles Section (only for parking) */}
           {type === 'parking' && vehicles.length > 0 && (
             <div className="space-y-4">
-              <h2 className="text-xl font-bold text-gray-900">Véhicules disponibles à cet endroit</h2>
+              <h2 className="text-xl font-bold text-black">Véhicules disponibles à cet endroit</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {vehicles.map((v) => (
                   <Link key={v.id} href={`/dashboard/client/search/${v.id}`} className="bg-white p-4 rounded-2xl border border-gray-100 flex gap-4 hover:shadow-md transition-all group">
@@ -211,8 +211,8 @@ export default function ParkingDetailsPage() {
                     </div>
                     <div className="flex-1 flex flex-col justify-between">
                       <div>
-                        <h4 className="font-bold text-gray-900 group-hover:text-orange-500 transition-colors">{v.marque || v.marqueRef?.name} {v.model}</h4>
-                        <div className="flex items-center gap-3 text-[10px] text-gray-500 mt-1 uppercase font-bold tracking-wider">
+                        <h4 className="font-bold text-black group-hover:text-orange-500 transition-colors">{v.marque || v.marqueRef?.name} {v.model}</h4>
+                        <div className="flex items-center gap-3 text-[10px] text-black mt-1 uppercase font-bold tracking-wider">
                           <span className="flex items-center gap-1"><FontAwesomeIcon icon={faGasPump} /> {v.fuelType}</span>
                           <span className="flex items-center gap-1"><FontAwesomeIcon icon={faCogs} /> {v.transmission}</span>
                         </div>
@@ -232,7 +232,7 @@ export default function ParkingDetailsPage() {
         {/* Right Column: Booking Widget */}
         <div className="lg:col-span-1">
           <div className="sticky top-24 bg-white rounded-3xl shadow-xl border border-orange-100 p-8 space-y-6">
-            <h3 className="text-xl font-bold text-gray-900">
+            <h3 className="text-xl font-bold text-black">
               {type === 'parking' ? 'Réserver une place' : 'Réserver ce véhicule'}
             </h3>
             
@@ -242,14 +242,14 @@ export default function ParkingDetailsPage() {
                   <button 
                     onClick={() => setResType('LOCATION')}
                     disabled={entity.forRent === false}
-                    className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${entity.forRent === false ? 'opacity-40 cursor-not-allowed text-gray-300' : resType === 'LOCATION' ? 'bg-white text-orange-500 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
+                    className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${entity.forRent === false ? 'opacity-40 cursor-not-allowed text-black' : resType === 'LOCATION' ? 'bg-white text-orange-500 shadow-sm' : 'text-black hover:text-black'}`}
                   >
                     Location
                   </button>
                   <button 
                     onClick={() => setResType('ACHAT')}
                     disabled={entity.forSale === false}
-                    className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${entity.forSale === false ? 'opacity-40 cursor-not-allowed text-gray-300' : resType === 'ACHAT' ? 'bg-white text-orange-500 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
+                    className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${entity.forSale === false ? 'opacity-40 cursor-not-allowed text-black' : resType === 'ACHAT' ? 'bg-white text-orange-500 shadow-sm' : 'text-black hover:text-black'}`}
                   >
                     Achat
                   </button>
@@ -260,7 +260,7 @@ export default function ParkingDetailsPage() {
                 <>
                   <div className="grid grid-cols-1 gap-4">
                     <div>
-                      <label className="block text-[10px] font-black uppercase text-gray-400 mb-2 tracking-widest">Date d'arrivée</label>
+                      <label className="block text-[10px] font-black uppercase text-black mb-2 tracking-widest">Date d'arrivée</label>
                       <input 
                         type="datetime-local" 
                         value={startDate}
@@ -269,7 +269,7 @@ export default function ParkingDetailsPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-black uppercase text-gray-400 mb-2 tracking-widest">Date de fin</label>
+                      <label className="block text-[10px] font-black uppercase text-black mb-2 tracking-widest">Date de fin</label>
                       <input 
                         type="datetime-local" 
                         value={endDate}
@@ -282,7 +282,7 @@ export default function ParkingDetailsPage() {
                   {type === 'vehicle' && (
                     <>
                       <div>
-                        <label className="block text-[10px] font-black uppercase text-gray-400 mb-2 tracking-widest">Motif de location</label>
+                        <label className="block text-[10px] font-black uppercase text-black mb-2 tracking-widest">Motif de location</label>
                         <select 
                           value={motif}
                           onChange={(e) => setMotif(e.target.value)}
@@ -298,17 +298,17 @@ export default function ParkingDetailsPage() {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-[10px] font-black uppercase text-gray-400 mb-2 tracking-widest">Localisation</label>
+                        <label className="block text-[10px] font-black uppercase text-black mb-2 tracking-widest">Localisation</label>
                         <div className="flex gap-2">
                           <button 
                             onClick={() => setLocalisation('bamako')}
-                            className={`flex-1 py-3 text-xs font-bold border rounded-xl transition-all ${localisation === 'bamako' ? 'bg-orange-50 border-orange-200 text-orange-600' : 'bg-white border-gray-100 text-gray-400'}`}
+                            className={`flex-1 py-3 text-xs font-bold border rounded-xl transition-all ${localisation === 'bamako' ? 'bg-orange-50 border-orange-200 text-orange-600' : 'bg-white border-gray-100 text-black'}`}
                           >
                             À Bamako
                           </button>
                           <button 
                             onClick={() => setLocalisation('hors_bamako')}
-                            className={`flex-1 py-3 text-xs font-bold border rounded-xl transition-all ${localisation === 'hors_bamako' ? 'bg-orange-50 border-orange-200 text-orange-600' : 'bg-white border-gray-100 text-gray-400'}`}
+                            className={`flex-1 py-3 text-xs font-bold border rounded-xl transition-all ${localisation === 'hors_bamako' ? 'bg-orange-50 border-orange-200 text-orange-600' : 'bg-white border-gray-100 text-black'}`}
                           >
                             Hors Bamako
                           </button>
@@ -320,7 +320,7 @@ export default function ParkingDetailsPage() {
               )}
 
               <div>
-                <label className="block text-[10px] font-black uppercase text-gray-400 mb-2 tracking-widest">Mode de paiement</label>
+                <label className="block text-[10px] font-black uppercase text-black mb-2 tracking-widest">Mode de paiement</label>
                 <select 
                   value={paymentMethod}
                   onChange={(e) => setPaymentMethod(e.target.value)}
@@ -336,7 +336,7 @@ export default function ParkingDetailsPage() {
 
             <div className="pt-4 space-y-2 border-t border-gray-50">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Prix unitaire</span>
+                <span className="text-black">Prix unitaire</span>
                 <span className="font-bold">
                   {(type === 'parking' ? entity.prixHeure : (entity.prix || entity.prixJour))?.toLocaleString()} F
                 </span>
@@ -370,7 +370,7 @@ export default function ParkingDetailsPage() {
             >
               {processing ? 'Traitement...' : 'Confirmer la réservation'}
             </button>
-            <p className="text-[10px] text-center text-gray-400 font-medium px-4">
+            <p className="text-[10px] text-center text-black font-medium px-4">
               En cliquant sur confirmer, vous acceptez nos conditions d'utilisation et de stationnement.
             </p>
           </div>
@@ -383,11 +383,11 @@ export default function ParkingDetailsPage() {
 function InfoBadge({ icon, label, value }: { icon: any, label: string, value: string }) {
   return (
     <div className="text-center md:text-left">
-      <div className="flex items-center justify-center md:justify-start gap-2 text-gray-400 mb-1">
+      <div className="flex items-center justify-center md:justify-start gap-2 text-black mb-1">
         <FontAwesomeIcon icon={icon} className="text-sm" />
         <span className="text-[10px] font-black uppercase tracking-widest">{label}</span>
       </div>
-      <p className="text-sm font-bold text-gray-800">{value}</p>
+      <p className="text-sm font-bold text-black">{value}</p>
     </div>
   );
 }

@@ -136,8 +136,8 @@ export default function ParkingSettingsPage() {
   return (
     <div className="max-w-5xl mx-auto space-y-8 animate-fadeIn pb-10">
       <div>
-        <h1 className="text-3xl font-black text-slate-900 tracking-tight">Paramètres</h1>
-        <p className="text-slate-500 mt-2 font-medium">Gérez vos informations personnelles et les détails de votre parking.</p>
+        <h1 className="text-3xl font-black text-black tracking-tight">Paramètres</h1>
+        <p className="text-black mt-2 font-medium">Gérez vos informations personnelles et les détails de votre parking.</p>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8">
@@ -151,10 +151,10 @@ export default function ParkingSettingsPage() {
                 className={`flex items-center gap-3 px-5 py-4 rounded-2xl transition-all duration-300 font-bold ${
                   activeTab === tab.id 
                     ? 'bg-orange-50 text-orange-600 shadow-sm border border-orange-100/50' 
-                    : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900 border border-transparent'
+                    : 'text-black hover:bg-slate-50 hover:text-black border border-transparent'
                 }`}
               >
-                <tab.icon className={`w-5 h-5 ${activeTab === tab.id ? 'text-orange-500' : 'text-slate-400'}`} />
+                <tab.icon className={`w-5 h-5 ${activeTab === tab.id ? 'text-orange-500' : 'text-black'}`} />
                 {tab.label}
               </button>
             ))}
@@ -183,8 +183,8 @@ export default function ParkingSettingsPage() {
             {activeTab === 'profile' && (
               <div className="animate-fadeIn">
                 <div className="mb-8">
-                  <h2 className="text-xl font-black text-slate-900 mb-1">Profil Personnel</h2>
-                  <p className="text-sm text-slate-500">Mettez à jour vos informations de contact.</p>
+                  <h2 className="text-xl font-black text-black mb-1">Profil Personnel</h2>
+                  <p className="text-sm text-black">Mettez à jour vos informations de contact.</p>
                 </div>
 
                 <form onSubmit={handleProfileSubmit} className="space-y-6">
@@ -212,57 +212,57 @@ export default function ParkingSettingsPage() {
                       <button 
                         type="button" 
                         onClick={() => fileInputRef.current?.click()}
-                        className="px-5 py-2.5 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors text-sm"
+                        className="px-5 py-2.5 bg-slate-100 text-black font-bold rounded-xl hover:bg-slate-200 transition-colors text-sm"
                       >
                         Changer la photo
                       </button>
-                      <p className="text-xs text-slate-400 mt-2 font-medium">JPG, GIF ou PNG. Max 2MB.</p>
+                      <p className="text-xs text-black mt-2 font-medium">JPG, GIF ou PNG. Max 2MB.</p>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Prénom</label>
+                      <label className="text-xs font-black text-black uppercase tracking-widest">Prénom</label>
                       <input 
                         type="text" 
                         value={profileData.prenom}
                         onChange={e => setProfileData({...profileData, prenom: e.target.value})}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-black font-medium focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Nom</label>
+                      <label className="text-xs font-black text-black uppercase tracking-widest">Nom</label>
                       <input 
                         type="text" 
                         value={profileData.nom}
                         onChange={e => setProfileData({...profileData, nom: e.target.value})}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-black font-medium focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Email</label>
+                      <label className="text-xs font-black text-black uppercase tracking-widest">Email</label>
                       <div className="relative">
-                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-black" />
                         <input 
                           type="email" 
                           value={profileData.email}
                           onChange={e => setProfileData({...profileData, email: e.target.value})}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-4 py-3 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-4 py-3 text-black font-medium focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
                           required
                         />
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Téléphone</label>
+                      <label className="text-xs font-black text-black uppercase tracking-widest">Téléphone</label>
                       <div className="relative">
-                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-black" />
                         <input 
                           type="text" 
                           value={profileData.phone}
                           onChange={e => setProfileData({...profileData, phone: e.target.value})}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-4 py-3 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-4 py-3 text-black font-medium focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
                         />
                       </div>
                     </div>
@@ -286,44 +286,44 @@ export default function ParkingSettingsPage() {
             {activeTab === 'parking' && (
               <div className="animate-fadeIn">
                 <div className="mb-8">
-                  <h2 className="text-xl font-black text-slate-900 mb-1">Informations du Parking</h2>
-                  <p className="text-sm text-slate-500">Gérez les détails visibles par vos clients.</p>
+                  <h2 className="text-xl font-black text-black mb-1">Informations du Parking</h2>
+                  <p className="text-sm text-black">Gérez les détails visibles par vos clients.</p>
                 </div>
 
                 <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); setSuccessMsg('Informations parking mises à jour.'); setTimeout(() => setSuccessMsg(''), 3000); }}>
                   <div className="space-y-2">
-                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Nom du Parking</label>
+                    <label className="text-xs font-black text-black uppercase tracking-widest">Nom du Parking</label>
                     <div className="relative">
-                      <Building className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                      <Building className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-black" />
                       <input 
                         type="text" 
                         value={parkingData.name}
                         onChange={e => setParkingData({...parkingData, name: e.target.value})}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-4 py-3 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-4 py-3 text-black font-medium focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
                       />
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Adresse complète</label>
+                    <label className="text-xs font-black text-black uppercase tracking-widest">Adresse complète</label>
                     <div className="relative">
-                      <MapPin className="absolute left-4 top-4 w-5 h-5 text-slate-400" />
+                      <MapPin className="absolute left-4 top-4 w-5 h-5 text-black" />
                       <textarea 
                         value={parkingData.address}
                         onChange={e => setParkingData({...parkingData, address: e.target.value})}
                         rows={3}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-4 py-3 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all resize-none"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-4 py-3 text-black font-medium focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all resize-none"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Description</label>
+                    <label className="text-xs font-black text-black uppercase tracking-widest">Description</label>
                     <textarea 
                       value={parkingData.description}
                       onChange={e => setParkingData({...parkingData, description: e.target.value})}
                       rows={4}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all resize-none"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-black font-medium focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all resize-none"
                     />
                   </div>
 
@@ -341,21 +341,21 @@ export default function ParkingSettingsPage() {
             {activeTab === 'security' && (
               <div className="animate-fadeIn">
                 <div className="mb-8">
-                  <h2 className="text-xl font-black text-slate-900 mb-1">Sécurité du compte</h2>
-                  <p className="text-sm text-slate-500">Modifiez votre mot de passe et vos paramètres de sécurité.</p>
+                  <h2 className="text-xl font-black text-black mb-1">Sécurité du compte</h2>
+                  <p className="text-sm text-black">Modifiez votre mot de passe et vos paramètres de sécurité.</p>
                 </div>
 
                 <form className="space-y-6" onSubmit={handleSecuritySubmit}>
                   <div className="space-y-2">
-                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Mot de passe actuel</label>
+                    <label className="text-xs font-black text-black uppercase tracking-widest">Mot de passe actuel</label>
                     <div className="relative">
-                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-black" />
                       <input 
                         type="password" 
                         value={securityData.currentPassword}
                         onChange={e => setSecurityData({...securityData, currentPassword: e.target.value})}
                         placeholder="••••••••"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-4 py-3 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-4 py-3 text-black font-medium focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
                         required
                       />
                     </div>
@@ -363,25 +363,25 @@ export default function ParkingSettingsPage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Nouveau mot de passe</label>
+                      <label className="text-xs font-black text-black uppercase tracking-widest">Nouveau mot de passe</label>
                       <input 
                         type="password" 
                         value={securityData.newPassword}
                         onChange={e => setSecurityData({...securityData, newPassword: e.target.value})}
                         placeholder="••••••••"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-black font-medium focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
                         required
                         minLength={6}
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Confirmer le mot de passe</label>
+                      <label className="text-xs font-black text-black uppercase tracking-widest">Confirmer le mot de passe</label>
                       <input 
                         type="password" 
                         value={securityData.confirmPassword}
                         onChange={e => setSecurityData({...securityData, confirmPassword: e.target.value})}
                         placeholder="••••••••"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-black font-medium focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
                         required
                         minLength={6}
                       />
@@ -406,8 +406,8 @@ export default function ParkingSettingsPage() {
             {activeTab === 'notifications' && (
               <div className="animate-fadeIn">
                 <div className="mb-8">
-                  <h2 className="text-xl font-black text-slate-900 mb-1">Préférences de notification</h2>
-                  <p className="text-sm text-slate-500">Gérez comment et quand vous souhaitez être contacté.</p>
+                  <h2 className="text-xl font-black text-black mb-1">Préférences de notification</h2>
+                  <p className="text-sm text-black">Gérez comment et quand vous souhaitez être contacté.</p>
                 </div>
 
                 <div className="space-y-4">
@@ -422,8 +422,8 @@ export default function ParkingSettingsPage() {
                         <div className="w-11 h-6 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[6px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
                       </div>
                       <div>
-                        <p className="font-bold text-slate-900">{notif.label}</p>
-                        <p className="text-sm text-slate-500 mt-0.5">{notif.desc}</p>
+                        <p className="font-bold text-black">{notif.label}</p>
+                        <p className="text-sm text-black mt-0.5">{notif.desc}</p>
                       </div>
                     </label>
                   ))}

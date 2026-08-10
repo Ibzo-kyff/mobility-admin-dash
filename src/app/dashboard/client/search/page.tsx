@@ -141,8 +141,8 @@ export default function SearchPage() {
     <div className="space-y-6 min-h-screen">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800 tracking-tight">Réservation</h1>
-          <p className="text-gray-500 text-sm">Trouvez et réservez votre parking ou votre véhicule idéal.</p>
+          <h1 className="text-2xl font-bold text-black tracking-tight">Réservation</h1>
+          <p className="text-black text-sm">Trouvez et réservez votre parking ou votre véhicule idéal.</p>
         </div>
       </div>
 
@@ -152,7 +152,7 @@ export default function SearchPage() {
           <button 
             onClick={() => setActiveTab('vehicles')}
             className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${
-              activeTab === 'vehicles' ? 'bg-white text-orange-500 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+              activeTab === 'vehicles' ? 'bg-white text-orange-500 shadow-sm' : 'text-black hover:text-black'
             }`}
           >
             <FontAwesomeIcon icon={faCar} className="mr-2" />
@@ -161,7 +161,7 @@ export default function SearchPage() {
           <button 
             onClick={() => setActiveTab('parkings')}
             className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${
-              activeTab === 'parkings' ? 'bg-white text-orange-500 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+              activeTab === 'parkings' ? 'bg-white text-orange-500 shadow-sm' : 'text-black hover:text-black'
             }`}
           >
             <FontAwesomeIcon icon={faParking} className="mr-2" />
@@ -174,7 +174,7 @@ export default function SearchPage() {
             <button 
               onClick={() => setViewMode('grid')}
               className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all ${
-                viewMode === 'grid' ? 'bg-white text-orange-500 shadow-sm' : 'text-gray-400 hover:text-gray-600'
+                viewMode === 'grid' ? 'bg-white text-orange-500 shadow-sm' : 'text-black hover:text-black'
               }`}
             >
               <FontAwesomeIcon icon={faThLarge} />
@@ -182,7 +182,7 @@ export default function SearchPage() {
             <button 
               onClick={() => setViewMode('list')}
               className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all ${
-                viewMode === 'list' ? 'bg-white text-orange-500 shadow-sm' : 'text-gray-400 hover:text-gray-600'
+                viewMode === 'list' ? 'bg-white text-orange-500 shadow-sm' : 'text-black hover:text-black'
               }`}
             >
               <FontAwesomeIcon icon={faList} />
@@ -196,7 +196,7 @@ export default function SearchPage() {
         <div className="flex-1 relative">
           <FontAwesomeIcon 
             icon={faSearch} 
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" 
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black" 
           />
           <input 
             type="text" 
@@ -209,7 +209,7 @@ export default function SearchPage() {
         <div className="flex gap-2">
           <button 
             onClick={fetchData}
-            className="p-3 bg-gray-100 text-gray-500 rounded-xl hover:text-orange-500 transition-all active:scale-95"
+            className="p-3 bg-gray-100 text-black rounded-xl hover:text-orange-500 transition-all active:scale-95"
           >
             <FontAwesomeIcon icon={faSync} className={loading ? 'animate-spin' : ''} />
           </button>
@@ -224,14 +224,14 @@ export default function SearchPage() {
           <div className="w-full lg:w-80 flex-shrink-0">
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sticky top-6">
               <div className="mb-6 border-b border-slate-100 pb-4">
-                <h3 className="text-xl font-black text-slate-900 tracking-tight">Filtres</h3>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Personnalisez votre recherche</p>
+                <h3 className="text-xl font-black text-black tracking-tight">Filtres</h3>
+                <p className="text-[10px] font-bold text-black uppercase tracking-widest mt-1">Personnalisez votre recherche</p>
               </div>
 
               <div className="space-y-8">
                 {/* Type de transaction */}
                 <div className="space-y-4">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                  <label className="text-[10px] font-black text-black uppercase tracking-widest flex items-center gap-2">
                     <FontAwesomeIcon icon={faMoneyBillWave} className="text-green-500" />
                     Type d'annonce
                   </label>
@@ -245,7 +245,7 @@ export default function SearchPage() {
                         className={`flex-1 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
                           filters.transactionType === t 
                           ? 'bg-white text-orange-500 shadow-sm border border-slate-100' 
-                          : 'text-slate-400 hover:text-slate-600 border border-transparent'
+                          : 'text-black hover:text-black border border-transparent'
                         }`}
                       >
                         {t === 'all' ? 'Tout' : t === 'rent' ? 'Location' : 'Achat'}
@@ -257,7 +257,7 @@ export default function SearchPage() {
                 {/* Échelle de prix (Slider) */}
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                    <label className="text-[10px] font-black text-black uppercase tracking-widest flex items-center gap-2">
                       <FontAwesomeIcon icon={faEuroSign} className="text-orange-500" />
                       Échelle de prix {filters.transactionType === 'rent' && '(Par jour)'}
                     </label>
@@ -275,7 +275,7 @@ export default function SearchPage() {
                       onChange={(e) => setFilters({ ...filters, maxPrice: Number(e.target.value) === maxSliderValue ? '' : e.target.value })}
                       className="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-orange-500 hover:accent-orange-600 transition-all"
                     />
-                    <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase">
+                    <div className="flex justify-between text-[10px] font-bold text-black uppercase">
                       <span>0 F</span>
                       <span>{maxSliderValue.toLocaleString()}+ F</span>
                     </div>
@@ -284,14 +284,14 @@ export default function SearchPage() {
 
                 {/* Marque */}
                 <div className="space-y-4">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                  <label className="text-[10px] font-black text-black uppercase tracking-widest flex items-center gap-2">
                     <FontAwesomeIcon icon={faCar} className="text-blue-500" />
                     Marque du véhicule
                   </label>
                   <select 
                     value={filters.marque}
                     onChange={(e) => setFilters({ ...filters, marque: e.target.value })}
-                    className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:border-orange-500 font-bold text-slate-700 transition-all appearance-none cursor-pointer"
+                    className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:border-orange-500 font-bold text-black transition-all appearance-none cursor-pointer"
                   >
                     <option value="all">Toutes les marques</option>
                     {marques.map(m => (
@@ -302,7 +302,7 @@ export default function SearchPage() {
 
                 {/* Boîte */}
                 <div className="space-y-4">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                  <label className="text-[10px] font-black text-black uppercase tracking-widest flex items-center gap-2">
                     <FontAwesomeIcon icon={faCogs} className="text-purple-500" />
                     Type de boîte
                   </label>
@@ -314,7 +314,7 @@ export default function SearchPage() {
                         className={`flex-1 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
                           filters.transmission === t 
                           ? 'bg-white text-orange-500 shadow-sm border border-slate-100' 
-                          : 'text-slate-400 hover:text-slate-600 border border-transparent'
+                          : 'text-black hover:text-black border border-transparent'
                         }`}
                       >
                         {t === 'all' ? 'Tout' : t === 'auto' ? 'Auto' : 'Manu'}
@@ -326,7 +326,7 @@ export default function SearchPage() {
                 <div className="pt-4 border-t border-slate-100">
                   <button
                     onClick={resetFilters}
-                    className="w-full py-3.5 bg-slate-50 hover:bg-rose-50 text-slate-500 hover:text-rose-600 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2"
+                    className="w-full py-3.5 bg-slate-50 hover:bg-rose-50 text-black hover:text-rose-600 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2"
                   >
                     <FontAwesomeIcon icon={faSync} className="text-[10px]" />
                     Réinitialiser
@@ -341,7 +341,7 @@ export default function SearchPage() {
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 space-y-4">
               <div className="w-12 h-12 border-4 border-orange-500/20 border-t-orange-500 rounded-full animate-spin"></div>
-              <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Chargement en cours...</p>
+              <p className="text-black font-bold uppercase tracking-widest text-xs">Chargement en cours...</p>
             </div>
           ) : (
             <>
@@ -375,19 +375,19 @@ export default function SearchPage() {
                 <button 
                   onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
-                  className="px-4 py-2 rounded-xl text-sm font-bold bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
+                  className="px-4 py-2 rounded-xl text-sm font-bold bg-white border border-gray-200 text-black hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
                 >
                   Précédent
                 </button>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-black text-slate-700">
-                    Page {currentPage} <span className="text-slate-400 font-medium">sur {totalPages}</span>
+                  <span className="text-sm font-black text-black">
+                    Page {currentPage} <span className="text-black font-medium">sur {totalPages}</span>
                   </span>
                 </div>
                 <button 
                   onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages}
-                  className="px-4 py-2 rounded-xl text-sm font-bold bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
+                  className="px-4 py-2 rounded-xl text-sm font-bold bg-white border border-gray-200 text-black hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
                 >
                   Suivant
                 </button>
@@ -405,10 +405,10 @@ export default function SearchPage() {
 function EmptyState({ message }: { message: string }) {
   return (
     <div className="col-span-full py-20 text-center bg-gray-50 rounded-[2.5rem] border-2 border-dashed border-gray-100">
-      <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-gray-200 shadow-sm">
+      <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-black shadow-sm">
         <FontAwesomeIcon icon={faInfoCircle} className="text-2xl" />
       </div>
-      <p className="text-gray-500 font-medium">{message}</p>
+      <p className="text-black font-medium">{message}</p>
     </div>
   );
 }
@@ -436,25 +436,25 @@ function ParkingCard({ parking }: { parking: any }) {
       
       <div className="p-5 flex-1 space-y-3">
         <div className="flex justify-between items-start">
-          <h3 className="font-bold text-lg text-gray-900 leading-tight group-hover:text-orange-500 transition-colors">{parking.nom || parking.name}</h3>
+          <h3 className="font-bold text-lg text-black leading-tight group-hover:text-orange-500 transition-colors">{parking.nom || parking.name}</h3>
           <div className="flex items-center text-amber-500 text-sm font-bold bg-amber-50 px-2 py-0.5 rounded-lg">
             <FontAwesomeIcon icon={faStar} className="mr-1" />
             {parking.rating || '4.5'}
           </div>
         </div>
         
-        <p className="text-sm text-gray-500 flex items-center gap-2">
+        <p className="text-sm text-black flex items-center gap-2">
           <FontAwesomeIcon icon={faMapMarkerAlt} className="text-orange-500" />
           {parking.adresse || parking.address || 'Dakar, Sénégal'}
         </p>
 
         <div className="flex items-center gap-4 pt-2 border-t border-gray-100 mt-2">
-          <div className="text-[10px] font-bold text-gray-400 flex items-center gap-1.5 uppercase tracking-wider">
-            <FontAwesomeIcon icon={faCar} className="text-gray-300" />
+          <div className="text-[10px] font-bold text-black flex items-center gap-1.5 uppercase tracking-wider">
+            <FontAwesomeIcon icon={faCar} className="text-black" />
             {parking.placesDisponibles || '12'} places
           </div>
-          <div className="text-[10px] font-bold text-gray-400 flex items-center gap-1.5 uppercase tracking-wider">
-            <FontAwesomeIcon icon={faClock} className="text-gray-300" />
+          <div className="text-[10px] font-bold text-black flex items-center gap-1.5 uppercase tracking-wider">
+            <FontAwesomeIcon icon={faClock} className="text-black" />
             24h/7j
           </div>
         </div>
@@ -523,7 +523,7 @@ function VehicleCard({ vehicle, viewMode = 'grid' }: { vehicle: any, viewMode?: 
         
         <button 
           onClick={toggleFavorite}
-          className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all z-10 shadow-sm ${isFav ? 'bg-rose-50 text-rose-500' : 'bg-gray-50 text-gray-400 hover:text-rose-400 hover:bg-rose-50'}`}
+          className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all z-10 shadow-sm ${isFav ? 'bg-rose-50 text-rose-500' : 'bg-gray-50 text-black hover:text-rose-400 hover:bg-rose-50'}`}
           title={isFav ? "Retirer des favoris" : "Ajouter aux favoris"}
         >
           <FontAwesomeIcon icon={faStar} className={isFav ? 'text-rose-500' : ''} />
@@ -531,10 +531,10 @@ function VehicleCard({ vehicle, viewMode = 'grid' }: { vehicle: any, viewMode?: 
         
         <div className="flex-1 flex flex-col md:flex-row md:items-center justify-between gap-4 pr-8">
           <div className="space-y-1">
-            <h3 className="font-bold text-gray-900 group-hover:text-orange-500 transition-colors">
+            <h3 className="font-bold text-black group-hover:text-orange-500 transition-colors">
               {vehicle.marque || vehicle.marqueRef?.name} {vehicle.model || vehicle.modele}
             </h3>
-            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest flex items-center gap-1.5">
+            <p className="text-[10px] text-black font-bold uppercase tracking-widest flex items-center gap-1.5">
                <FontAwesomeIcon icon={faParking} className="text-orange-500 text-[8px]" />
                {vehicle.parking?.nom || vehicle.parking?.name || 'Vendeur particulier'}
             </p>
@@ -542,16 +542,16 @@ function VehicleCard({ vehicle, viewMode = 'grid' }: { vehicle: any, viewMode?: 
 
           <div className="hidden lg:flex items-center gap-6">
             <div className="flex flex-col">
-               <span className="text-[8px] font-black text-gray-300 uppercase tracking-widest">Carburant</span>
-               <div className="flex items-center gap-2 text-xs text-gray-500">
-                  <FontAwesomeIcon icon={faGasPump} className="text-gray-300" />
+               <span className="text-[8px] font-black text-black uppercase tracking-widest">Carburant</span>
+               <div className="flex items-center gap-2 text-xs text-black">
+                  <FontAwesomeIcon icon={faGasPump} className="text-black" />
                   {vehicle.fuelType || vehicle.carburant || '---'}
                </div>
             </div>
             <div className="flex flex-col">
-               <span className="text-[8px] font-black text-gray-300 uppercase tracking-widest">Boîte</span>
-               <div className="flex items-center gap-2 text-xs text-gray-500">
-                  <FontAwesomeIcon icon={faCogs} className="text-gray-300" />
+               <span className="text-[8px] font-black text-black uppercase tracking-widest">Boîte</span>
+               <div className="flex items-center gap-2 text-xs text-black">
+                  <FontAwesomeIcon icon={faCogs} className="text-black" />
                   {vehicle.transmission || vehicle.boite || '---'}
                </div>
             </div>
@@ -559,8 +559,8 @@ function VehicleCard({ vehicle, viewMode = 'grid' }: { vehicle: any, viewMode?: 
 
           <div className="flex items-center gap-6">
             <div className="text-right">
-              <p className="text-sm font-black text-gray-900">{(vehicle.prix || vehicle.prixJour || 0).toLocaleString()} F</p>
-              <p className="text-[10px] text-gray-400 uppercase font-bold tracking-widest">{vehicle.forRent ? 'Par jour' : 'Prix total'}</p>
+              <p className="text-sm font-black text-black">{(vehicle.prix || vehicle.prixJour || 0).toLocaleString()} F</p>
+              <p className="text-[10px] text-black uppercase font-bold tracking-widest">{vehicle.forRent ? 'Par jour' : 'Prix total'}</p>
             </div>
             <Link 
               href={`/dashboard/client/search/${vehicle.id}`}
@@ -583,7 +583,7 @@ function VehicleCard({ vehicle, viewMode = 'grid' }: { vehicle: any, viewMode?: 
           alt={`${vehicle.marque} ${vehicle.model}`}
           onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
         />
-        <div className="absolute top-3 left-3 px-3 py-1 bg-white/90 backdrop-blur rounded-full text-[10px] font-black text-gray-900 shadow-sm uppercase tracking-widest">
+        <div className="absolute top-3 left-3 px-3 py-1 bg-white/90 backdrop-blur rounded-full text-[10px] font-black text-black shadow-sm uppercase tracking-widest">
           {vehicle.forRent ? 'À Louer' : 'À Vendre'}
         </div>
         <div className="absolute top-3 right-3 px-3 py-1 bg-orange-500 rounded-full text-xs font-bold text-white shadow-sm">
@@ -595,7 +595,7 @@ function VehicleCard({ vehicle, viewMode = 'grid' }: { vehicle: any, viewMode?: 
         <div>
           <div className="flex justify-between items-start gap-2">
             <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-lg text-gray-900 leading-tight truncate group-hover:text-orange-500 transition-colors">
+              <h3 className="font-bold text-lg text-black leading-tight truncate group-hover:text-orange-500 transition-colors">
                 {vehicle.marque || vehicle.marqueRef?.name} {vehicle.model || vehicle.modele}
               </h3>
               {vehicle.stats?.reservations > 0 && (
@@ -606,25 +606,25 @@ function VehicleCard({ vehicle, viewMode = 'grid' }: { vehicle: any, viewMode?: 
             </div>
             <button 
               onClick={toggleFavorite}
-              className={`w-8 h-8 rounded-full flex items-center justify-center transition-all flex-shrink-0 ${isFav ? 'bg-rose-50 text-rose-500 shadow-sm' : 'bg-gray-50 text-gray-400 hover:text-rose-500 hover:bg-rose-50'}`}
+              className={`w-8 h-8 rounded-full flex items-center justify-center transition-all flex-shrink-0 ${isFav ? 'bg-rose-50 text-rose-500 shadow-sm' : 'bg-gray-50 text-black hover:text-rose-500 hover:bg-rose-50'}`}
               title={isFav ? "Retirer des favoris" : "Ajouter aux favoris"}
             >
               <FontAwesomeIcon icon={faStar} />
             </button>
           </div>
-          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1 flex items-center gap-1.5">
+          <p className="text-[10px] text-black font-bold uppercase tracking-widest mt-1 flex items-center gap-1.5">
             <FontAwesomeIcon icon={faParking} className="text-orange-500 text-[8px]" />
             {vehicle.parking?.nom || vehicle.parking?.name || 'Vendeur particulier'}
           </p>
         </div>
 
         <div className="grid grid-cols-2 gap-3 py-3 border-y border-gray-50">
-          <div className="flex items-center gap-2 text-xs font-medium text-gray-600">
-            <FontAwesomeIcon icon={faGasPump} className="text-gray-400 w-3" />
+          <div className="flex items-center gap-2 text-xs font-medium text-black">
+            <FontAwesomeIcon icon={faGasPump} className="text-black w-3" />
             {vehicle.fuelType || vehicle.carburant || '---'}
           </div>
-          <div className="flex items-center gap-2 text-xs font-medium text-gray-600">
-            <FontAwesomeIcon icon={faCogs} className="text-gray-400 w-3" />
+          <div className="flex items-center gap-2 text-xs font-medium text-black">
+            <FontAwesomeIcon icon={faCogs} className="text-black w-3" />
             {vehicle.transmission || vehicle.boite || '---'}
           </div>
         </div>
@@ -634,7 +634,7 @@ function VehicleCard({ vehicle, viewMode = 'grid' }: { vehicle: any, viewMode?: 
             <FontAwesomeIcon icon={faStar} className="mr-1" />
             4.8
           </div>
-          <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-50 px-2 py-0.5 rounded-lg">
+          <div className="text-[10px] font-bold text-black uppercase tracking-widest bg-gray-50 px-2 py-0.5 rounded-lg">
             {vehicle.annee || vehicle.year || '2023'}
           </div>
         </div>

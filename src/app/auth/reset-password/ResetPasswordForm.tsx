@@ -108,20 +108,20 @@ export default function ResetPasswordPage() {
           <div className="mx-auto w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mb-4">
             <FontAwesomeIcon icon={faLock} className="text-3xl text-orange-500" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-800">Réinitialiser le mot de passe</h1>
-          <p className="text-gray-600 mt-2">{message}</p>
+          <h1 className="text-2xl font-bold text-black">Réinitialiser le mot de passe</h1>
+          <p className="text-black mt-2">{message}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-            <input type="email" value={email} disabled className="w-full p-4 bg-gray-100 rounded-2xl text-gray-500" />
+            <label className="block text-sm font-medium text-black mb-2">Email</label>
+            <input type="email" value={email} disabled className="w-full p-4 bg-gray-100 rounded-2xl text-black" />
           </div>
 
           {/* OTP + Timer expiration */}
           <div>
             <div className="flex justify-between items-center mb-2">
-              <label className="block text-sm font-medium text-gray-700">Code OTP</label>
+              <label className="block text-sm font-medium text-black">Code OTP</label>
               <div className="flex items-center gap-1.5 text-sm text-orange-600 font-medium">
                 <FontAwesomeIcon icon={faClock} />
                 Expire dans {formatTime(otpTimeLeft)}
@@ -157,7 +157,7 @@ export default function ResetPasswordPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Nouveau mot de passe</label>
+            <label className="block text-sm font-medium text-black mb-2">Nouveau mot de passe</label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
@@ -171,7 +171,7 @@ export default function ResetPasswordPage() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-4 top-1/2 text-black hover:text-black"
               >
                 <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
               </button>
@@ -179,7 +179,7 @@ export default function ResetPasswordPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Confirmer le mot de passe</label>
+            <label className="block text-sm font-medium text-black mb-2">Confirmer le mot de passe</label>
             <input
               type="password"
               value={confirmPassword}

@@ -1,8 +1,10 @@
-/* global.css - Version corrigée pour Tailwind CSS v4 */
-@import "tailwindcss";
+/* global.css - Tailwind directives + CSS variables */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* Désactivation complète du mode sombre */
-@theme {
+/* Styles de base + variables CSS */
+:root {
   --color-background: #ffffff;
   --color-foreground: #171717;
   --font-sans: ui-sans-serif, system-ui, sans-serif, "Segoe UI", Roboto, "Helvetica Neue", Arial;
@@ -14,11 +16,7 @@
   --color-orange-200: #FFD9AD;
   --color-orange-100: #FFF2E6;
   --color-orange-50: #FFF9F0;
-}
-
-/* Styles de base */
-:root {
-  color-scheme: light only;
+  color-scheme: light;
 }
 
 body {

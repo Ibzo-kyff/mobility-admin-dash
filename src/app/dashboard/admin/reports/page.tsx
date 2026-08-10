@@ -63,7 +63,7 @@ export default function page() {
 //   }
 
 //   if (!summary) {
-//     return <div className="p-10 text-center text-gray-500">Impossible de charger les rapports</div>;
+//     return <div className="p-10 text-center text-black">Impossible de charger les rapports</div>;
 //   }
 
 //   const pieData = summary.topActions.map((item, index) => ({
@@ -76,8 +76,8 @@ export default function page() {
 //     <div className="p-8 max-w-[1400px] mx-auto">
 //       <div className="flex justify-between items-center mb-10">
 //         <div>
-//           <h1 className="text-4xl font-bold text-gray-900">Rapports & Statistiques Serveur</h1>
-//           <p className="text-gray-600 mt-2">Vue d'ensemble de l'activité sur la plateforme</p>
+//           <h1 className="text-4xl font-bold text-black">Rapports & Statistiques Serveur</h1>
+//           <p className="text-black mt-2">Vue d'ensemble de l'activité sur la plateforme</p>
 //         </div>
 //         <button
 //           onClick={handleRefresh}
@@ -91,15 +91,15 @@ export default function page() {
 //       {/* KPIs */}
 //       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
 //         <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
-//           <p className="text-gray-500 text-sm">Total des logs</p>
-//           <p className="text-5xl font-bold text-gray-900 mt-4">{summary.totalLogs.toLocaleString()}</p>
+//           <p className="text-black text-sm">Total des logs</p>
+//           <p className="text-5xl font-bold text-black mt-4">{summary.totalLogs.toLocaleString()}</p>
 //         </div>
 
 //         <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
 //           <div className="flex items-center gap-3">
 //             <FontAwesomeIcon icon={faCalendarDay} className="text-3xl text-orange-500" />
 //             <div>
-//               <p className="text-gray-500 text-sm">Aujourd'hui</p>
+//               <p className="text-black text-sm">Aujourd'hui</p>
 //               <p className="text-4xl font-bold text-orange-600">{summary.logsToday}</p>
 //             </div>
 //           </div>
@@ -109,7 +109,7 @@ export default function page() {
 //           <div className="flex items-center gap-3">
 //             <FontAwesomeIcon icon={faCalendarWeek} className="text-3xl text-blue-500" />
 //             <div>
-//               <p className="text-gray-500 text-sm">Cette semaine</p>
+//               <p className="text-black text-sm">Cette semaine</p>
 //               <p className="text-4xl font-bold text-blue-600">{summary.logsThisWeek}</p>
 //             </div>
 //           </div>
@@ -119,7 +119,7 @@ export default function page() {
 //           <div className="flex items-center gap-3">
 //             <FontAwesomeIcon icon={faCalendarAlt} className="text-3xl text-emerald-500" />
 //             <div>
-//               <p className="text-gray-500 text-sm">Ce mois-ci</p>
+//               <p className="text-black text-sm">Ce mois-ci</p>
 //               <p className="text-4xl font-bold text-emerald-600">{summary.logsThisMonth}</p>
 //             </div>
 //           </div>

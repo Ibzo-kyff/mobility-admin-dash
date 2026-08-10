@@ -54,9 +54,9 @@ export default function NotFound() {
           </div>
         </div>
         
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">Page non trouvée</h1>
+        <h1 className="text-3xl font-bold text-black mb-4">Page non trouvée</h1>
         
-        <p className="text-gray-600 mb-8">
+        <p className="text-black mb-8">
           Désolé, la page que vous recherchez n'existe pas ou a été déplacée.
         </p>
 
@@ -69,7 +69,7 @@ export default function NotFound() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <button
             onClick={() => window.history.back()}
-            className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
+            className="px-6 py-3 bg-gray-100 text-black rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
           >
             <FontAwesomeIcon icon={faArrowLeft} />
             Page précédente
@@ -86,7 +86,7 @@ export default function NotFound() {
 
         {!isAuthenticated && (
           <div className="mt-8 pt-6 border-t border-gray-200">
-            <p className="text-gray-600">
+            <p className="text-black">
               Vous avez un compte ?{' '}
               <Link href="/auth/login" className="text-orange-600 hover:text-orange-700 font-medium">
                 Se connecter

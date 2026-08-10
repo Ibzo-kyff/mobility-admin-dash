@@ -40,7 +40,7 @@ export default function MonthlyReservationsChart({ reservations }: Props) {
     <div className="bg-white rounded-lg shadow-sm p-6 h-full flex flex-col">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-semibold">Évolution des réservations</h2>
-        <div className="flex items-center gap-2 text-sm text-gray-600">
+        <div className="flex items-center gap-2 text-sm text-black">
           <FontAwesomeIcon icon={faChartLine} className="text-orange-500" />
           <span>12 derniers mois</span>
         </div>
@@ -55,8 +55,8 @@ export default function MonthlyReservationsChart({ reservations }: Props) {
                 style={{ height: `${(item.count / maxCount) * 220}px` }}
               />
             </div>
-            <span className="mt-3 text-xs font-medium text-gray-600">{item.month}</span>
-            <span className="text-sm font-semibold text-gray-800 mt-1">{item.count}</span>
+            <span className="mt-3 text-xs font-medium text-black">{item.month}</span>
+            <span className="text-sm font-semibold text-black mt-1">{item.count}</span>
           </div>
         ))}
       </div>

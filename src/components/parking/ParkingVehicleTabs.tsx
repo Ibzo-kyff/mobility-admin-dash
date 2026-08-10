@@ -954,8 +954,8 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
       case 'APPROVED': return 'text-emerald-600 bg-emerald-50 border-emerald-100';
       case 'PENDING': return 'text-amber-600 bg-amber-50 border-amber-100';
 
-      case 'BLOCKED': return 'text-slate-600 bg-slate-50 border-slate-100';
-      default: return 'text-slate-400 bg-slate-50 border-slate-50';
+      case 'BLOCKED': return 'text-black bg-slate-50 border-slate-100';
+      default: return 'text-black bg-slate-50 border-slate-50';
     }
   };
 
@@ -965,7 +965,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
       {showDashboard && (
         <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-black text-slate-900 tracking-tight flex items-center gap-3">
+          <h2 className="text-xl font-black text-black tracking-tight flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-orange-500 text-white flex items-center justify-center shadow-lg shadow-orange-500/20">
               <FontAwesomeIcon icon={faCar} size="sm" />
             </div>
@@ -974,13 +974,13 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
           <div className="flex bg-slate-100 p-1 rounded-xl shadow-inner">
             <button
               onClick={() => setFleetGraphType('pie')}
-              className={`px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${fleetGraphType === 'pie' ? 'bg-white text-orange-500 shadow-sm' : 'text-slate-400'}`}
+              className={`px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${fleetGraphType === 'pie' ? 'bg-white text-orange-500 shadow-sm' : 'text-black'}`}
             >
               Distribution
             </button>
             <button
               onClick={() => setFleetGraphType('bar')}
-              className={`px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${fleetGraphType === 'bar' ? 'bg-white text-orange-500 shadow-sm' : 'text-slate-400'}`}
+              className={`px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${fleetGraphType === 'bar' ? 'bg-white text-orange-500 shadow-sm' : 'text-black'}`}
             >
               Activité
             </button>
@@ -1000,8 +1000,8 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                 <div className={`w-10 h-10 rounded-xl bg-${stat.color}-50 text-${stat.color}-500 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
                   <FontAwesomeIcon icon={stat.icon} />
                 </div>
-                <p className="text-slate-400 font-black text-[9px] uppercase tracking-widest mb-1">{stat.title}</p>
-                <h3 className="text-xl font-black text-slate-900">{stat.value}</h3>
+                <p className="text-black font-black text-[9px] uppercase tracking-widest mb-1">{stat.title}</p>
+                <h3 className="text-xl font-black text-black">{stat.value}</h3>
               </div>
             ))}
           </div>
@@ -1040,8 +1040,8 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
             
             {fleetGraphType === 'pie' && (
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span className="text-3xl font-black text-slate-900 leading-none">100%</span>
-                <span className="text-[10px] font-black uppercase text-slate-400 mt-1 tracking-widest">Actif</span>
+                <span className="text-3xl font-black text-black leading-none">100%</span>
+                <span className="text-[10px] font-black uppercase text-black mt-1 tracking-widest">Actif</span>
               </div>
             )}
           </div>
@@ -1052,13 +1052,13 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
       {/* Search and Filters */}
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
         <div className="relative w-full md:w-96">
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-black">
             <FontAwesomeIcon icon={faSearch} />
           </span>
           <input
             type="text"
             placeholder="Rechercher un véhicule..."
-            className="w-full pl-12 pr-4 py-3 bg-white border border-slate-100 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-slate-700 font-medium"
+            className="w-full pl-12 pr-4 py-3 bg-white border border-slate-100 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-black font-medium"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -1070,8 +1070,8 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                 key={tab}
                 onClick={() => setSaleRentTab(tab)}
                 className={`flex-1 md:px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${saleRentTab === tab
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-400 hover:text-slate-600'
+                  ? 'bg-white text-black shadow-sm'
+                  : 'text-black hover:text-black'
                   }`}
               >
                 {tab === 'all' ? 'Tous' : tab === 'sale' ? 'Vente' : 'Location'}
@@ -1081,7 +1081,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
 
           <button
             onClick={() => setShowAdvancedFilters(true)}
-            className="px-6 py-3 bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md transition-all flex items-center gap-3 text-slate-600 font-bold"
+            className="px-6 py-3 bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md transition-all flex items-center gap-3 text-black font-bold"
           >
             <FontAwesomeIcon icon={faFilter} className="text-orange-500" />
             <span className="hidden md:inline">Filtres</span>
@@ -1090,7 +1090,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
           <div className="relative flex-1 md:flex-initial">
             <select
               title="Filtrer par statut"
-              className="w-full md:w-48 pl-4 pr-10 py-3 bg-white border border-slate-100 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 appearance-none cursor-pointer font-bold text-slate-600"
+              className="w-full md:w-48 pl-4 pr-10 py-3 bg-white border border-slate-100 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 appearance-none cursor-pointer font-bold text-black"
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
             >
@@ -1100,7 +1100,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
 
               <option value="BLOCKED">Statut: Bloqué</option>
             </select>
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-black">
               <FontAwesomeIcon icon={faFilter} size="xs" />
             </div>
           </div>
@@ -1110,7 +1110,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
               onClick={() => setViewMode('grid')}
               className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${viewMode === 'grid'
                 ? 'bg-white text-orange-500 shadow-sm'
-                : 'text-slate-400 hover:text-slate-600'
+                : 'text-black hover:text-black'
                 }`}
               title="Vue grille"
             >
@@ -1120,7 +1120,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
               onClick={() => setViewMode('list')}
               className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${viewMode === 'list'
                 ? 'bg-white text-orange-500 shadow-sm'
-                : 'text-slate-400 hover:text-slate-600'
+                : 'text-black hover:text-black'
                 }`}
               title="Vue liste"
             >
@@ -1143,7 +1143,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
             onClick={() => setActiveQuickFilter(filter.id)}
             className={`whitespace-nowrap px-6 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest border transition-all ${activeQuickFilter === filter.id
               ? 'bg-orange-500 text-white border-orange-500 shadow-lg shadow-orange-500/20'
-              : 'bg-white text-slate-400 border-slate-100 hover:border-slate-300'
+              : 'bg-white text-black border-slate-100 hover:border-slate-300'
               }`}
           >
             {filter.label}
@@ -1153,7 +1153,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
 
       {/* Results Header */}
       <div className="flex justify-between items-center mb-4">
-        <p className="text-slate-500 font-bold text-sm">
+        <p className="text-black font-bold text-sm">
           {filteredVehicles.length} résultat{filteredVehicles.length > 1 ? 's' : ''} trouvé{filteredVehicles.length > 1 ? 's' : ''}
         </p>
         {(searchTerm || filterStatus !== 'ALL' || saleRentTab !== 'all' || activeQuickFilter !== 'all') && (
@@ -1196,7 +1196,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                         className="object-cover group-hover:scale-105 transition-transform duration-700"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-slate-200">
+                      <div className="w-full h-full flex items-center justify-center text-black">
                         <FontAwesomeIcon icon={faCar} size="3x" />
                       </div>
                     )}
@@ -1226,10 +1226,10 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                 <div className="p-6 pt-2 flex-1 flex flex-col">
                   <div className="flex justify-between items-start mb-4">
                     <div>
-                      <h3 className="text-2xl font-black text-slate-800 tracking-tight leading-tight group-hover:text-orange-600 transition-colors">
+                      <h3 className="text-2xl font-black text-black tracking-tight leading-tight group-hover:text-orange-600 transition-colors">
                         {vehicle.marque || vehicle.marqueRef?.name} {vehicle.model || vehicle.modele}
                       </h3>
-                      <p className="text-slate-400 font-bold text-sm uppercase tracking-widest mt-1">
+                      <p className="text-black font-bold text-sm uppercase tracking-widest mt-1">
                         {vehicle.annee || vehicle.year} • {vehicle.categorie || 'Standard'}
                       </p>
                     </div>
@@ -1237,24 +1237,24 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                       <p className="text-3xl font-black text-orange-600 leading-none">
                         {formatPrice(vehicle.prixJour || vehicle.prix || 0)}
                       </p>
-                      <p className="text-xs font-black text-slate-400 uppercase tracking-widest mt-1">/jour</p>
+                      <p className="text-xs font-black text-black uppercase tracking-widest mt-1">/jour</p>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-                    <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl text-xs font-bold text-slate-500">
+                    <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl text-xs font-bold text-black">
                       <FontAwesomeIcon icon={faGasPump} className="text-orange-500/50" />
                       <span className="truncate">{vehicle.fuelType || vehicle.carburant || 'N/A'}</span>
                     </div>
-                    <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl text-xs font-bold text-slate-500">
+                    <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl text-xs font-bold text-black">
                       <FontAwesomeIcon icon={faCogs} className="text-indigo-500/50" />
                       <span className="truncate">{formatTransmissionForDisplay(vehicle.transmission || vehicle.boite)}</span>
                     </div>
-                    <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl text-xs font-bold text-slate-500">
+                    <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl text-xs font-bold text-black">
                       <FontAwesomeIcon icon={faCalendarAlt} className="text-rose-500/50" />
                       <span className="truncate">{vehicle.annee || vehicle.year || 'N/A'}</span>
                     </div>
-                    <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl text-xs font-bold text-slate-500">
+                    <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl text-xs font-bold text-black">
                       <FontAwesomeIcon icon={faTachometerAlt} className="text-emerald-500/50" />
                       <span className="truncate">{formatMileage(vehicle.mileage || vehicle.kilometrage || 0)}</span>
                     </div>
@@ -1303,7 +1303,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                           </span>
                         </div>
                         {nextRes && (
-                          <div className="flex items-center gap-2 px-3 text-[10px] font-bold text-slate-400">
+                          <div className="flex items-center gap-2 px-3 text-[10px] font-bold text-black">
                             <FontAwesomeIcon icon={faClock} size="xs" />
                             <span>Prochaine: {new Date(nextRes.dateDebut).toLocaleDateString('fr-FR')}</span>
                           </div>
@@ -1313,10 +1313,10 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                   })()}
 
                   <div className="flex items-center gap-2 mb-6 px-1">
-                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-black">
                       <FontAwesomeIcon icon={faMapMarkerAlt} size="sm" />
                     </div>
-                    <p className="text-sm font-bold text-slate-500 truncate">
+                    <p className="text-sm font-bold text-black truncate">
                       {vehicle.parking?.name || 'Localisation non spécifiée'}
                     </p>
                   </div>
@@ -1324,7 +1324,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                   <div className="mt-auto flex gap-2">
                     <button
                       title="Voir les détails du véhicule"
-                      className="flex-1 py-3 bg-slate-50 hover:bg-orange-50 text-slate-600 hover:text-orange-600 rounded-2xl font-black text-sm uppercase tracking-widest transition-all"
+                      className="flex-1 py-3 bg-slate-50 hover:bg-orange-50 text-black hover:text-orange-600 rounded-2xl font-black text-sm uppercase tracking-widest transition-all"
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectedVehicle(vehicle);
@@ -1373,7 +1373,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                         className="object-cover group-hover:scale-105 transition-transform duration-700"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-slate-200">
+                      <div className="w-full h-full flex items-center justify-center text-black">
                         <FontAwesomeIcon icon={faCar} size="2x" />
                       </div>
                     )}
@@ -1397,11 +1397,11 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                 <div className="flex-1 p-6 flex flex-col justify-center min-w-0">
                   <div className="flex flex-col lg:flex-row justify-between lg:items-start gap-4">
                     <div className="min-w-0">
-                      <h3 className="text-3xl font-black text-slate-800 tracking-tight group-hover:text-orange-600 transition-colors truncate">
+                      <h3 className="text-3xl font-black text-black tracking-tight group-hover:text-orange-600 transition-colors truncate">
                         {vehicle.marque || vehicle.marqueRef?.name} {vehicle.model || vehicle.modele}
                       </h3>
                       <div className="flex items-center gap-2 mt-1">
-                        <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">
+                        <p className="text-black font-bold text-sm uppercase tracking-widest">
                           {vehicle.annee || vehicle.year} • {vehicle.categorie || 'Standard'}
                         </p>
                         <span className={`inline-flex items-center px-3.5 py-1.5 rounded-full text-[11px] font-black uppercase border ${getStatusColor(vehicle.status)} bg-white`}>
@@ -1414,30 +1414,30 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                       <p className="text-3xl font-black text-orange-600 leading-none">
                         {formatPrice(vehicle.prixJour || vehicle.prix || 0)}
                       </p>
-                      <p className="text-xs font-black text-slate-400 uppercase tracking-widest mt-1">/jour</p>
+                      <p className="text-xs font-black text-black uppercase tracking-widest mt-1">/jour</p>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                    <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
+                    <div className="flex items-center gap-2 text-xs font-bold text-black">
                       <div className="w-6 h-6 rounded-lg bg-orange-50 flex items-center justify-center text-orange-500 shrink-0">
                         <FontAwesomeIcon icon={faGasPump} size="xs" />
                       </div>
                       <span className="truncate">{vehicle.fuelType || vehicle.carburant || 'N/A'}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
+                    <div className="flex items-center gap-2 text-xs font-bold text-black">
                       <div className="w-6 h-6 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-500 shrink-0">
                         <FontAwesomeIcon icon={faCogs} size="xs" />
                       </div>
                       <span className="truncate">{formatTransmissionForDisplay(vehicle.transmission || vehicle.boite)}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
+                    <div className="flex items-center gap-2 text-xs font-bold text-black">
                       <div className="w-6 h-6 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-500 shrink-0">
                         <FontAwesomeIcon icon={faTachometerAlt} size="xs" />
                       </div>
                       <span className="truncate">{formatMileage(vehicle.mileage || vehicle.kilometrage || 0)}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
+                    <div className="flex items-center gap-2 text-xs font-bold text-black">
                       <div className="w-6 h-6 rounded-lg bg-rose-50 flex items-center justify-center text-rose-500 shrink-0">
                         <FontAwesomeIcon icon={faMapMarkerAlt} size="xs" />
                       </div>
@@ -1461,7 +1461,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                     <div className="flex gap-2">
                       <button
                         title="Voir les détails du véhicule"
-                        className="px-6 py-2 bg-slate-50 hover:bg-orange-50 text-slate-600 hover:text-orange-600 rounded-xl font-black text-xs uppercase tracking-widest transition-all"
+                        className="px-6 py-2 bg-slate-50 hover:bg-orange-50 text-black hover:text-orange-600 rounded-xl font-black text-xs uppercase tracking-widest transition-all"
                         onClick={(e) => {
                           e.stopPropagation();
                           setSelectedVehicle(vehicle);
@@ -1493,7 +1493,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
       {filteredVehicles.length > 0 && (
         <div className="mt-8 px-6 py-4 bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-700 font-medium">
+            <span className="text-sm text-black font-medium">
               Affichage de <span className="font-bold">{(currentPage - 1) * itemsPerPage + 1}</span> à <span className="font-bold">{Math.min(currentPage * itemsPerPage, filteredVehicles.length)}</span> sur <span className="font-bold text-orange-600">{filteredVehicles.length}</span> véhicules
             </span>
             <select
@@ -1503,7 +1503,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                 setItemsPerPage(Number(e.target.value));
                 setCurrentPage(1);
               }}
-              className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm font-bold text-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500/20 cursor-pointer transition-all hover:bg-gray-100"
+              className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm font-bold text-black focus:outline-none focus:ring-2 focus:ring-orange-500/20 cursor-pointer transition-all hover:bg-gray-100"
             >
               <option value={6}>6 par page</option>
               <option value={12}>12 par page</option>
@@ -1520,13 +1520,13 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                 window.scrollTo({ top: 300, behavior: 'smooth' });
               }}
               disabled={currentPage === 1}
-              className="w-10 h-10 border border-gray-200 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-50 hover:text-orange-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              className="w-10 h-10 border border-gray-200 rounded-lg flex items-center justify-center text-black hover:bg-gray-50 hover:text-orange-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
               <FontAwesomeIcon icon={faChevronLeft} />
             </button>
 
             <div className="px-4 py-2 bg-gray-50 rounded-lg border border-gray-100">
-              <span className="text-sm font-bold text-gray-700">
+              <span className="text-sm font-bold text-black">
                 Page <span className="text-orange-600">{currentPage}</span> sur {Math.ceil(filteredVehicles.length / itemsPerPage) || 1}
               </span>
             </div>
@@ -1538,7 +1538,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                 window.scrollTo({ top: 300, behavior: 'smooth' });
               }}
               disabled={currentPage === Math.ceil(filteredVehicles.length / itemsPerPage) || filteredVehicles.length === 0}
-              className="w-10 h-10 border border-gray-200 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-50 hover:text-orange-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              className="w-10 h-10 border border-gray-200 rounded-lg flex items-center justify-center text-black hover:bg-gray-50 hover:text-orange-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
               <FontAwesomeIcon icon={faChevronRight} />
             </button>
@@ -1548,11 +1548,11 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
 
       {filteredVehicles.length === 0 && (
         <div className="py-24 text-center">
-          <div className="w-24 h-24 bg-slate-50 rounded-[2rem] flex items-center justify-center mx-auto mb-6 text-slate-300 shadow-inner">
+          <div className="w-24 h-24 bg-slate-50 rounded-[2rem] flex items-center justify-center mx-auto mb-6 text-black shadow-inner">
             <FontAwesomeIcon icon={faCar} size="2x" />
           </div>
-          <h3 className="text-2xl font-black text-slate-800 tracking-tight">Aucun véhicule</h3>
-          <p className="text-slate-400 font-bold mt-1">Nous n&apos;avons trouvé aucun véhicule correspondant à votre recherche.</p>
+          <h3 className="text-2xl font-black text-black tracking-tight">Aucun véhicule</h3>
+          <p className="text-black font-bold mt-1">Nous n&apos;avons trouvé aucun véhicule correspondant à votre recherche.</p>
           <button
             onClick={() => {
               setSearchTerm('');
@@ -1583,11 +1583,11 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
         <div className="fixed inset-0 z-[100] flex items-center justify-end animate-fadeIn bg-slate-900/40 backdrop-blur-sm">
           <div className="w-full max-w-sm h-full bg-white shadow-2xl animate-slideLeft flex flex-col">
             <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-              <h3 className="text-2xl font-black text-slate-900 tracking-tight">Filtres Avancés</h3>
+              <h3 className="text-2xl font-black text-black tracking-tight">Filtres Avancés</h3>
               <button
                 title="Fermer les filtres"
                 onClick={() => setShowAdvancedFilters(false)}
-                className="w-10 h-10 rounded-full bg-white border border-slate-100 text-slate-400 hover:text-slate-900 transition-all flex items-center justify-center shadow-sm"
+                className="w-10 h-10 rounded-full bg-white border border-slate-100 text-black hover:text-black transition-all flex items-center justify-center shadow-sm"
               >
                 <FontAwesomeIcon icon={faTimesCircle} />
               </button>
@@ -1595,7 +1595,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
 
             <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
               <div className="space-y-4">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                <label className="text-[10px] font-black text-black uppercase tracking-widest flex items-center gap-2">
                   <FontAwesomeIcon icon={faEuroSign} className="text-orange-500" />
                   Budget (FCFA)
                 </label>
@@ -1603,14 +1603,14 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                   <input
                     type="number"
                     placeholder="Min"
-                    className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:border-orange-500 font-bold text-slate-700 transition-all"
+                    className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:border-orange-500 font-bold text-black transition-all"
                     value={advancedFilters.minPrice}
                     onChange={(e) => setAdvancedFilters({ ...advancedFilters, minPrice: e.target.value })}
                   />
                   <input
                     type="number"
                     placeholder="Max"
-                    className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:border-orange-500 font-bold text-slate-700 transition-all"
+                    className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:border-orange-500 font-bold text-black transition-all"
                     value={advancedFilters.maxPrice}
                     onChange={(e) => setAdvancedFilters({ ...advancedFilters, maxPrice: e.target.value })}
                   />
@@ -1618,7 +1618,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
               </div>
 
               <div className="space-y-4">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                <label className="text-[10px] font-black text-black uppercase tracking-widest flex items-center gap-2">
                   <FontAwesomeIcon icon={faTachometerAlt} className="text-emerald-500" />
                   Kilométrage (km)
                 </label>
@@ -1626,14 +1626,14 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                   <input
                     type="number"
                     placeholder="Min"
-                    className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:border-orange-500 font-bold text-slate-700 transition-all"
+                    className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:border-orange-500 font-bold text-black transition-all"
                     value={advancedFilters.minMileage}
                     onChange={(e) => setAdvancedFilters({ ...advancedFilters, minMileage: e.target.value })}
                   />
                   <input
                     type="number"
                     placeholder="Max"
-                    className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:border-orange-500 font-bold text-slate-700 transition-all"
+                    className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:border-orange-500 font-bold text-black transition-all"
                     value={advancedFilters.maxMileage}
                     onChange={(e) => setAdvancedFilters({ ...advancedFilters, maxMileage: e.target.value })}
                   />
@@ -1641,7 +1641,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
               </div>
 
               <div className="space-y-4">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                <label className="text-[10px] font-black text-black uppercase tracking-widest flex items-center gap-2">
                   <FontAwesomeIcon icon={faCalendarAlt} className="text-indigo-500" />
                   Année
                 </label>
@@ -1649,14 +1649,14 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                   <input
                     type="number"
                     placeholder="1990"
-                    className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:border-orange-500 font-bold text-slate-700 transition-all"
+                    className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:border-orange-500 font-bold text-black transition-all"
                     value={advancedFilters.minYear}
                     onChange={(e) => setAdvancedFilters({ ...advancedFilters, minYear: e.target.value })}
                   />
                   <input
                     type="number"
                     placeholder="2025"
-                    className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:border-orange-500 font-bold text-slate-700 transition-all"
+                    className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:border-orange-500 font-bold text-black transition-all"
                     value={advancedFilters.maxYear}
                     onChange={(e) => setAdvancedFilters({ ...advancedFilters, maxYear: e.target.value })}
                   />
@@ -1664,7 +1664,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
               </div>
 
               <div className="space-y-4">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Garanties & Inclusions</label>
+                <label className="text-[10px] font-black text-black uppercase tracking-widest">Garanties & Inclusions</label>
                 <div className="space-y-3">
                   <label className="flex items-center gap-4 p-4 bg-slate-50 border border-slate-100 rounded-2xl cursor-pointer hover:bg-white hover:border-orange-100 transition-all group">
                     <input
@@ -1674,8 +1674,8 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                       onChange={(e) => setAdvancedFilters({ ...advancedFilters, withWarranty: e.target.checked })}
                     />
                     <div className="flex-1">
-                      <p className="text-sm font-bold text-slate-800">Avec garantie</p>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Véhicules sous garantie</p>
+                      <p className="text-sm font-bold text-black">Avec garantie</p>
+                      <p className="text-[10px] text-black font-bold uppercase tracking-tight">Véhicules sous garantie</p>
                     </div>
                   </label>
                   <label className="flex items-center gap-4 p-4 bg-slate-50 border border-slate-100 rounded-2xl cursor-pointer hover:bg-white hover:border-orange-100 transition-all group">
@@ -1686,16 +1686,16 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                       onChange={(e) => setAdvancedFilters({ ...advancedFilters, withInsurance: e.target.checked })}
                     />
                     <div className="flex-1">
-                      <p className="text-sm font-bold text-slate-800">Avec assurance</p>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Assurance incluse</p>
+                      <p className="text-sm font-bold text-black">Avec assurance</p>
+                      <p className="text-[10px] text-black font-bold uppercase tracking-tight">Assurance incluse</p>
                     </div>
                   </label>
                 </div>
               </div>
 
               <div className="space-y-4">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                  <FontAwesomeIcon icon={faCogs} className="text-slate-400" />
+                <label className="text-[10px] font-black text-black uppercase tracking-widest flex items-center gap-2">
+                  <FontAwesomeIcon icon={faCogs} className="text-black" />
                   Transmission
                 </label>
                 <div className="grid grid-cols-2 gap-3">
@@ -1705,7 +1705,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                       onClick={() => setAdvancedFilters({ ...advancedFilters, transmission: advancedFilters.transmission === trans ? '' : trans })}
                       className={`px-4 py-3 rounded-xl border text-[10px] font-black uppercase tracking-widest transition-all ${advancedFilters.transmission === trans
                         ? 'bg-slate-900 text-white border-slate-900 shadow-lg'
-                        : 'bg-white text-slate-400 border-slate-100 hover:border-slate-300'
+                        : 'bg-white text-black border-slate-100 hover:border-slate-300'
                         }`}
                     >
                       {trans === 'MANUELLE' ? 'Manuelle' : 'Auto'}
@@ -1728,7 +1728,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                   maxYear: '',
                   transmission: '',
                 })}
-                className="flex-1 py-4 bg-white border border-slate-200 text-slate-400 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:text-slate-900 transition-all active:scale-95"
+                className="flex-1 py-4 bg-white border border-slate-200 text-black rounded-2xl font-black text-[10px] uppercase tracking-widest hover:text-black transition-all active:scale-95"
               >
                 Réinitialiser
               </button>
@@ -1760,7 +1760,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
               setSelectedVehicle(null);
               setActiveTab('list');
             }}
-            className="group flex items-center gap-3 text-slate-400 hover:text-orange-500 font-black text-xs uppercase tracking-[0.2em] transition-all"
+            className="group flex items-center gap-3 text-black hover:text-orange-500 font-black text-xs uppercase tracking-[0.2em] transition-all"
           >
             <div className="w-10 h-10 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center group-hover:bg-orange-50 group-hover:border-orange-100 transition-all">
               <FontAwesomeIcon icon={faChevronLeft} size="xs" />
@@ -1846,7 +1846,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                 </>
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-slate-100">
-                  <FontAwesomeIcon icon={faCar} size="4x" className="text-slate-300" />
+                  <FontAwesomeIcon icon={faCar} size="4x" className="text-black" />
                 </div>
               )}
 
@@ -1891,10 +1891,10 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
           <div className="p-6">
             <div className="flex flex-col md:flex-row justify-between items-start gap-6 mb-8">
               <div>
-                <h1 className="text-3xl md:text-4xl font-black text-slate-900 leading-tight">
+                <h1 className="text-3xl md:text-4xl font-black text-black leading-tight">
                   {selectedVehicle.marque || selectedVehicle.marqueRef?.name} {selectedVehicle.model || selectedVehicle.modele}
                 </h1>
-                <div className="flex flex-wrap items-center gap-3 mt-4 text-slate-400 text-[10px] font-bold uppercase tracking-widest">
+                <div className="flex flex-wrap items-center gap-3 mt-4 text-black text-[10px] font-bold uppercase tracking-widest">
                   <span className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
                     <FontAwesomeIcon icon={faCalendarAlt} className="text-orange-500/70" />
                     {selectedVehicle.annee || selectedVehicle.year || 'N/A'}
@@ -1916,7 +1916,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
             {/* Services & Inclusions cards */}
             {(selectedVehicle.garantie || selectedVehicle.assurance || selectedVehicle.chauffeur) && (
               <div className="mb-8">
-                <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                <h3 className="text-xs font-black text-black uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
                   <span className="w-8 h-[1px] bg-slate-200"></span>
                   Services & Inclusions
                 </h3>
@@ -1961,33 +1961,33 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
             {/* Description */}
             {selectedVehicle.description && (
               <div className="mb-6 p-4 bg-slate-50 rounded-xl">
-                <p className="text-slate-600">{selectedVehicle.description}</p>
+                <p className="text-black">{selectedVehicle.description}</p>
               </div>
             )}
 
             {/* Documents Checklist cards */}
             <div className="mb-8">
-              <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+              <h3 className="text-xs font-black text-black uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
                 <span className="w-8 h-[1px] bg-slate-200"></span>
                 Documents & Conformité
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 <div className={`p-4 rounded-[1.5rem] border ${selectedVehicle.carteGrise ? 'bg-emerald-50/50 border-emerald-100' : 'bg-slate-50 border-slate-100'} flex items-center md:flex-col md:text-center gap-4 md:gap-0 transition-all`}>
-                  <div className={`w-10 h-10 md:mb-3 shrink-0 rounded-xl flex items-center justify-center ${selectedVehicle.carteGrise ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-400'}`}>
+                  <div className={`w-10 h-10 md:mb-3 shrink-0 rounded-xl flex items-center justify-center ${selectedVehicle.carteGrise ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-black'}`}>
                     <FontAwesomeIcon icon={faFileContract} />
                   </div>
                   <div>
-                    <p className={`text-[10px] font-black uppercase tracking-widest ${selectedVehicle.carteGrise ? 'text-emerald-700' : 'text-slate-400'}`}>Carte Grise</p>
-                    <p className="text-[9px] font-bold mt-1 text-slate-500">{selectedVehicle.carteGrise ? 'Disponible' : 'Non spécifié'}</p>
+                    <p className={`text-[10px] font-black uppercase tracking-widest ${selectedVehicle.carteGrise ? 'text-emerald-700' : 'text-black'}`}>Carte Grise</p>
+                    <p className="text-[9px] font-bold mt-1 text-black">{selectedVehicle.carteGrise ? 'Disponible' : 'Non spécifié'}</p>
                   </div>
                 </div>
                 <div className={`p-4 rounded-[1.5rem] border ${selectedVehicle.vignette ? 'bg-emerald-50/50 border-emerald-100' : 'bg-slate-50 border-slate-100'} flex items-center md:flex-col md:text-center gap-4 md:gap-0 transition-all`}>
-                  <div className={`w-10 h-10 md:mb-3 shrink-0 rounded-xl flex items-center justify-center ${selectedVehicle.vignette ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-400'}`}>
+                  <div className={`w-10 h-10 md:mb-3 shrink-0 rounded-xl flex items-center justify-center ${selectedVehicle.vignette ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-black'}`}>
                     <FontAwesomeIcon icon={faCertificate} />
                   </div>
                   <div>
-                    <p className={`text-[10px] font-black uppercase tracking-widest ${selectedVehicle.vignette ? 'text-emerald-700' : 'text-slate-400'}`}>Vignette</p>
-                    <p className="text-[9px] font-bold mt-1 text-slate-500">{selectedVehicle.vignette ? 'Validé' : 'Non spécifié'}</p>
+                    <p className={`text-[10px] font-black uppercase tracking-widest ${selectedVehicle.vignette ? 'text-emerald-700' : 'text-black'}`}>Vignette</p>
+                    <p className="text-[9px] font-bold mt-1 text-black">{selectedVehicle.vignette ? 'Validé' : 'Non spécifié'}</p>
                   </div>
                 </div>
                 <div className="p-4 rounded-[1.5rem] border bg-emerald-50/50 border-emerald-100 flex items-center md:flex-col md:text-center gap-4 md:gap-0">
@@ -1996,7 +1996,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                   </div>
                   <div>
                     <p className="text-[10px] font-black text-emerald-700 uppercase tracking-widest">Contrôle T.</p>
-                    <p className="text-[9px] font-bold mt-1 text-slate-500">Conforme</p>
+                    <p className="text-[9px] font-bold mt-1 text-black">Conforme</p>
                   </div>
                 </div>
               </div>
@@ -2024,7 +2024,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
 
             {/* Fiche Technique en Cards */}
             <div className="mb-8">
-              <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+              <h3 className="text-xs font-black text-black uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
                 <span className="w-8 h-[1px] bg-slate-200"></span>
                 Caractéristiques
               </h3>
@@ -2040,8 +2040,8 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                       <FontAwesomeIcon icon={spec.icon} className="text-xl" />
                     </div>
                     <div>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{spec.label}</p>
-                      <p className="text-base font-black text-slate-900">{spec.value}</p>
+                      <p className="text-[10px] font-black text-black uppercase tracking-widest mb-1">{spec.label}</p>
+                      <p className="text-base font-black text-black">{spec.value}</p>
                     </div>
                   </div>
                 ))}
@@ -2052,7 +2052,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
 
         {/* Management Action Bar */}
         <div className="bg-white rounded-2xl p-6 shadow-md border border-slate-100">
-          <h3 className="text-lg font-black text-slate-800 mb-6 flex items-center gap-2">
+          <h3 className="text-lg font-black text-black mb-6 flex items-center gap-2">
             <FontAwesomeIcon icon={faShieldAlt} className="text-orange-500" />
             Gestion du véhicule
           </h3>
@@ -2078,18 +2078,18 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
         {/* Statistiques */}
         {selectedVehicle.stats && (
           <div className="bg-white rounded-2xl p-6 shadow-md border border-slate-100">
-            <h3 className="text-lg font-black text-slate-800 mb-4 flex items-center gap-2">
+            <h3 className="text-lg font-black text-black mb-4 flex items-center gap-2">
               <FontAwesomeIcon icon={faChartBar} className="text-orange-500" />
               Statistiques
             </h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center">
                 <p className="text-2xl font-black text-orange-600">{selectedVehicle.stats.vues || 0}</p>
-                <p className="text-xs font-bold text-slate-500">Vues</p>
+                <p className="text-xs font-bold text-black">Vues</p>
               </div>
               <div className="text-center">
                 <p className="text-2xl font-black text-emerald-600">{selectedVehicle.stats.reservations || 0}</p>
-                <p className="text-xs font-bold text-slate-500">Réservations</p>
+                <p className="text-xs font-bold text-black">Réservations</p>
               </div>
             </div>
           </div>
@@ -2108,14 +2108,14 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
       <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center animate-fadeIn bg-slate-900/60 backdrop-blur-sm p-0 sm:p-4">
         <div className="w-full max-w-2xl bg-white rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl max-h-[95vh] sm:max-h-[90vh] flex flex-col">
           <div className="flex-shrink-0 bg-white p-6 border-b border-slate-100 flex justify-between items-center z-10">
-            <h2 className="text-xl sm:text-2xl font-black text-slate-900">Aperçu réservation</h2>
+            <h2 className="text-xl sm:text-2xl font-black text-black">Aperçu réservation</h2>
             <button
               title="Fermer"
               onClick={() => {
                 setModalVisible(false);
                 setReservationType(null);
               }}
-              className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center transition-all"
+              className="w-10 h-10 rounded-full bg-slate-100 text-black hover:bg-slate-200 flex items-center justify-center transition-all"
             >
               <FontAwesomeIcon icon={faTimes} />
             </button>
@@ -2124,13 +2124,13 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
           <div className="p-6 overflow-y-auto custom-scrollbar">
             {/* Type de réservation */}
             <div className="mb-8">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 block">Type de réservation</label>
+              <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] mb-4 block">Type de réservation</label>
               <div className="flex gap-4">
                 <button
                   onClick={() => selectReservationType('ACHAT')}
                   className={`flex-1 py-5 rounded-2xl border-2 font-black text-xs uppercase tracking-widest transition-all flex flex-col sm:flex-row items-center justify-center gap-3 ${reservationType === 'ACHAT'
                     ? 'bg-orange-500 text-white border-orange-500 shadow-lg shadow-orange-500/20'
-                    : 'border-slate-100 text-slate-500 hover:border-orange-200'
+                    : 'border-slate-100 text-black hover:border-orange-200'
                     }`}
                 >
                   <FontAwesomeIcon icon={faShoppingCart} className="text-lg" />
@@ -2140,7 +2140,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                   onClick={() => selectReservationType('LOCATION')}
                   className={`flex-1 py-5 rounded-2xl border-2 font-black text-xs uppercase tracking-widest transition-all flex flex-col sm:flex-row items-center justify-center gap-3 ${reservationType === 'LOCATION'
                     ? 'bg-orange-500 text-white border-orange-500 shadow-lg shadow-orange-500/20'
-                    : 'border-slate-100 text-slate-500 hover:border-orange-200'
+                    : 'border-slate-100 text-black hover:border-orange-200'
                     }`}
                 >
                   <FontAwesomeIcon icon={faCalendarCheck} className="text-lg" />
@@ -2153,11 +2153,11 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
               <>
                 {/* Dates de location */}
                 <div className="mb-6">
-                  <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3 block">Dates de location</label>
+                  <label className="text-xs font-black text-black uppercase tracking-widest mb-3 block">Dates de location</label>
 
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <div>
-                      <label className="text-[10px] font-bold text-slate-500 mb-2 block uppercase tracking-widest">Date de début</label>
+                      <label className="text-[10px] font-bold text-black mb-2 block uppercase tracking-widest">Date de début</label>
                       <input
                         title="Date de début"
                         type="datetime-local"
@@ -2167,7 +2167,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                       />
                     </div>
                     <div>
-                      <label className="text-[10px] font-bold text-slate-500 mb-2 block uppercase tracking-widest">Date de fin</label>
+                      <label className="text-[10px] font-bold text-black mb-2 block uppercase tracking-widest">Date de fin</label>
                       <input
                         title="Date de fin"
                         type="datetime-local"
@@ -2188,7 +2188,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
 
                 {/* Motif de location */}
                 <div className="mb-6">
-                  <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3 block">Motif de location</label>
+                  <label className="text-xs font-black text-black uppercase tracking-widest mb-3 block">Motif de location</label>
                   <div className="grid grid-cols-2 gap-3">
                     {MOTIFS_LOCATION.map((motif) => (
                       <button
@@ -2199,7 +2199,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                         }}
                         className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${selectedMotif === motif.id
                           ? 'bg-orange-500 text-white border-orange-500'
-                          : 'border-slate-200 text-slate-500 hover:border-orange-200'
+                          : 'border-slate-200 text-black hover:border-orange-200'
                           }`}
                       >
                         <FontAwesomeIcon icon={motif.icon} />
@@ -2221,7 +2221,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
 
                 {/* Localisation */}
                 <div className="mb-8">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 block">Localisation</label>
+                  <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] mb-4 block">Localisation</label>
                   <div className="flex flex-col sm:flex-row gap-4">
                     {LOCALISATIONS.map((loc) => (
                       <button
@@ -2229,7 +2229,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                         onClick={() => setSelectedLocalisation(loc.id)}
                         className={`flex-1 py-5 rounded-2xl border-2 font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-3 ${selectedLocalisation === loc.id
                           ? 'bg-orange-500 text-white border-orange-500 shadow-lg shadow-orange-500/20'
-                          : 'border-slate-100 text-slate-500 hover:border-orange-200'
+                          : 'border-slate-100 text-black hover:border-orange-200'
                           }`}
                       >
                         <FontAwesomeIcon icon={faLocationDot} />
@@ -2249,12 +2249,12 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                       onChange={(e) => setConditionsAccepted(e.target.checked)}
                       className="mt-1 w-5 h-5 accent-orange-500"
                     />
-                    <span className="text-sm font-bold text-slate-700">
+                    <span className="text-sm font-bold text-black">
                       J&apos;accepte les conditions générales de location
                     </span>
                   </label>
 
-                  <div className="mt-4 p-4 bg-slate-50 rounded-xl text-sm text-slate-600 space-y-2">
+                  <div className="mt-4 p-4 bg-slate-50 rounded-xl text-sm text-black space-y-2">
                     <p className="flex items-center gap-2">
                       <FontAwesomeIcon icon={faCheckCircle} className="text-emerald-500" size="xs" />
                       Le client prend en charge les frais d&apos;essence
@@ -2294,7 +2294,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                   setModalVisible(false);
                   setReservationType(null);
                 }}
-                className="flex-1 py-4 bg-slate-100 text-slate-600 rounded-xl font-black text-sm uppercase tracking-widest hover:bg-slate-200 transition-all"
+                className="flex-1 py-4 bg-slate-100 text-black rounded-xl font-black text-sm uppercase tracking-widest hover:bg-slate-200 transition-all"
               >
                 Annuler
               </button>
@@ -2302,7 +2302,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                 onClick={confirmReservation}
                 disabled={!reservationType || (reservationType === 'LOCATION' && (!selectedMotif || !selectedLocalisation || !conditionsAccepted))}
                 className={`flex-1 py-4 rounded-xl font-black text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-3 ${!reservationType || (reservationType === 'LOCATION' && (!selectedMotif || !selectedLocalisation || !conditionsAccepted))
-                  ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                  ? 'bg-slate-300 text-black cursor-not-allowed'
                   : 'bg-orange-500 text-white hover:bg-orange-600'
                   }`}
               >
@@ -2324,14 +2324,14 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
       <div className="fixed inset-0 z-[200] flex items-center justify-center animate-fadeIn bg-slate-900/60 backdrop-blur-sm p-4">
         <div className="w-full max-w-md bg-white rounded-[2.5rem] shadow-2xl">
           <div className="p-6 border-b border-slate-100 flex justify-between items-center">
-            <h2 className="text-2xl font-black text-slate-900">Paiement</h2>
+            <h2 className="text-2xl font-black text-black">Paiement</h2>
             <button
               title="Fermer"
               onClick={() => {
                 setModalPayVisible(false);
                 setCurrentReservation(null);
               }}
-              className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center transition-all"
+              className="w-10 h-10 rounded-full bg-slate-100 text-black hover:bg-slate-200 flex items-center justify-center transition-all"
             >
               <FontAwesomeIcon icon={faTimes} />
             </button>
@@ -2340,36 +2340,36 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
           <div className="p-6">
             {/* Récapitulatif */}
             <div className="mb-6 p-4 bg-slate-50 rounded-xl">
-              <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Récapitulatif</p>
+              <p className="text-xs font-black text-black uppercase tracking-widest mb-3">Récapitulatif</p>
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-sm text-slate-600">Véhicule</span>
-                  <span className="text-sm font-black text-slate-900">
+                  <span className="text-sm text-black">Véhicule</span>
+                  <span className="text-sm font-black text-black">
                     {selectedVehicle?.marque} {selectedVehicle?.model}
                   </span>
                 </div>
                 {currentReservation.type === 'LOCATION' && (
                   <>
                     <div className="flex justify-between">
-                      <span className="text-sm text-slate-600">Dates</span>
-                      <span className="text-sm font-black text-slate-900">
+                      <span className="text-sm text-black">Dates</span>
+                      <span className="text-sm font-black text-black">
                         {new Date(currentReservation.dateDebut).toLocaleDateString('fr-FR')} - {new Date(currentReservation.dateFin).toLocaleDateString('fr-FR')}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm text-slate-600">Durée</span>
-                      <span className="text-sm font-black text-slate-900">{selectedDays} jour(s)</span>
+                      <span className="text-sm text-black">Durée</span>
+                      <span className="text-sm font-black text-black">{selectedDays} jour(s)</span>
                     </div>
                   </>
                 )}
                 <div className="flex justify-between pt-2 border-t border-slate-200">
-                  <span className="text-base font-black text-slate-900">Total</span>
+                  <span className="text-base font-black text-black">Total</span>
                   <span className="text-xl font-black text-orange-600">{formatPrice(currentReservation.montant)}</span>
                 </div>
               </div>
             </div>
 
-            <p className="text-center text-xs font-bold text-slate-500 mb-4">
+            <p className="text-center text-xs font-bold text-black mb-4">
               Sélectionnez votre mode de paiement
             </p>
 
@@ -2384,8 +2384,8 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                   <FontAwesomeIcon icon={faMoneyBillWave} size="lg" />
                 </div>
                 <div className="flex-1 text-left">
-                  <p className="font-black text-slate-900">Espèces</p>
-                  <p className="text-xs text-slate-500">Paiement à la remise</p>
+                  <p className="font-black text-black">Espèces</p>
+                  <p className="text-xs text-black">Paiement à la remise</p>
                 </div>
                 {isProcessingPayment ? (
                   <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
@@ -2395,32 +2395,32 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
               </button>
 
               <div className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl flex items-center gap-4 opacity-60 cursor-not-allowed">
-                <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-black">
                   <FontAwesomeIcon icon={faMobile} size="lg" />
                 </div>
                 <div className="flex-1 text-left">
-                  <p className="font-black text-slate-900">Orange Money</p>
-                  <p className="text-xs text-slate-500">Bientôt disponible</p>
+                  <p className="font-black text-black">Orange Money</p>
+                  <p className="text-xs text-black">Bientôt disponible</p>
                 </div>
-                <FontAwesomeIcon icon={faLock} className="text-slate-400" />
+                <FontAwesomeIcon icon={faLock} className="text-black" />
               </div>
 
               <div className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl flex items-center gap-4 opacity-60 cursor-not-allowed">
-                <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-black">
                   <FontAwesomeIcon icon={faWaveSquare} size="lg" />
                 </div>
                 <div className="flex-1 text-left">
-                  <p className="font-black text-slate-900">Wave</p>
-                  <p className="text-xs text-slate-500">Bientôt disponible</p>
+                  <p className="font-black text-black">Wave</p>
+                  <p className="text-xs text-black">Bientôt disponible</p>
                 </div>
-                <FontAwesomeIcon icon={faLock} className="text-slate-400" />
+                <FontAwesomeIcon icon={faLock} className="text-black" />
               </div>
             </div>
 
             {isProcessingPayment && (
               <div className="flex items-center justify-center gap-2 mt-4">
                 <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
-                <span className="text-sm text-slate-600">Traitement en cours...</span>
+                <span className="text-sm text-black">Traitement en cours...</span>
               </div>
             )}
           </div>
@@ -2433,13 +2433,13 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
     <div className="bg-white rounded-[4rem] p-12 shadow-2xl shadow-slate-200/50 border border-slate-50 animate-fadeIn">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-16">
         <div>
-          <h3 className="text-4xl font-black text-slate-900 tracking-tighter flex items-center gap-6">
+          <h3 className="text-4xl font-black text-black tracking-tighter flex items-center gap-6">
             <span className="w-16 h-16 rounded-[2rem] bg-orange-100 text-orange-500 flex items-center justify-center shadow-xl shadow-orange-500/10">
               <FontAwesomeIcon icon={faHistory} size="sm" />
             </span>
             Journal de Bord
           </h3>
-          <p className="text-slate-400 font-bold text-lg mt-3 ml-22">Historique des opérations</p>
+          <p className="text-black font-bold text-lg mt-3 ml-22">Historique des opérations</p>
         </div>
       </div>
 
@@ -2458,19 +2458,19 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
               <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{item.date}</span>
+                    <span className="text-[10px] font-black text-black uppercase tracking-widest">{item.date}</span>
                     <span className="w-1 h-1 rounded-full bg-slate-200"></span>
                     <span className="text-[10px] font-black text-orange-500 uppercase tracking-widest">{item.time}</span>
                   </div>
-                  <h4 className="text-2xl font-black text-slate-900 uppercase tracking-tighter">{item.event}</h4>
+                  <h4 className="text-2xl font-black text-black uppercase tracking-tighter">{item.event}</h4>
                 </div>
               </div>
-              <p className="text-lg font-medium text-slate-500 leading-relaxed mb-8 border-l-2 border-slate-200 pl-6">{item.desc}</p>
+              <p className="text-lg font-medium text-black leading-relaxed mb-8 border-l-2 border-slate-200 pl-6">{item.desc}</p>
               <div className="flex items-center gap-4 pt-8 border-t border-slate-100">
                 <div className="w-8 h-8 rounded-xl bg-white border border-slate-100 flex items-center justify-center text-[10px]">👤</div>
                 <div>
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Responsable</p>
-                  <p className="text-sm font-black text-slate-800 mt-1">{item.author}</p>
+                  <p className="text-[10px] font-black text-black uppercase tracking-widest leading-none">Responsable</p>
+                  <p className="text-sm font-black text-black mt-1">{item.author}</p>
                 </div>
               </div>
             </div>
@@ -2490,8 +2490,8 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
             <div className="w-14 h-14 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-lg mb-6 group-hover:rotate-6 transition-transform">
               <FontAwesomeIcon icon={faEye} />
             </div>
-            <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Vues</p>
-            <h4 className="text-3xl font-black text-slate-900 tracking-tighter leading-none mb-2">{selectedVehicle.stats?.vues || 0}</h4>
+            <p className="text-xs font-black text-black uppercase tracking-widest mb-2">Vues</p>
+            <h4 className="text-3xl font-black text-black tracking-tighter leading-none mb-2">{selectedVehicle.stats?.vues || 0}</h4>
             <span className="inline-flex px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-widest rounded-xl border border-emerald-100">
               Total
             </span>
@@ -2501,8 +2501,8 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
             <div className="w-14 h-14 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-lg mb-6 group-hover:rotate-6 transition-transform">
               <FontAwesomeIcon icon={faCalendarCheck} />
             </div>
-            <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Réservations</p>
-            <h4 className="text-3xl font-black text-slate-900 tracking-tighter leading-none mb-2">{selectedVehicle.stats?.reservations || 0}</h4>
+            <p className="text-xs font-black text-black uppercase tracking-widest mb-2">Réservations</p>
+            <h4 className="text-3xl font-black text-black tracking-tighter leading-none mb-2">{selectedVehicle.stats?.reservations || 0}</h4>
             <span className="inline-flex px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-widest rounded-xl border border-emerald-100">
               Total
             </span>
@@ -2518,7 +2518,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
     return (
       <div className="space-y-10 animate-fadeIn">
         <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl">
-          <h3 className="text-2xl font-black text-slate-900 mb-8 flex items-center gap-4">
+          <h3 className="text-2xl font-black text-black mb-8 flex items-center gap-4">
             <span className="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center">
               <FontAwesomeIcon icon={faShieldAlt} />
             </span>
@@ -2527,13 +2527,13 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className={`flex items-center gap-4 p-4 rounded-xl border ${selectedVehicle.carteGrise ? 'bg-emerald-50 border-emerald-200' : 'bg-slate-50 border-slate-200'}`}>
-              <div className={`w-12 h-12 rounded-xl ${selectedVehicle.carteGrise ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-200 text-slate-400'} flex items-center justify-center`}>
+              <div className={`w-12 h-12 rounded-xl ${selectedVehicle.carteGrise ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-200 text-black'} flex items-center justify-center`}>
                 <FontAwesomeIcon icon={faFileContract} />
               </div>
               <div className="flex-1">
                 <div className="flex justify-between items-start">
-                  <h4 className="font-black text-slate-900">Carte Grise</h4>
-                  <span className={`text-[10px] font-black px-2 py-1 rounded-lg ${selectedVehicle.carteGrise ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500'}`}>
+                  <h4 className="font-black text-black">Carte Grise</h4>
+                  <span className={`text-[10px] font-black px-2 py-1 rounded-lg ${selectedVehicle.carteGrise ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-black'}`}>
                     {selectedVehicle.carteGrise ? 'Validé' : 'Non fourni'}
                   </span>
                 </div>
@@ -2541,13 +2541,13 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
             </div>
 
             <div className={`flex items-center gap-4 p-4 rounded-xl border ${selectedVehicle.assurance ? 'bg-emerald-50 border-emerald-200' : 'bg-slate-50 border-slate-200'}`}>
-              <div className={`w-12 h-12 rounded-xl ${selectedVehicle.assurance ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-200 text-slate-400'} flex items-center justify-center`}>
+              <div className={`w-12 h-12 rounded-xl ${selectedVehicle.assurance ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-200 text-black'} flex items-center justify-center`}>
                 <FontAwesomeIcon icon={faCheckCircle} />
               </div>
               <div className="flex-1">
                 <div className="flex justify-between items-start">
-                  <h4 className="font-black text-slate-900">Assurance</h4>
-                  <span className={`text-[10px] font-black px-2 py-1 rounded-lg ${selectedVehicle.assurance ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500'}`}>
+                  <h4 className="font-black text-black">Assurance</h4>
+                  <span className={`text-[10px] font-black px-2 py-1 rounded-lg ${selectedVehicle.assurance ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-black'}`}>
                     {selectedVehicle.assurance ? `${selectedVehicle.dureeAssurance || '?'} mois` : 'Non inclus'}
                   </span>
                 </div>
@@ -2555,13 +2555,13 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
             </div>
 
             <div className={`flex items-center gap-4 p-4 rounded-xl border ${selectedVehicle.vignette ? 'bg-emerald-50 border-emerald-200' : 'bg-slate-50 border-slate-200'}`}>
-              <div className={`w-12 h-12 rounded-xl ${selectedVehicle.vignette ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-200 text-slate-400'} flex items-center justify-center`}>
+              <div className={`w-12 h-12 rounded-xl ${selectedVehicle.vignette ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-200 text-black'} flex items-center justify-center`}>
                 <FontAwesomeIcon icon={faCertificate} />
               </div>
               <div className="flex-1">
                 <div className="flex justify-between items-start">
-                  <h4 className="font-black text-slate-900">Vignette</h4>
-                  <span className={`text-[10px] font-black px-2 py-1 rounded-lg ${selectedVehicle.vignette ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500'}`}>
+                  <h4 className="font-black text-black">Vignette</h4>
+                  <span className={`text-[10px] font-black px-2 py-1 rounded-lg ${selectedVehicle.vignette ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-black'}`}>
                     {selectedVehicle.vignette ? 'Validé' : 'Non fourni'}
                   </span>
                 </div>
@@ -2569,12 +2569,12 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
             </div>
 
             <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
-              <div className="w-12 h-12 rounded-xl bg-slate-200 text-slate-400 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-slate-200 text-black flex items-center justify-center">
                 <FontAwesomeIcon icon={faWrench} />
               </div>
               <div className="flex-1">
                 <div className="flex justify-between items-start">
-                  <h4 className="font-black text-slate-900">Contrôle Technique</h4>
+                  <h4 className="font-black text-black">Contrôle Technique</h4>
                   <span className="text-[10px] font-black px-2 py-1 rounded-lg bg-amber-100 text-amber-700">
                     À vérifier
                   </span>
@@ -2595,14 +2595,14 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
       <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center animate-fadeIn bg-slate-900/60 backdrop-blur-sm p-0 sm:p-4">
         <div className="w-full max-w-4xl bg-white rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl max-h-[95vh] sm:max-h-[90vh] flex flex-col relative overflow-hidden">
           <div className="sticky top-0 bg-white p-6 border-b border-slate-100 flex justify-between items-center z-10">
-            <h2 className="text-xl sm:text-2xl font-black text-slate-900 flex items-center gap-3">
+            <h2 className="text-xl sm:text-2xl font-black text-black flex items-center gap-3">
               <FontAwesomeIcon icon={faEdit} className="text-orange-500" />
               Édition du véhicule
             </h2>
             <button
               title="Fermer"
               onClick={() => setIsEditing(false)}
-              className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center transition-all"
+              className="w-10 h-10 rounded-full bg-slate-100 text-black hover:bg-slate-200 flex items-center justify-center transition-all"
             >
               <FontAwesomeIcon icon={faTimes} />
             </button>
@@ -2611,7 +2611,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
           <div className="p-6 sm:p-8 overflow-y-auto custom-scrollbar">
             {/* Photo Management */}
             <div className="mb-8 p-4 sm:p-6 bg-slate-50 rounded-[2rem] border border-slate-200">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2 mb-4 block">
+              <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2 mb-4 block">
                 Photos ({photos.length + editNewPhotos.length})
               </label>
               <div className="flex flex-wrap gap-3">
@@ -2645,7 +2645,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                   </div>
                 ))}
 
-                <label className="w-24 h-24 rounded-xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center cursor-pointer hover:border-orange-500 hover:bg-orange-50 transition-all text-slate-400 hover:text-orange-500 group">
+                <label className="w-24 h-24 rounded-xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center cursor-pointer hover:border-orange-500 hover:bg-orange-50 transition-all text-black hover:text-orange-500 group">
                   <FontAwesomeIcon icon={faImage} size="lg" className="group-hover:scale-110 transition-transform" />
                   <span className="text-[8px] font-black uppercase tracking-widest mt-2">+ Photo</span>
                   <input
@@ -2666,67 +2666,67 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Marque</label>
+                <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2">Marque</label>
                 <input
                   type="text"
                   value={editMarque}
                   onChange={(e) => setEditMarque(e.target.value)}
-                  className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all"
+                  className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none font-bold text-black transition-all"
                   placeholder="Ex: Toyota"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Modèle</label>
+                <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2">Modèle</label>
                 <input
                   type="text"
                   value={editModel}
                   onChange={(e) => setEditModel(e.target.value)}
-                  className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all"
+                  className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none font-bold text-black transition-all"
                   placeholder="Ex: Corolla"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Année</label>
+                <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2">Année</label>
                 <input
                   type="number"
                   value={editYear}
                   onChange={(e) => setEditYear(Number(e.target.value))}
-                  className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all"
+                  className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none font-bold text-black transition-all"
                   placeholder="2024"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Prix (FCFA)</label>
+                <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2">Prix (FCFA)</label>
                 <input
                   title="Prix du véhicule"
                   type="number"
                   value={editPrice}
                   onChange={(e) => setEditPrice(Number(e.target.value))}
-                  className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all"
+                  className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none font-bold text-black transition-all"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Kilométrage (km)</label>
+                <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2">Kilométrage (km)</label>
                 <input
                   title="Kilométrage du véhicule"
                   type="number"
                   value={editMileage}
                   onChange={(e) => setEditMileage(Number(e.target.value))}
-                  className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all"
+                  className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none font-bold text-black transition-all"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Statut</label>
+                <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2">Statut</label>
                 <select
                   title="Statut du véhicule"
                   value={editStatus}
                   onChange={(e) => setEditStatus(e.target.value)}
-                  className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all"
+                  className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none font-bold text-black transition-all"
                 >
                   <option value="PENDING">En attente</option>
                   <option value="APPROVED">Approuvé</option>
@@ -2735,12 +2735,12 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Carburant</label>
+                <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2">Carburant</label>
                 <select
                   title="Type de carburant"
                   value={editFuelType}
                   onChange={(e) => setEditFuelType(e.target.value)}
-                  className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all"
+                  className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none font-bold text-black transition-all"
                 >
                   <option value="ESSENCE">Essence</option>
                   <option value="DIESEL">Diesel</option>
@@ -2750,12 +2750,12 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Transmission</label>
+                <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2">Transmission</label>
                 <select
                   title="Type de transmission"
                   value={editTransmission}
                   onChange={(e) => setEditTransmission(e.target.value)}
-                  className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all"
+                  className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none font-bold text-black transition-all"
                 >
                   <option value="MANUAL">Manuelle</option>
                   <option value="AUTOMATIC">Automatique</option>
@@ -2763,12 +2763,12 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
               </div>
 
               <div className="space-y-2 md:col-span-2 lg:col-span-3">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Description</label>
+                <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2">Description</label>
                 <textarea
                   value={editDescription}
                   onChange={(e) => setEditDescription(e.target.value)}
                   rows={2}
-                  className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all resize-none"
+                  className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none font-bold text-black transition-all resize-none"
                   placeholder="Description du véhicule..."
                 />
               </div>
@@ -2789,7 +2789,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                       onClick={() => opt.setter(!opt.state)}
                       className={`py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all border flex items-center justify-center gap-2 ${opt.state
                         ? 'bg-orange-500 text-white border-orange-600 shadow-lg shadow-orange-500/20'
-                        : 'bg-slate-50 text-slate-400 border-slate-100 hover:bg-slate-100'
+                        : 'bg-slate-50 text-black border-slate-100 hover:bg-slate-100'
                         }`}
                     >
                       <FontAwesomeIcon icon={opt.icon} size="xs" />
@@ -2803,7 +2803,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                 <div className="col-span-1 md:col-span-2 lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-4">
                   {editGarantie && (
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Durée Garantie (mois)</label>
+                      <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2">Durée Garantie (mois)</label>
                       <select
                         title="Durée de la garantie"
                         value={editDureeGarantie}
@@ -2818,7 +2818,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                   )}
                   {editAssurance && (
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Durée Assurance (mois)</label>
+                      <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2">Durée Assurance (mois)</label>
                       <select
                         title="Durée de l'assurance"
                         value={editDureeAssurance}
@@ -2856,7 +2856,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
           {/* Header */}
           <div className="flex-shrink-0 bg-white p-6 sm:p-8 border-b border-slate-100 flex justify-between items-center z-20">
             <div>
-              <h2 className="text-xl sm:text-3xl font-black text-slate-900 flex items-center gap-3 sm:gap-4">
+              <h2 className="text-xl sm:text-3xl font-black text-black flex items-center gap-3 sm:gap-4">
                 <span className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-orange-100 text-orange-500 flex items-center justify-center shadow-inner">
                   <FontAwesomeIcon icon={faCar} className="text-sm sm:text-lg" />
                 </span>
@@ -2865,19 +2865,19 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
               <div className="flex items-center gap-2 sm:gap-3 mt-3">
                 <div className="flex items-center gap-1.5">
                   <div className={`w-2.5 h-2.5 rounded-full ${addStep >= 1 ? 'bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.5)]' : 'bg-slate-200'} transition-all`} />
-                  <span className={`text-[8px] sm:text-[10px] font-black uppercase tracking-widest ${addStep === 1 ? 'text-slate-900' : 'text-slate-400'}`}>Infos Base</span>
+                  <span className={`text-[8px] sm:text-[10px] font-black uppercase tracking-widest ${addStep === 1 ? 'text-black' : 'text-black'}`}>Infos Base</span>
                 </div>
                 <div className="w-4 sm:w-8 h-px bg-slate-100" />
                 <div className="flex items-center gap-1.5">
                   <div className={`w-2.5 h-2.5 rounded-full ${addStep >= 2 ? 'bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.5)]' : 'bg-slate-200'} transition-all`} />
-                  <span className={`text-[8px] sm:text-[10px] font-black uppercase tracking-widest ${addStep === 2 ? 'text-slate-900' : 'text-slate-400'}`}>Options</span>
+                  <span className={`text-[8px] sm:text-[10px] font-black uppercase tracking-widest ${addStep === 2 ? 'text-black' : 'text-black'}`}>Options</span>
                 </div>
               </div>
             </div>
             <button
               title="Fermer"
               onClick={() => setIsAdding(false)}
-              className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-50 text-slate-400 hover:text-slate-900 flex items-center justify-center border border-slate-100 transition-all"
+              className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-50 text-black hover:text-black flex items-center justify-center border border-slate-100 transition-all"
             >
               <FontAwesomeIcon icon={faTimes} />
             </button>
@@ -2888,7 +2888,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
               <div className="space-y-8 animate-fadeIn">
                 {/* Photo Upload Section */}
                 <div className="p-8 bg-slate-50 rounded-[2.5rem] border border-slate-200 shadow-inner">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2 mb-6 block">
+                  <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2 mb-6 block">
                     Photos du véhicule ({addPhotos.length}/10)
                   </label>
                   <div className="flex flex-wrap gap-4">
@@ -2905,8 +2905,8 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                       </div>
                     ))}
                     {addPhotos.length < 10 && (
-                      <label className="w-28 h-28 rounded-2xl border-2 border-dashed border-slate-300 bg-white flex flex-col items-center justify-center cursor-pointer hover:border-orange-500 hover:bg-orange-50 transition-all text-slate-400 hover:text-orange-500 group shadow-sm">
-                        <FontAwesomeIcon icon={faImage} size="xl" className="group-hover:scale-110 transition-transform text-slate-300 group-hover:text-orange-400" />
+                      <label className="w-28 h-28 rounded-2xl border-2 border-dashed border-slate-300 bg-white flex flex-col items-center justify-center cursor-pointer hover:border-orange-500 hover:bg-orange-50 transition-all text-black hover:text-orange-500 group shadow-sm">
+                        <FontAwesomeIcon icon={faImage} size="xl" className="group-hover:scale-110 transition-transform text-black group-hover:text-orange-400" />
                         <span className="text-[10px] font-black uppercase tracking-widest mt-3 transition-colors">Ajouter</span>
                         <input
                           type="file"
@@ -2927,14 +2927,14 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Marque</label>
+                    <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2">Marque</label>
                     <div className="relative">
                       <input
                         type="text"
                         list="marques-list"
                         value={addMarque}
                         onChange={(e) => setAddMarque(e.target.value)}
-                        className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all"
+                        className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-black transition-all"
                         placeholder="Ex: Toyota"
                       />
                       <datalist id="marques-list">
@@ -2945,27 +2945,27 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Modèle</label>
+                    <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2">Modèle</label>
                     <input
                       type="text"
                       value={addModel}
                       onChange={(e) => setAddModel(e.target.value)}
-                      className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all"
+                      className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-black transition-all"
                       placeholder="Corolla"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Année</label>
+                    <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2">Année</label>
                     <input
                       title="Année du véhicule"
                       type="number"
                       value={addYear}
                       onChange={(e) => setAddYear(Number(e.target.value))}
-                      className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all"
+                      className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-black transition-all"
                     />
                   </div>
                   <div className="space-y-2 text-orange-600">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Prix (FCFA)</label>
+                    <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2">Prix (FCFA)</label>
                     <div className="relative">
                       <input
                         title="Prix du véhicule"
@@ -2978,22 +2978,22 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Kilométrage (km)</label>
+                    <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2">Kilométrage (km)</label>
                     <input
                       title="Kilométrage du véhicule"
                       type="number"
                       value={addMileage}
                       onChange={(e) => setAddMileage(Number(e.target.value))}
-                      className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all"
+                      className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-black transition-all"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Catégorie</label>
+                    <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2">Catégorie</label>
                     <select
                       title="Catégorie du véhicule"
                       value={addCategory}
                       onChange={(e) => setAddCategory(e.target.value)}
-                      className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all appearance-none cursor-pointer"
+                      className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-black transition-all appearance-none cursor-pointer"
                     >
                       <option value="Standard">Standard</option>
                       <option value="Économique">Économique</option>
@@ -3002,12 +3002,12 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Carburant</label>
+                    <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2">Carburant</label>
                     <select
                       title="Type de carburant"
                       value={addFuelType}
                       onChange={(e) => setAddFuelType(e.target.value)}
-                      className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none font-bold text-slate-700 appearance-none cursor-pointer"
+                      className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none font-bold text-black appearance-none cursor-pointer"
                     >
                       <option value="ESSENCE">Essence</option>
                       <option value="DIESEL">Diesel</option>
@@ -3016,12 +3016,12 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Transmission</label>
+                    <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2">Transmission</label>
                     <select
                       title="Type de transmission"
                       value={addTransmission}
                       onChange={(e) => setAddTransmission(e.target.value)}
-                      className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none font-bold text-slate-700 appearance-none cursor-pointer"
+                      className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none font-bold text-black appearance-none cursor-pointer"
                     >
                       <option value="MANUAL">Manuelle</option>
                       <option value="AUTOMATIC">Automatique</option>
@@ -3029,7 +3029,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Parking de rattachement *</label>
+                    <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2">Parking de rattachement *</label>
                     <select
                       title="Sélectionner un parking"
                       value={addParkingId}
@@ -3044,12 +3044,12 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                   </div>
 
                   <div className="space-y-2 md:col-span-2 lg:col-span-3">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Description</label>
+                    <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2">Description</label>
                     <textarea
                       value={addDescription}
                       onChange={(e) => setAddDescription(e.target.value)}
                       rows={3}
-                      className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-[2rem] outline-none font-bold text-slate-700 resize-none transition-all focus:ring-4 focus:ring-orange-500/10"
+                      className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-[2rem] outline-none font-bold text-black resize-none transition-all focus:ring-4 focus:ring-orange-500/10"
                       placeholder="Décrivez l'état général du véhicule..."
                     />
                   </div>
@@ -3057,20 +3057,20 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
 
                 <div className="flex items-center gap-6 p-8 bg-slate-50 rounded-[2rem] border border-slate-100">
                   <div className="flex-1">
-                    <p className="text-sm font-black text-slate-900 uppercase tracking-widest">Disponibilités obligatoires</p>
-                    <p className="text-xs font-bold text-slate-400 mt-1">Choisissez les modes d&apos;exploitation du véhicule</p>
+                    <p className="text-sm font-black text-black uppercase tracking-widest">Disponibilités obligatoires</p>
+                    <p className="text-xs font-bold text-black mt-1">Choisissez les modes d&apos;exploitation du véhicule</p>
                   </div>
                   <div className="flex gap-4">
                     <button
                       onClick={() => setAddForSale(!addForSale)}
-                      className={`px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all flex items-center gap-2 ${addForSale ? 'bg-orange-500 text-white border-orange-600 shadow-xl shadow-orange-500/20' : 'bg-white text-slate-400 border-slate-100'}`}
+                      className={`px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all flex items-center gap-2 ${addForSale ? 'bg-orange-500 text-white border-orange-600 shadow-xl shadow-orange-500/20' : 'bg-white text-black border-slate-100'}`}
                     >
                       <FontAwesomeIcon icon={faTag} />
                       Vente
                     </button>
                     <button
                       onClick={() => setAddForRent(!addForRent)}
-                      className={`px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all flex items-center gap-2 ${addForRent ? 'bg-indigo-500 text-white border-indigo-600 shadow-xl shadow-indigo-500/20' : 'bg-white text-slate-400 border-slate-100'}`}
+                      className={`px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all flex items-center gap-2 ${addForRent ? 'bg-indigo-500 text-white border-indigo-600 shadow-xl shadow-indigo-500/20' : 'bg-white text-black border-slate-100'}`}
                     >
                       <FontAwesomeIcon icon={faClockRegular} />
                       Location
@@ -3119,10 +3119,10 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                         ? `bg-white border-${opt.color}-200 shadow-xl shadow-slate-200/50`
                         : 'bg-slate-50 border-slate-100 opacity-60 grayscale hover:grayscale-0 hover:opacity-100'}`}
                     >
-                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-xl transition-all duration-500 ${opt.state ? `bg-${opt.color}-100 text-${opt.color}-500 shadow-inner` : 'bg-slate-200 text-slate-400 group-hover:scale-110'}`}>
+                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-xl transition-all duration-500 ${opt.state ? `bg-${opt.color}-100 text-${opt.color}-500 shadow-inner` : 'bg-slate-200 text-black group-hover:scale-110'}`}>
                         <FontAwesomeIcon icon={opt.icon} />
                       </div>
-                      <span className={`text-[10px] font-black uppercase tracking-widest text-center ${opt.state ? 'text-slate-900' : 'text-slate-400'}`}>
+                      <span className={`text-[10px] font-black uppercase tracking-widest text-center ${opt.state ? 'text-black' : 'text-black'}`}>
                         {opt.label}
                       </span>
                       <div className={`w-8 h-4 rounded-full relative transition-colors ${opt.state ? `bg-${opt.color}-500/20` : 'bg-slate-200'}`}>
@@ -3177,7 +3177,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                 <div className="flex gap-4 pt-12">
                   <button
                     onClick={() => setAddStep(1)}
-                    className="px-10 py-5 bg-white border border-slate-200 text-slate-400 rounded-[2rem] font-black text-sm uppercase tracking-widest hover:text-slate-900 hover:border-slate-400 transition-all active:scale-95 flex items-center gap-3"
+                    className="px-10 py-5 bg-white border border-slate-200 text-black rounded-[2rem] font-black text-sm uppercase tracking-widest hover:text-black hover:border-slate-400 transition-all active:scale-95 flex items-center gap-3"
                   >
                     <FontAwesomeIcon icon={faChevronLeft} />
                     Précédent
@@ -3215,7 +3215,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
           <div className="absolute inset-0 border-4 border-orange-500/10 rounded-full"></div>
           <div className="absolute inset-0 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
         </div>
-        <p className="mt-8 text-xs font-black text-slate-400 uppercase tracking-widest animate-pulse">
+        <p className="mt-8 text-xs font-black text-black uppercase tracking-widest animate-pulse">
           Chargement des véhicules...
         </p>
       </div>
@@ -3232,7 +3232,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
               setSelectedVehicle(null);
               setActiveTab('list');
             }}
-            className="hidden sm:flex w-14 h-14 rounded-[1.5rem] bg-white text-slate-400 hover:text-orange-500 shadow-xl border border-white items-center justify-center transition-all hover:scale-105 active:scale-95 group flex-shrink-0"
+            className="hidden sm:flex w-14 h-14 rounded-[1.5rem] bg-white text-black hover:text-orange-500 shadow-xl border border-white items-center justify-center transition-all hover:scale-105 active:scale-95 group flex-shrink-0"
           >
             <FontAwesomeIcon icon={faChevronLeft} className="group-hover:-translate-x-1 transition-transform" />
           </button>
@@ -3249,7 +3249,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                 onClick={() => setActiveTab(tab.id as TabType)}
                 className={`flex-1 sm:flex-initial flex items-center justify-center gap-3 px-4 sm:px-8 py-3.5 sm:py-4 rounded-2xl sm:rounded-[2.5rem] font-black text-[10px] sm:text-xs uppercase tracking-widest transition-all duration-300 ${activeTab === tab.id
                   ? 'bg-slate-900 text-white shadow-xl shadow-slate-900/20'
-                  : 'text-slate-400 hover:text-slate-600 hover:bg-white'
+                  : 'text-black hover:text-black hover:bg-white'
                   }`}
               >
                 <FontAwesomeIcon icon={tab.icon} className={activeTab === tab.id ? 'text-orange-500' : ''} />

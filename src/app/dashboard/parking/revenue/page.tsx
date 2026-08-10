@@ -11,7 +11,7 @@ const ParkingRevenueStats = dynamic(() => import('@/components/parking/ParkingRe
   loading: () => (
     <div className="flex flex-col items-center justify-center py-32 bg-white rounded-[3.5rem] border border-slate-100 shadow-sm space-y-4">
       <div className="w-12 h-12 border-4 border-orange-500/20 border-t-orange-500 rounded-full animate-spin"></div>
-      <p className="text-slate-500 font-black animate-pulse uppercase tracking-widest text-[10px]">Chargement des données...</p>
+      <p className="text-black font-black animate-pulse uppercase tracking-widest text-[10px]">Chargement des données...</p>
     </div>
   )
 });
@@ -24,13 +24,13 @@ export default function RevenuePage() {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-4">
+          <h1 className="text-3xl font-black text-black tracking-tight flex items-center gap-4">
             <div className="w-12 h-12 rounded-2xl bg-orange-500 text-white flex items-center justify-center shadow-xl shadow-orange-500/20">
               <FontAwesomeIcon icon={faWallet} size="sm" />
             </div>
             Tableau de Bord Financier
           </h1>
-          <p className="text-slate-400 font-bold text-[10px] uppercase tracking-widest mt-3 ml-1">
+          <p className="text-black font-bold text-[10px] uppercase tracking-widest mt-3 ml-1">
             Suivez vos revenus, analysez vos performances et gérez vos transactions
           </p>
         </div>
@@ -38,7 +38,7 @@ export default function RevenuePage() {
         <div className="flex gap-3 w-full md:w-auto">
           <button 
             onClick={() => window.location.reload()}
-            className="flex-1 md:flex-none px-8 py-4 bg-white border border-slate-100 text-slate-600 rounded-[2rem] font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 transition-all flex items-center justify-center gap-3 shadow-sm hover:shadow-md active:scale-95"
+            className="flex-1 md:flex-none px-8 py-4 bg-white border border-slate-100 text-black rounded-[2rem] font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 transition-all flex items-center justify-center gap-3 shadow-sm hover:shadow-md active:scale-95"
           >
             <FontAwesomeIcon icon={faExclamationTriangle} className="text-orange-500" />
             Actualiser la session

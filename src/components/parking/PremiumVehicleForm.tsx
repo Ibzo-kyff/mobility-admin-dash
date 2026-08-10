@@ -144,25 +144,25 @@ export default function PremiumVehicleForm({ onSuccess, hideHeader = false }: { 
           <div>
             <button 
               onClick={() => router.push('/dashboard/parking/vehicles')}
-              className="flex items-center gap-2 text-slate-400 hover:text-orange-500 font-black text-[10px] uppercase tracking-[0.2em] mb-4 transition-all"
+              className="flex items-center gap-2 text-black hover:text-orange-500 font-black text-[10px] uppercase tracking-[0.2em] mb-4 transition-all"
             >
               <FontAwesomeIcon icon={faArrowLeft} />
               Retour à la flotte
             </button>
-            <h1 className="text-4xl font-black text-slate-900 tracking-tight leading-tight">
+            <h1 className="text-4xl font-black text-black tracking-tight leading-tight">
               Nouveau <span className="text-orange-500 text-stroke-thin">Véhicule</span>
             </h1>
-            <p className="text-slate-400 font-bold text-xs uppercase tracking-[0.2em] mt-2 flex items-center gap-2">
+            <p className="text-black font-bold text-xs uppercase tracking-[0.2em] mt-2 flex items-center gap-2">
               <span className="w-8 h-[2px] bg-orange-500"></span>
               Interface d'ajout premium
             </p>
           </div>
 
           <div className="flex bg-white p-1.5 rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100">
-             <div className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${step === 1 ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20' : 'text-slate-400'}`}>
+             <div className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${step === 1 ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20' : 'text-black'}`}>
                 01. Informations
              </div>
-             <div className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${step === 2 ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20' : 'text-slate-400'}`}>
+             <div className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${step === 2 ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20' : 'text-black'}`}>
                 02. Services & Options
              </div>
           </div>
@@ -173,7 +173,7 @@ export default function PremiumVehicleForm({ onSuccess, hideHeader = false }: { 
         {saving && (
           <div className="absolute inset-0 z-50 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center space-y-4">
              <div className="w-16 h-16 border-4 border-orange-500/20 border-t-orange-500 rounded-full animate-spin"></div>
-             <p className="text-slate-900 font-black uppercase tracking-widest text-xs">Création en cours...</p>
+             <p className="text-black font-black uppercase tracking-widest text-xs">Création en cours...</p>
           </div>
         )}
 
@@ -183,7 +183,7 @@ export default function PremiumVehicleForm({ onSuccess, hideHeader = false }: { 
               {/* Photo Upload Section - Admin Style */}
               <div className="relative group">
                 <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-xs font-black text-slate-900 uppercase tracking-[0.2em] flex items-center gap-3">
+                  <h3 className="text-xs font-black text-black uppercase tracking-[0.2em] flex items-center gap-3">
                     <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
                     Galerie Photos ({photos.length}/10)
                   </h3>
@@ -217,7 +217,7 @@ export default function PremiumVehicleForm({ onSuccess, hideHeader = false }: { 
                     );
                   })}
                   {photos.length < 10 && (
-                    <label className="aspect-square rounded-[2rem] border-4 border-dashed border-slate-100 bg-slate-50/50 flex flex-col items-center justify-center cursor-pointer hover:border-orange-500 hover:bg-orange-50 transition-all text-slate-300 hover:text-orange-500 group relative">
+                    <label className="aspect-square rounded-[2rem] border-4 border-dashed border-slate-100 bg-slate-50/50 flex flex-col items-center justify-center cursor-pointer hover:border-orange-500 hover:bg-orange-50 transition-all text-black hover:text-orange-500 group relative">
                       <div className="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                         <FontAwesomeIcon icon={faPlus} className="text-orange-500" />
                       </div>
@@ -231,22 +231,22 @@ export default function PremiumVehicleForm({ onSuccess, hideHeader = false }: { 
               {/* Form Grid - Admin Style */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-8">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Immatriculation *</label>
-                  <input type="text" value={plate} onChange={(e) => setPlate(e.target.value)} className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all" placeholder="AA-000-XX" />
+                  <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2">Immatriculation *</label>
+                  <input type="text" value={plate} onChange={(e) => setPlate(e.target.value)} className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-black transition-all" placeholder="AA-000-XX" />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Marque *</label>
-                  <input type="text" list="marques-list-premium" value={marque} onChange={(e) => setMarque(e.target.value)} className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all" />
+                  <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2">Marque *</label>
+                  <input type="text" list="marques-list-premium" value={marque} onChange={(e) => setMarque(e.target.value)} className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-black transition-all" />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Modèle *</label>
-                  <input type="text" value={model} onChange={(e) => setModel(e.target.value)} className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all" />
+                  <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2">Modèle *</label>
+                  <input type="text" value={model} onChange={(e) => setModel(e.target.value)} className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-black transition-all" />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Prix (FCFA) *</label>
+                  <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2">Prix (FCFA) *</label>
                   <div className="relative">
                     <input type="number" value={price} onChange={(e) => setPrice(Number(e.target.value))} className="w-full px-6 py-4 bg-orange-50 border border-orange-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-black text-orange-600 text-xl transition-all" />
                     <span className="absolute right-6 top-1/2 -translate-y-1/2 font-black text-orange-300">FCFA</span>
@@ -254,18 +254,18 @@ export default function PremiumVehicleForm({ onSuccess, hideHeader = false }: { 
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Année</label>
-                  <input type="number" value={year} onChange={(e) => setYear(Number(e.target.value))} className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none font-bold text-slate-700" />
+                  <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2">Année</label>
+                  <input type="number" value={year} onChange={(e) => setYear(Number(e.target.value))} className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none font-bold text-black" />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Kilométrage (km)</label>
-                  <input type="number" value={mileage} onChange={(e) => setMileage(Number(e.target.value))} className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all" />
+                  <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2">Kilométrage (km)</label>
+                  <input type="number" value={mileage} onChange={(e) => setMileage(Number(e.target.value))} className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-black transition-all" />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Catégorie</label>
-                  <select title="Catégorie" value={category} onChange={(e) => setCategory(e.target.value)} className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all appearance-none cursor-pointer">
+                  <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2">Catégorie</label>
+                  <select title="Catégorie" value={category} onChange={(e) => setCategory(e.target.value)} className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-black transition-all appearance-none cursor-pointer">
                     <option value="Standard">Standard</option>
                     <option value="Économique">Économique</option>
                     <option value="Luxe">Luxe</option>
@@ -274,8 +274,8 @@ export default function PremiumVehicleForm({ onSuccess, hideHeader = false }: { 
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Carburant</label>
-                  <select title="Carburant" value={fuelType} onChange={(e) => setFuelType(e.target.value)} className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none font-bold text-slate-700 appearance-none cursor-pointer">
+                  <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2">Carburant</label>
+                  <select title="Carburant" value={fuelType} onChange={(e) => setFuelType(e.target.value)} className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none font-bold text-black appearance-none cursor-pointer">
                     <option value="ESSENCE">Essence</option>
                     <option value="DIESEL">Diesel</option>
                     <option value="ELECTRIQUE">Électrique</option>
@@ -284,36 +284,36 @@ export default function PremiumVehicleForm({ onSuccess, hideHeader = false }: { 
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Transmission</label>
-                  <select title="Transmission" value={transmission} onChange={(e) => setTransmission(e.target.value)} className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none font-bold text-slate-700 appearance-none cursor-pointer">
+                  <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2">Transmission</label>
+                  <select title="Transmission" value={transmission} onChange={(e) => setTransmission(e.target.value)} className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none font-bold text-black appearance-none cursor-pointer">
                     <option value="MANUAL">Manuelle</option>
                     <option value="AUTOMATIC">Automatique</option>
                   </select>
                 </div>
 
                 <div className="space-y-2 md:col-span-2 lg:col-span-3">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Description</label>
-                  <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-[2rem] outline-none font-bold text-slate-700 resize-none transition-all focus:ring-4 focus:ring-orange-500/10" placeholder="Décrivez l'état général du véhicule..." />
+                  <label className="text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2">Description</label>
+                  <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-[2rem] outline-none font-bold text-black resize-none transition-all focus:ring-4 focus:ring-orange-500/10" placeholder="Décrivez l'état général du véhicule..." />
                 </div>
               </div>
 
               {/* Availability Toggles - Admin Style */}
               <div className="flex items-center gap-6 p-8 bg-slate-50 rounded-[2.5rem] border border-slate-100">
                 <div className="flex-1">
-                  <p className="text-sm font-black text-slate-900 uppercase tracking-widest">Disponibilités obligatoires</p>
-                  <p className="text-xs font-bold text-slate-400 mt-1">Choisissez les modes d'exploitation du véhicule</p>
+                  <p className="text-sm font-black text-black uppercase tracking-widest">Disponibilités obligatoires</p>
+                  <p className="text-xs font-bold text-black mt-1">Choisissez les modes d'exploitation du véhicule</p>
                 </div>
                 <div className="flex gap-4">
                   <button 
                     onClick={() => setForSale(!forSale)} 
-                    className={`px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all flex items-center gap-2 ${forSale ? 'bg-orange-500 text-white border-orange-600 shadow-xl shadow-orange-500/20' : 'bg-white text-slate-400 border-slate-100'}`}
+                    className={`px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all flex items-center gap-2 ${forSale ? 'bg-orange-500 text-white border-orange-600 shadow-xl shadow-orange-500/20' : 'bg-white text-black border-slate-100'}`}
                   >
                     <FontAwesomeIcon icon={faTag} />
                     Vente
                   </button>
                   <button 
                     onClick={() => setForRent(!forRent)} 
-                    className={`px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all flex items-center gap-2 ${forRent ? 'bg-indigo-500 text-white border-indigo-600 shadow-xl shadow-indigo-500/20' : 'bg-white text-slate-400 border-slate-100'}`}
+                    className={`px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all flex items-center gap-2 ${forRent ? 'bg-indigo-500 text-white border-indigo-600 shadow-xl shadow-indigo-500/20' : 'bg-white text-black border-slate-100'}`}
                   >
                     <FontAwesomeIcon icon={faClockRegular} />
                     Location
@@ -346,7 +346,7 @@ export default function PremiumVehicleForm({ onSuccess, hideHeader = false }: { 
                     <FontAwesomeIcon icon={faInfoCircle} />
                     Configuration des services
                   </p>
-                  <p className="text-sm font-bold text-slate-600 leading-relaxed">
+                  <p className="text-sm font-bold text-black leading-relaxed">
                     Activez les garanties, assurances et services optionnels pour ce véhicule. Ces informations seront visibles par les clients.
                   </p>
                </div>
@@ -364,11 +364,11 @@ export default function PremiumVehicleForm({ onSuccess, hideHeader = false }: { 
                     onClick={() => opt.setter(!opt.state)}
                     className={`flex flex-col items-center gap-6 p-10 rounded-[3rem] border transition-all duration-500 group/opt ${opt.state ? `bg-white border-${opt.color}-200 shadow-2xl shadow-slate-200/50` : 'bg-slate-50 border-slate-100 opacity-60 grayscale hover:opacity-100 hover:grayscale-0'}`}
                   >
-                    <div className={`w-20 h-20 rounded-[1.5rem] flex items-center justify-center text-3xl transition-transform group-hover/opt:scale-110 ${opt.state ? `bg-${opt.color}-100 text-${opt.color}-500` : 'bg-slate-200 text-slate-400'}`}>
+                    <div className={`w-20 h-20 rounded-[1.5rem] flex items-center justify-center text-3xl transition-transform group-hover/opt:scale-110 ${opt.state ? `bg-${opt.color}-100 text-${opt.color}-500` : 'bg-slate-200 text-black'}`}>
                       <FontAwesomeIcon icon={opt.icon} />
                     </div>
                     <div className="flex flex-col items-center gap-1">
-                      <span className={`text-[10px] font-black uppercase tracking-widest ${opt.state ? 'text-slate-900' : 'text-slate-400'}`}>{opt.label}</span>
+                      <span className={`text-[10px] font-black uppercase tracking-widest ${opt.state ? 'text-black' : 'text-black'}`}>{opt.label}</span>
                       {opt.state && <FontAwesomeIcon icon={faCheck} className={`text-[10px] text-${opt.color}-500`} />}
                     </div>
                   </button>
@@ -380,13 +380,13 @@ export default function PremiumVehicleForm({ onSuccess, hideHeader = false }: { 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-10 bg-slate-50 rounded-[2.5rem] border border-slate-100 animate-slideUp">
                    {garantie && (
                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Durée Garantie (mois)</label>
+                        <label className="text-[10px] font-black text-black uppercase tracking-widest ml-2">Durée Garantie (mois)</label>
                         <input type="number" value={dureeGarantie} onChange={(e) => setDureeGarantie(Number(e.target.value))} className="w-full px-6 py-4 bg-white border border-slate-100 rounded-2xl outline-none font-bold" />
                      </div>
                    )}
                    {assurance && (
                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Durée Assurance (mois)</label>
+                        <label className="text-[10px] font-black text-black uppercase tracking-widest ml-2">Durée Assurance (mois)</label>
                         <input type="number" value={dureeAssurance} onChange={(e) => setDureeAssurance(Number(e.target.value))} className="w-full px-6 py-4 bg-white border border-slate-100 rounded-2xl outline-none font-bold" />
                      </div>
                    )}
@@ -396,7 +396,7 @@ export default function PremiumVehicleForm({ onSuccess, hideHeader = false }: { 
               <div className="flex gap-6 pt-12 border-t border-slate-50">
                 <button 
                   onClick={() => setStep(1)} 
-                  className="px-10 py-5 bg-white border border-slate-200 text-slate-400 rounded-3xl font-black text-sm uppercase tracking-widest hover:text-slate-900 hover:border-slate-400 transition-all flex items-center gap-3"
+                  className="px-10 py-5 bg-white border border-slate-200 text-black rounded-3xl font-black text-sm uppercase tracking-widest hover:text-black hover:border-slate-400 transition-all flex items-center gap-3"
                 >
                   <FontAwesomeIcon icon={faChevronLeft} className="text-xs" />
                   Précédent

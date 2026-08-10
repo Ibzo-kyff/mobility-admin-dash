@@ -35,11 +35,11 @@ export default function ParkingSidebar({
       href: '/dashboard/parking',
       exact: true
     },
-    {
-      title: 'Ma Flotte',
-      icon: faCar,
-      href: '/dashboard/parking/fleet',
-    },
+    // {
+    //   title: 'Ma Flotte',
+    //   icon: faCar,
+    //   href: '/dashboard/parking/fleet',
+    // },
     {
       title: 'Véhicules',
       icon: faCar,
@@ -50,21 +50,21 @@ export default function ParkingSidebar({
       icon: faCalendarCheck,
       href: '/dashboard/parking/reservations',
     },
-    {
-      title: 'Revenus',
-      icon: faEuroSign,
-      href: '/dashboard/parking/revenue',
-    },
+    // {
+    //   title: 'Revenus',
+    //   icon: faEuroSign,
+    //   href: '/dashboard/parking/revenue',
+    // },
     {
       title: 'Statistiques',
       icon: faChartLine,
       href: '/dashboard/parking/analytics',
     },
-    {
-      title: 'Clients',
-      icon: faUsers,
-      href: '/dashboard/parking/clients',
-    },
+    // {
+    //   title: 'Clients',
+    //   icon: faUsers,
+    //   href: '/dashboard/parking/clients',
+    // },
     {
       title: 'Paramètres',
       icon: faCog,
@@ -100,7 +100,7 @@ export default function ParkingSidebar({
             <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">P</span>
             </div>
-            <span className="font-bold text-gray-800">Parking Pro</span>
+            <span className="font-bold text-black">Parking Pro</span>
           </Link>
         )}
         {collapsed && (
@@ -112,7 +112,7 @@ export default function ParkingSidebar({
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500"
+          className="p-1.5 rounded-lg hover:bg-gray-100 text-black"
         >
           <FontAwesomeIcon icon={collapsed ? faChevronRight : faChevronLeft} />
         </button>
@@ -128,7 +128,7 @@ export default function ParkingSidebar({
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
                   isActive(item)
                     ? 'bg-orange-50 text-orange-600'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    : 'text-black hover:bg-gray-100'
                 }`}
               >
                 <FontAwesomeIcon icon={item.icon} className="w-5 h-5" />

@@ -44,16 +44,16 @@ export default function RegisterPage() {
     }
 
     try {
-      const data = await register(formData); // ← on récupère la réponse maintenant
+      await register(formData);
 
       // Redirection conditionnelle selon le rôle
       if (formData.role === 'PARKING') {
         router.push('/auth/pending-approuval'); // Page "en attente d'approbation"
       } else {
-        router.push('/auth/verify-email'); // CLIENT → vérification email
+        router.push(`/auth/verify-email?email=${encodeURIComponent(formData.email)}`); // CLIENT → vérification email
       }
-    } catch (err: any) {
-      setError(err.message || "Erreur lors de l'inscription");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Erreur lors de l'inscription");
     }
   };
 
@@ -68,8 +68,8 @@ export default function RegisterPage() {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-500 rounded-2xl mb-4">
             <span className="text-white font-bold text-2xl">M</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-800">Créer un compte</h1>
-          <p className="text-gray-600">Rejoignez Mobility Dash</p>
+          <h1 className="text-2xl font-bold text-black">Créer un compte</h1>
+          <p className="text-black">Rejoignez Mobility Dash</p>
         </div>
 
         {/* Formulaire */}
@@ -77,7 +77,7 @@ export default function RegisterPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Rôle */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-black">
                 Vous êtes *
               </label>
               <select
@@ -94,11 +94,11 @@ export default function RegisterPage() {
             {/* Nom et Prénom */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-black">
                   Nom *
                 </label>
                 <div className="relative">
-                  <FontAwesomeIcon icon={faUser} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <FontAwesomeIcon icon={faUser} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black" />
                   <input
                     type="text"
                     name="nom"
@@ -111,11 +111,11 @@ export default function RegisterPage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-black">
                   Prénom *
                 </label>
                 <div className="relative">
-                  <FontAwesomeIcon icon={faUser} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <FontAwesomeIcon icon={faUser} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black" />
                   <input
                     type="text"
                     name="prenom"
@@ -131,11 +131,11 @@ export default function RegisterPage() {
 
             {/* Email */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-black">
                 Email *
               </label>
               <div className="relative">
-                <FontAwesomeIcon icon={faEnvelope} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <FontAwesomeIcon icon={faEnvelope} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black" />
                 <input
                   type="email"
                   name="email"
@@ -151,11 +151,11 @@ export default function RegisterPage() {
             {/* Téléphone et Adresse */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-black">
                   Téléphone *
                 </label>
                 <div className="relative">
-                  <FontAwesomeIcon icon={faPhone} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <FontAwesomeIcon icon={faPhone} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black" />
                   <input
                     type="tel"
                     name="phone"
@@ -168,11 +168,11 @@ export default function RegisterPage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-black">
                   Adresse
                 </label>
                 <div className="relative">
-                  <FontAwesomeIcon icon={faMapMarkerAlt} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <FontAwesomeIcon icon={faMapMarkerAlt} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black" />
                   <input
                     type="text"
                     name="address"
@@ -187,11 +187,11 @@ export default function RegisterPage() {
 
             {/* Mot de passe */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-black">
                 Mot de passe *
               </label>
               <div className="relative">
-                <FontAwesomeIcon icon={faLock} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <FontAwesomeIcon icon={faLock} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black" />
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"
@@ -205,12 +205,12 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-black hover:text-black"
                 >
                   <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                 </button>
               </div>
-              <p className="text-xs text-gray-500">Minimum 6 caractères</p>
+              <p className="text-xs text-black">Minimum 6 caractères</p>
             </div>
 
             {/* Conditions */}
@@ -223,10 +223,10 @@ export default function RegisterPage() {
                 className="mt-1 accent-orange-500"
                 required
               />
-              <label htmlFor="terms" className="text-sm text-gray-700">
-                J'accepte les{' '}
+              <label htmlFor="terms" className="text-sm text-black">
+                J&apos;accepte les{' '}
                 <Link href="/terms" className="text-orange-600 hover:text-orange-500 font-medium">
-                  conditions d'utilisation
+                  conditions d&apos;utilisation
                 </Link>{' '}
                 et la{' '}
                 <Link href="/privacy" className="text-orange-600 hover:text-orange-500 font-medium">
@@ -260,7 +260,7 @@ export default function RegisterPage() {
             </button>
           </form>
 
-          <p className="text-center text-sm text-gray-600 mt-6">
+          <p className="text-center text-sm text-black mt-6">
             Déjà un compte ?{' '}
             <Link 
               href="/auth/login"

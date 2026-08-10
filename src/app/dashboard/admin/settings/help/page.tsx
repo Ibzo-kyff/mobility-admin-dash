@@ -90,8 +90,8 @@ export default function HelpCenterPage() {
         <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-orange-100 to-orange-200 rounded-2xl mb-4">
           <FontAwesomeIcon icon={faHeadset} className="text-4xl text-orange-500" />
         </div>
-        <h1 className="text-3xl font-bold text-gray-800">Centre d'Aide</h1>
-        <p className="text-gray-500 mt-2">Trouvez des réponses à vos questions ou contactez notre support</p>
+        <h1 className="text-3xl font-bold text-black">Centre d'Aide</h1>
+        <p className="text-black mt-2">Trouvez des réponses à vos questions ou contactez notre support</p>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-8">
@@ -99,7 +99,7 @@ export default function HelpCenterPage() {
         <div className="lg:col-span-2">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-gray-800">
+              <h2 className="text-xl font-semibold text-black">
                 <FontAwesomeIcon icon={faQuestionCircle} className="mr-2 text-orange-500" />
                 Questions fréquentes
               </h2>
@@ -123,14 +123,14 @@ export default function HelpCenterPage() {
                     onClick={() => toggleFaq(faq.id)}
                     className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition-colors"
                   >
-                    <span className="font-medium text-gray-800">{faq.question}</span>
+                    <span className="font-medium text-black">{faq.question}</span>
                     <FontAwesomeIcon 
                       icon={openFaqs.includes(faq.id) ? faChevronUp : faChevronDown} 
-                      className="text-gray-400"
+                      className="text-black"
                     />
                   </button>
                   {openFaqs.includes(faq.id) && (
-                    <div className="p-4 pt-0 text-gray-600 border-t border-gray-100">
+                    <div className="p-4 pt-0 text-black border-t border-gray-100">
                       {faq.answer}
                     </div>
                   )}
@@ -159,7 +159,7 @@ export default function HelpCenterPage() {
           </div>
 
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <h3 className="font-semibold text-black mb-4 flex items-center gap-2">
               <FontAwesomeIcon icon={faTicket} className="text-orange-500" />
               Ouvrir un ticket
             </h3>

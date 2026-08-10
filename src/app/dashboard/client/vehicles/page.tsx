@@ -70,8 +70,8 @@ export default function ClientVehiclesPage() {
     <div className="space-y-4 sm:space-y-6 w-full max-w-full">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Mes Véhicules</h1>
-          <p className="text-gray-500">Gérez vos véhicules pour des réservations plus rapides.</p>
+          <h1 className="text-2xl font-bold text-black">Mes Véhicules</h1>
+          <p className="text-black">Gérez vos véhicules pour des réservations plus rapides.</p>
         </div>
         <button className="flex items-center justify-center gap-2 bg-orange-500 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-orange-600 transition-all shadow-sm active:scale-95">
           <FontAwesomeIcon icon={faPlus} />
@@ -82,7 +82,7 @@ export default function ClientVehiclesPage() {
       <div className="flex-1 relative">
         <FontAwesomeIcon 
           icon={faSearch} 
-          className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" 
+          className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black" 
         />
         <input 
           type="text" 
@@ -103,12 +103,12 @@ export default function ClientVehiclesPage() {
                     <FontAwesomeIcon icon={faCar} className="text-xl" />
                   </div>
                   <div className="flex gap-2">
-                    <button className="p-2 hover:bg-gray-50 rounded-lg transition-colors text-gray-400 hover:text-gray-900">
+                    <button className="p-2 hover:bg-gray-50 rounded-lg transition-colors text-black hover:text-black">
                       <FontAwesomeIcon icon={faEdit} />
                     </button>
                     <button 
                       onClick={() => handleDelete(vehicle.id)}
-                      className="p-2 hover:bg-red-50 rounded-lg transition-colors text-gray-400 hover:text-red-600"
+                      className="p-2 hover:bg-red-50 rounded-lg transition-colors text-black hover:text-red-600"
                     >
                       <FontAwesomeIcon icon={faTrash} />
                     </button>
@@ -116,7 +116,7 @@ export default function ClientVehiclesPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <h3 className="text-xl font-bold text-gray-900 uppercase tracking-tight">
+                  <h3 className="text-xl font-bold text-black uppercase tracking-tight">
                     {vehicle.marque || 'Marque'}
                   </h3>
                   <p className="text-orange-600 font-bold">{vehicle.modele || 'Modèle'}</p>
@@ -124,12 +124,12 @@ export default function ClientVehiclesPage() {
 
                 <div className="mt-8 grid grid-cols-2 gap-4 border-t border-gray-50 pt-6">
                   <div className="space-y-1">
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Plaque / Immat</p>
-                    <p className="text-lg font-black text-gray-900">{vehicle.plate || vehicle.immatriculation || '---'}</p>
+                    <p className="text-[10px] font-black text-black uppercase tracking-widest">Plaque / Immat</p>
+                    <p className="text-lg font-black text-black">{vehicle.plate || vehicle.immatriculation || '---'}</p>
                   </div>
                   <div className="flex flex-col items-end justify-center">
                     {vehicle.stats ? (
-                      <div className="flex gap-4 text-[10px] font-bold text-gray-500 uppercase">
+                      <div className="flex gap-4 text-[10px] font-bold text-black uppercase">
                         <span>{vehicle.stats.reservations || 0} Rés.</span>
                         <span>{vehicle.stats.vues || 0} Vues</span>
                       </div>
@@ -147,11 +147,11 @@ export default function ClientVehiclesPage() {
         </div>
       ) : (
         <div className="bg-white border-2 border-dashed border-gray-100 rounded-2xl p-20 text-center">
-          <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-300">
+          <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 text-black">
             <FontAwesomeIcon icon={faCar} className="text-3xl" />
           </div>
-          <h3 className="text-xl font-bold text-gray-900">Aucun véhicule trouvé</h3>
-          <p className="text-gray-500 max-w-xs mx-auto mt-2">
+          <h3 className="text-xl font-bold text-black">Aucun véhicule trouvé</h3>
+          <p className="text-black max-w-xs mx-auto mt-2">
             Ajoutez votre premier véhicule pour commencer à réserver vos places de parking.
           </p>
           <button className="mt-8 bg-orange-500 text-white px-8 py-3 rounded-xl font-bold hover:bg-orange-600 transition-all shadow-lg shadow-orange-500/20">

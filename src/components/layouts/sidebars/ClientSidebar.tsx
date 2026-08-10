@@ -99,7 +99,7 @@ export default function ClientSidebar({
             <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">M</span>
             </div>
-            <span className="font-bold text-gray-800">Mobility</span>
+            <span className="font-bold text-black">Mobility</span>
           </Link>
         )}
         {collapsed && (
@@ -113,7 +113,7 @@ export default function ClientSidebar({
           onClick={() => setCollapsed(!collapsed)}
           title={collapsed ? "Développer le menu" : "Réduire le menu"}
           aria-label={collapsed ? "Développer le menu" : "Réduire le menu"}
-          className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500"
+          className="p-1.5 rounded-lg hover:bg-gray-100 text-black"
         >
           <FontAwesomeIcon icon={collapsed ? faChevronRight : faChevronLeft} />
         </button>
@@ -129,7 +129,7 @@ export default function ClientSidebar({
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
                   isActive(item)
                     ? 'bg-orange-50 text-orange-600'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    : 'text-black hover:bg-gray-100'
                 }`}
               >
                 <FontAwesomeIcon icon={item.icon} className="w-5 h-5" />

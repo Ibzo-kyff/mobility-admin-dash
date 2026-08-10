@@ -91,13 +91,13 @@ export default function ProfilePage() {
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 flex items-center gap-4">
+          <h1 className="text-2xl sm:text-3xl font-black text-black flex items-center gap-4">
             <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/10">
               <FontAwesomeIcon icon={faUser} className="text-xl sm:text-2xl" />
             </div>
             Mon Profil
           </h1>
-          <p className="text-[10px] sm:text-xs font-black text-slate-400 mt-2 ml-1 uppercase tracking-widest">
+          <p className="text-[10px] sm:text-xs font-black text-black mt-2 ml-1 uppercase tracking-widest">
             Gérez vos informations et préférences de compte
           </p>
         </div>
@@ -120,7 +120,7 @@ export default function ProfilePage() {
                 </div>
                 <button 
                   onClick={() => fileInputRef.current?.click()}
-                  className="absolute -bottom-2 -right-2 w-10 h-10 bg-white border border-slate-100 rounded-xl shadow-xl flex items-center justify-center text-slate-400 hover:text-orange-500 transition-all active:scale-95"
+                  className="absolute -bottom-2 -right-2 w-10 h-10 bg-white border border-slate-100 rounded-xl shadow-xl flex items-center justify-center text-black hover:text-orange-500 transition-all active:scale-95"
                 >
                   <FontAwesomeIcon icon={faCamera} className="text-sm" />
                 </button>
@@ -128,8 +128,8 @@ export default function ProfilePage() {
               </div>
               
               <div className="mt-6">
-                <h2 className="text-xl font-black text-slate-900">{user.prenom} {user.nom}</h2>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Client Privilège</p>
+                <h2 className="text-xl font-black text-black">{user.prenom} {user.nom}</h2>
+                <p className="text-[10px] font-black text-black uppercase tracking-widest mt-1">Client Privilège</p>
               </div>
 
               {/* Quick Info Blocks */}
@@ -150,7 +150,7 @@ export default function ProfilePage() {
               <div className="w-12 h-12 rounded-2xl bg-orange-50 text-orange-500 flex items-center justify-center text-lg shadow-inner">
                 <FontAwesomeIcon icon={faUser} />
               </div>
-              <h3 className="text-xl font-black text-slate-900">Informations Personnelles</h3>
+              <h3 className="text-xl font-black text-black">Informations Personnelles</h3>
             </div>
 
             <div className="grid md:grid-cols-2 gap-6 mb-6">
@@ -224,8 +224,8 @@ export default function ProfilePage() {
                   <FontAwesomeIcon icon={faShieldAlt} />
                 </div>
                 <div>
-                  <p className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Compte vérifié</p>
-                  <p className="text-[8px] font-bold text-slate-400 uppercase">Protection activée</p>
+                  <p className="text-[10px] font-black text-black uppercase tracking-widest">Compte vérifié</p>
+                  <p className="text-[8px] font-bold text-black uppercase">Protection activée</p>
                 </div>
               </div>
             </div>
@@ -233,9 +233,9 @@ export default function ProfilePage() {
 
           {/* Account Actions Card */}
           <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-8">
-             <h4 className="text-sm font-black text-slate-900 uppercase tracking-[0.2em] mb-6">Paramètres de sécurité</h4>
+             <h4 className="text-sm font-black text-black uppercase tracking-[0.2em] mb-6">Paramètres de sécurité</h4>
              <div className="flex flex-col sm:flex-row gap-4">
-                <button className="flex-1 py-3 bg-slate-100 text-slate-700 rounded-xl font-bold hover:bg-slate-200 transition-all">
+                <button className="flex-1 py-3 bg-slate-100 text-black rounded-xl font-bold hover:bg-slate-200 transition-all">
                   Changer le mot de passe
                 </button>
                 <button className="flex-1 py-3 bg-rose-50 text-rose-600 rounded-xl font-bold hover:bg-rose-100 transition-all">
@@ -252,10 +252,10 @@ export default function ProfilePage() {
 function QuickInfo({ icon, value }: { icon: any, value: string }) {
   return (
     <div className="flex items-center gap-4 text-left p-3 hover:bg-slate-50 rounded-2xl transition-all">
-      <div className="w-8 h-8 rounded-xl bg-white border border-slate-50 flex items-center justify-center text-slate-400 shadow-sm">
+      <div className="w-8 h-8 rounded-xl bg-white border border-slate-50 flex items-center justify-center text-black shadow-sm">
         <FontAwesomeIcon icon={icon} className="text-xs" />
       </div>
-      <p className="text-xs font-bold text-slate-600 truncate">{value}</p>
+      <p className="text-xs font-bold text-black truncate">{value}</p>
     </div>
   );
 }
@@ -263,7 +263,7 @@ function QuickInfo({ icon, value }: { icon: any, value: string }) {
 function FormInput({ label, value, onChange, placeholder, type = "text" }: { label: string, value: string, onChange: (v: string) => void, placeholder: string, type?: string }) {
   return (
     <div className="space-y-2">
-      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">
+      <label className="block text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2">
         {label}
       </label>
       <input 
@@ -271,7 +271,7 @@ function FormInput({ label, value, onChange, placeholder, type = "text" }: { lab
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 font-bold text-sm text-slate-700 transition-all placeholder:text-slate-300"
+        className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 font-bold text-sm text-black transition-all placeholder:text-black"
       />
     </div>
   );

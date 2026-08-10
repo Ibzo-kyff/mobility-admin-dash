@@ -339,18 +339,18 @@ const Home: React.FC = () => {
           <div className="flex justify-between items-start mb-4">
             <div>
               <h4 className="text-xl font-bold">{marque} {modele} {annee}</h4>
-              <p className="text-gray-600">{categorie} • {kilometrage ? kilometrage.toLocaleString() + ' km' : 'Neuf'}</p>
+              <p className="text-black">{categorie} • {kilometrage ? kilometrage.toLocaleString() + ' km' : 'Neuf'}</p>
             </div>
             <div className="text-right">
-              <p className="text-2xl font-bold text-orange-600">{prix.toLocaleString()} CFA<span className="text-gray-500 text-lg"></span></p>
-              {prixAchat && <p className="text-sm text-gray-500">ou {prixAchat.toLocaleString()} CFA</p>}
+              <p className="text-2xl font-bold text-orange-600">{prix.toLocaleString()} CFA<span className="text-black text-lg"></span></p>
+              {prixAchat && <p className="text-sm text-black">ou {prixAchat.toLocaleString()} CFA</p>}
             </div>
           </div>
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-4">
-              <span className="flex items-center gap-2"><FontAwesomeIcon icon={faGasPump} className="text-gray-500" /> <span className="text-gray-700">{carburant}</span></span>
-              <span className="flex items-center gap-2"><FontAwesomeIcon icon={faCogs} className="text-gray-500" /> <span className="text-gray-700">{transmission}</span></span>
-              <span className="flex items-center gap-2"><FontAwesomeIcon icon={faUsers} className="text-gray-500" /> <span className="text-gray-700">{places}</span></span>
+              <span className="flex items-center gap-2"><FontAwesomeIcon icon={faGasPump} className="text-black" /> <span className="text-black">{carburant}</span></span>
+              <span className="flex items-center gap-2"><FontAwesomeIcon icon={faCogs} className="text-black" /> <span className="text-black">{transmission}</span></span>
+              <span className="flex items-center gap-2"><FontAwesomeIcon icon={faUsers} className="text-black" /> <span className="text-black">{places}</span></span>
             </div>
             <button onClick={() => handleReserve(vehicule.id)} className="px-6 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-full transition-colors font-medium">
               Réserver
@@ -389,8 +389,8 @@ const Home: React.FC = () => {
         <div className="p-5">
           <div className="flex justify-between items-start mb-3">
             <div>
-              <h3 className="text-lg font-bold text-gray-900">{marque} {modele} {annee ? `(${annee})` : ''}</h3>
-              <p className="text-sm text-gray-500">{kilometrage ? `${kilometrage.toLocaleString()} km` : 'Neuf'}</p>
+              <h3 className="text-lg font-bold text-black">{marque} {modele} {annee ? `(${annee})` : ''}</h3>
+              <p className="text-sm text-black">{kilometrage ? `${kilometrage.toLocaleString()} km` : 'Neuf'}</p>
             </div>
             <span className={`px-2 py-1 text-xs font-semibold rounded ${
               type === 'ACHAT' ? 'bg-blue-100 text-blue-800' : type === 'LOCATION' ? 'bg-orange-100 text-orange-800' : 'bg-green-100 text-green-800'
@@ -399,7 +399,7 @@ const Home: React.FC = () => {
             </span>
           </div>
 
-          <div className="flex items-center gap-3 mb-4 text-sm text-gray-600">
+          <div className="flex items-center gap-3 mb-4 text-sm text-black">
             <div className="flex items-center gap-1"><FontAwesomeIcon icon={faGasPump} className="w-4 h-4" /> <span>{carburant}</span></div>
             <div className="flex items-center gap-1"><FontAwesomeIcon icon={faCogs} className="w-4 h-4" /> <span>{transmission}</span></div>
             <div className="flex items-center gap-1"><FontAwesomeIcon icon={faUsers} className="w-4 h-4" /> <span>{places} places</span></div>
@@ -409,7 +409,7 @@ const Home: React.FC = () => {
             <div>
               <div className="text-xl font-bold text-orange-600">
                 {prix.toLocaleString()} CFA
-                {vehicule?.forRent && <span className="text-sm font-normal text-gray-500 ml-1">/jour</span>}
+                {vehicule?.forRent && <span className="text-sm font-normal text-black ml-1">/jour</span>}
               </div>
             </div>
             <div className="flex gap-2">
@@ -433,7 +433,7 @@ const Home: React.FC = () => {
                     showToast('Ajouté aux favoris', 'success');
                   }
                 }}
-                className="p-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+                className="p-2 bg-gray-100 hover:bg-gray-200 text-black rounded-lg transition-colors"
               >
                 <FontAwesomeIcon icon={faHeart} className="w-4 h-4" />
               </button>
@@ -722,23 +722,23 @@ footer {
           </div>
         
           <nav className="hidden md:flex items-center gap-8">
-            <a href="#how-it-works" className="text-gray-700 hover:text-orange-600 font-medium transition-colors">
+            <a href="#how-it-works" className="text-black hover:text-orange-600 font-medium transition-colors">
               Comment ça marche
             </a>
-            <a href="#vehicles" className="text-gray-700 hover:text-orange-600 font-medium transition-colors">
+            <a href="#vehicles" className="text-black hover:text-orange-600 font-medium transition-colors">
               Véhicules
             </a>
-            <a href="#features" className="text-gray-700 hover:text-orange-600 font-medium transition-colors">
+            <a href="#features" className="text-black hover:text-orange-600 font-medium transition-colors">
               Fonctionnalités
             </a>
-            <a href="#testimonials" className="text-gray-700 hover:text-orange-600 font-medium transition-colors">
+            <a href="#testimonials" className="text-black hover:text-orange-600 font-medium transition-colors">
               Avis
             </a>
             {!user ? (
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => router.push('/auth/login')}
-                  className="px-6 py-2 bg-gray-100 text-gray-700 font-semibold rounded-full hover:bg-gray-200 transition-colors"
+                  className="px-6 py-2 bg-gray-100 text-black font-semibold rounded-full hover:bg-gray-200 transition-colors"
                 >
                   Connexion
                 </button>
@@ -759,7 +759,7 @@ footer {
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 text-sm"
+                  className="px-4 py-2 bg-gray-100 text-black rounded-full hover:bg-gray-200 text-sm"
                 >
                   Déconnexion
                 </button>
@@ -767,7 +767,7 @@ footer {
             )}
           </nav>
           <button
-            className="md:hidden text-gray-700"
+            className="md:hidden text-black"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             <FontAwesomeIcon icon={isMobileMenuOpen ? faTimes : faBars} className="text-2xl" />
@@ -776,16 +776,16 @@ footer {
         {isMobileMenuOpen && (
           <div className="md:hidden mt-4 pb-4">
             <div className="flex flex-col gap-4">
-              <a href="#how-it-works" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 hover:text-orange-600 font-medium py-2">
+              <a href="#how-it-works" onClick={() => setIsMobileMenuOpen(false)} className="text-black hover:text-orange-600 font-medium py-2">
                 Comment ça marche
               </a>
-              <a href="#vehicles" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 hover:text-orange-600 font-medium py-2">
+              <a href="#vehicles" onClick={() => setIsMobileMenuOpen(false)} className="text-black hover:text-orange-600 font-medium py-2">
                 Véhicules
               </a>
-              <a href="#features" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 hover:text-orange-600 font-medium py-2">
+              <a href="#features" onClick={() => setIsMobileMenuOpen(false)} className="text-black hover:text-orange-600 font-medium py-2">
                 Fonctionnalités
               </a>
-              <a href="#testimonials" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 hover:text-orange-600 font-medium py-2">
+              <a href="#testimonials" onClick={() => setIsMobileMenuOpen(false)} className="text-black hover:text-orange-600 font-medium py-2">
                 Avis
               </a>
             
@@ -793,7 +793,7 @@ footer {
                 <div className="flex flex-col gap-3 mt-4">
                   <button
                     onClick={() => { router.push('/auth/login'); setIsMobileMenuOpen(false); }}
-                    className="px-6 py-2 bg-gray-100 text-gray-700 font-semibold rounded-full hover:bg-gray-200 transition-colors"
+                    className="px-6 py-2 bg-gray-100 text-black font-semibold rounded-full hover:bg-gray-200 transition-colors"
                   >
                     Connexion
                   </button>
@@ -814,7 +814,7 @@ footer {
                   </div>
                   <button
                     onClick={handleLogout}
-                    className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 text-sm"
+                    className="w-full px-4 py-2 bg-gray-100 text-black rounded-full hover:bg-gray-200 text-sm"
                   >
                     Déconnexion
                   </button>
@@ -862,7 +862,7 @@ footer {
                 <span className="gradient-text">Mobility</span><br />
                 Votre liberté sur 4 roues
               </h1>
-              <p className="text-xl text-gray-600 mb-8 max-w-xl">
+              <p className="text-xl text-black mb-8 max-w-xl">
                 Réservez, louez ou achetez la voiture qui vous correspond en quelques clics.
                 Une expérience simple, fluide et sécurisée.
               </p>
@@ -873,7 +873,7 @@ footer {
                 >
                   Explorer les véhicules
                 </button>
-                <button className="px-8 py-4 bg-white text-gray-800 font-semibold rounded-full border-2 border-gray-200 hover:border-orange-500 hover:text-orange-600 transition-all duration-300 text-lg">
+                <button className="px-8 py-4 bg-white text-black font-semibold rounded-full border-2 border-gray-200 hover:border-orange-500 hover:text-orange-600 transition-all duration-300 text-lg">
                   <FontAwesomeIcon icon={faPlayCircle} className="mr-2" />
                   Voir la démo
                 </button>
@@ -882,15 +882,15 @@ footer {
               <div className="grid grid-cols-3 gap-8">
                 <div>
                   <h3 className="text-3xl font-bold gradient-text">{stats?.totalVehicules ?? '500'}+</h3>
-                  <p className="text-gray-600">Véhicules disponibles</p>
+                  <p className="text-black">Véhicules disponibles</p>
                 </div>
                 <div>
                   <h3 className="text-3xl font-bold gradient-text">{stats?.totalParkings ?? '50'}+</h3>
-                  <p className="text-gray-600">Partenaires parking</p>
+                  <p className="text-black">Partenaires parking</p>
                 </div>
                 <div>
                   <h3 className="text-3xl font-bold gradient-text">24/7</h3>
-                  <p className="text-gray-600">Support client</p>
+                  <p className="text-black">Support client</p>
                 </div>
               </div>
             </div>
@@ -922,7 +922,7 @@ footer {
             <h2 className="section-title font-bold mb-6 text-5xl">
               Comment <span className="gradient-text">ça marche</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-black max-w-3xl mx-auto">
               Mobility simplifie la réservation, l&apos;achat et la location de véhicules en 4 étapes simples.
             </p>
           </div>
@@ -934,7 +934,7 @@ footer {
                   <FontAwesomeIcon icon={step.icon} />
                 </div>
                 <h3 className="text-xl font-bold mb-4">{step.title}</h3>
-                <p className="text-gray-600">{step.description}</p>
+                <p className="text-black">{step.description}</p>
               </div>
             ))}
           </div>
@@ -942,8 +942,8 @@ footer {
           <div className="mt-20 text-center">
             <div className="inline-flex flex-col lg:flex-row items-center gap-8 p-8 bg-orange-50 rounded-2xl border border-orange-100 max-w-4xl mx-auto">
               <div className="text-left">
-                <h4 className="font-bold text-2xl mb-2 text-gray-800">Pour les partenaires parking</h4>
-                <p className="text-gray-600">Créez un compte, ajoutez vos véhicules et gérez vos réservations facilement.</p>
+                <h4 className="font-bold text-2xl mb-2 text-black">Pour les partenaires parking</h4>
+                <p className="text-black">Créez un compte, ajoutez vos véhicules et gérez vos réservations facilement.</p>
               </div>
               <button onClick={() => router.push('/auth/login?role=PARKING')} className="px-8 py-3 bg-orange-600 text-white font-semibold rounded-full hover:bg-orange-700 transition-colors whitespace-nowrap">
                 Devenir partenaire
@@ -958,7 +958,7 @@ footer {
             <h2 className="section-title font-bold mb-6 text-5xl">
               Notre <span className="gradient-text">sélection</span> de véhicules
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-black max-w-3xl mx-auto">
               Des voitures pour tous les goûts et tous les budgets, disponibles à l&apos;achat ou à la location.
             </p>
           </div>
@@ -997,13 +997,13 @@ footer {
             {isLoading ? (
               <div className="col-span-full text-center py-12">
                 <div className="loading mx-auto"></div>
-                <p className="mt-4 text-gray-600">Chargement des véhicules...</p>
+                <p className="mt-4 text-black">Chargement des véhicules...</p>
               </div>
             ) : allVehicles.length === 0 ? (
               <div className="col-span-full text-center py-12">
-                <FontAwesomeIcon icon={faCar} className="text-4xl text-gray-300 mb-4" />
-                <h3 className="text-xl font-semibold text-gray-600 mb-2">Aucun véhicule trouvé</h3>
-                <p className="text-gray-500">Essayez de modifier vos filtres de recherche</p>
+                <FontAwesomeIcon icon={faCar} className="text-4xl text-black mb-4" />
+                <h3 className="text-xl font-semibold text-black mb-2">Aucun véhicule trouvé</h3>
+                <p className="text-black">Essayez de modifier vos filtres de recherche</p>
               </div>
             ) : (
               allVehicles.map((vehicule) => (
@@ -1030,7 +1030,7 @@ footer {
             <h2 className="section-title font-bold mb-6 text-5xl">
               Pourquoi choisir <span className="gradient-text">Mobility</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-black max-w-3xl mx-auto">
               Découvrez les avantages qui font de Mobility la plateforme de réservation préférée.
             </p>
           </div>
@@ -1048,14 +1048,14 @@ footer {
                 <div className="absolute -top-4 -right-4 bg-white p-4 rounded-xl shadow-lg border border-gray-200">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-orange-600">4.9/5</div>
-                    <div className="text-gray-600 text-sm">Satisfaction</div>
+                    <div className="text-black text-sm">Satisfaction</div>
                   </div>
                 </div>
               
                 <div className="absolute -bottom-4 -left-4 bg-white p-4 rounded-xl shadow-lg border border-gray-200">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-orange-600">24h</div>
-                    <div className="text-gray-600 text-sm">Support</div>
+                    <div className="text-black text-sm">Support</div>
                   </div>
                 </div>
               </div>
@@ -1070,7 +1070,7 @@ footer {
                     </div>
                     <div>
                       <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-                      <p className="text-gray-600">{feature.description}</p>
+                      <p className="text-black">{feature.description}</p>
                     </div>
                   </div>
                 ))}
@@ -1085,7 +1085,7 @@ footer {
             <h2 className="section-title font-bold mb-6 text-5xl">
               Ils nous <span className="gradient-text">font confiance</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-black max-w-3xl mx-auto">
               Découvrez les expériences de nos utilisateurs et partenaires parking.
             </p>
           </div>
@@ -1099,10 +1099,10 @@ footer {
                   </div>
                   <div>
                     <h4 className="font-bold text-lg">{testimonial.name}</h4>
-                    <p className="text-gray-600">{testimonial.role}</p>
+                    <p className="text-black">{testimonial.role}</p>
                   </div>
                 </div>
-                <p className="text-gray-700 mb-6 italic">
+                <p className="text-black mb-6 italic">
                   &quot;{testimonial.text}&quot;
                 </p>
                 <div className="flex text-orange-400">
@@ -1125,7 +1125,7 @@ footer {
       <h2 className="section-title font-bold mb-8 text-5xl">
         Prêt à <span className="gradient-text">rouler</span> avec nous ?
       </h2>
-      <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-12">
+      <p className="text-xl text-black max-w-3xl mx-auto mb-12">
         Rejoignez des milliers d&apos;utilisateurs qui ont simplifié leur mobilité. Téléchargez l&apos;application ou inscrivez-vous dès maintenant.
       </p>
     
@@ -1133,7 +1133,7 @@ footer {
         <button onClick={() => router.push('/auth/register')} className="px-10 py-5 bg-orange-600 text-white font-semibold rounded-2xl hover:bg-orange-700 transition-all duration-300 transform hover:-translate-y-2 text-lg shadow-lg hover:shadow-xl hover:shadow-orange-200">
           S&apos;inscrire gratuitement
         </button>
-        <button className="px-10 py-5 bg-white text-gray-800 font-semibold rounded-2xl border-2 border-gray-300 hover:border-orange-500 hover:text-orange-600 transition-all duration-300 text-lg">
+        <button className="px-10 py-5 bg-white text-black font-semibold rounded-2xl border-2 border-gray-300 hover:border-orange-500 hover:text-orange-600 transition-all duration-300 text-lg">
           <FontAwesomeIcon icon={faMobileAlt} className="mr-2" />
           Télécharger l&apos;app
         </button>
@@ -1146,8 +1146,8 @@ footer {
               <div className="feature-icon mx-auto">
                 <FontAwesomeIcon icon={feature.icon} />
               </div>
-              <h4 className="font-bold text-xl mb-2 text-gray-800">{feature.title}</h4>
-              <p className="text-gray-600">{feature.description}</p>
+              <h4 className="font-bold text-xl mb-2 text-black">{feature.title}</h4>
+              <p className="text-black">{feature.description}</p>
             </div>
           ))}
         </div>
@@ -1161,7 +1161,7 @@ footer {
       
         {/* Deuxième ligne - copyright */}
         <div className="text-center pt-6 border-t border-gray-100">
-          <p className="text-gray-500 text-sm">
+          <p className="text-black text-sm">
             © 2023 Mobility - Conçu pour améliorer la mobilité urbaine.
           </p>
         </div>

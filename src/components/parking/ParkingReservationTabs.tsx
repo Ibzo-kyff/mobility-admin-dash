@@ -569,12 +569,12 @@ export default function ParkingReservationTabs() {
           className={`px-4 sm:px-6 py-4 text-sm font-medium transition-colors whitespace-nowrap ${
             activeTab === 'pending'
               ? 'border-b-2 border-orange-500 text-orange-600'
-              : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+              : 'text-black hover:text-black hover:bg-gray-50'
           }`}
           onClick={() => setActiveTab('pending')}
         >
           Réservations en attente
-          <span className="ml-2 bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-xs">
+          <span className="ml-2 bg-gray-100 text-black px-2 py-0.5 rounded-full text-xs">
             {reservations.filter(r => r.status === 'PENDING').length}
           </span>
         </button>
@@ -582,12 +582,12 @@ export default function ParkingReservationTabs() {
           className={`px-4 sm:px-6 py-4 text-sm font-medium transition-colors whitespace-nowrap ${
             activeTab === 'ongoing'
               ? 'border-b-2 border-orange-500 text-orange-600'
-              : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+              : 'text-black hover:text-black hover:bg-gray-50'
           }`}
           onClick={() => setActiveTab('ongoing')}
         >
           Locations en cours
-          <span className="ml-2 bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-xs">
+          <span className="ml-2 bg-gray-100 text-black px-2 py-0.5 rounded-full text-xs">
             {reservations.filter(r => r.status === 'ACCEPTED').length}
           </span>
         </button>
@@ -595,12 +595,12 @@ export default function ParkingReservationTabs() {
           className={`px-4 sm:px-6 py-4 text-sm font-medium transition-colors whitespace-nowrap ${
             activeTab === 'history'
               ? 'border-b-2 border-orange-500 text-orange-600'
-              : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+              : 'text-black hover:text-black hover:bg-gray-50'
           }`}
           onClick={() => setActiveTab('history')}
         >
           Historique
-          <span className="ml-2 bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-xs">
+          <span className="ml-2 bg-gray-100 text-black px-2 py-0.5 rounded-full text-xs">
             {reservations.length}
           </span>
         </button>
@@ -612,12 +612,12 @@ export default function ParkingReservationTabs() {
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           className="w-full px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center justify-between"
         >
-          <span className="text-sm font-medium text-gray-700">
+          <span className="text-sm font-medium text-black">
             {activeTab === 'pending' && 'Réservations en attente'}
             {activeTab === 'ongoing' && 'Locations en cours'}
             {activeTab === 'history' && 'Historique'}
           </span>
-          <FontAwesomeIcon icon={mobileMenuOpen ? faXmark : faBars} className="text-gray-500" />
+          <FontAwesomeIcon icon={mobileMenuOpen ? faXmark : faBars} className="text-black" />
         </button>
         
         {mobileMenuOpen && (
@@ -626,7 +626,7 @@ export default function ParkingReservationTabs() {
               className={`w-full px-4 py-3 text-left text-sm transition-colors ${
                 activeTab === 'pending'
                   ? 'bg-orange-50 text-orange-600 font-medium'
-                  : 'text-gray-600 hover:bg-gray-50'
+                  : 'text-black hover:bg-gray-50'
               }`}
               onClick={() => {
                 setActiveTab('pending');
@@ -634,7 +634,7 @@ export default function ParkingReservationTabs() {
               }}
             >
               Réservations en attente
-              <span className="ml-2 bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-xs">
+              <span className="ml-2 bg-gray-100 text-black px-2 py-0.5 rounded-full text-xs">
                 {reservations.filter(r => r.status === 'PENDING').length}
               </span>
             </button>
@@ -642,7 +642,7 @@ export default function ParkingReservationTabs() {
               className={`w-full px-4 py-3 text-left text-sm transition-colors ${
                 activeTab === 'ongoing'
                   ? 'bg-orange-50 text-orange-600 font-medium'
-                  : 'text-gray-600 hover:bg-gray-50'
+                  : 'text-black hover:bg-gray-50'
               }`}
               onClick={() => {
                 setActiveTab('ongoing');
@@ -650,7 +650,7 @@ export default function ParkingReservationTabs() {
               }}
             >
               Locations en cours
-              <span className="ml-2 bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-xs">
+              <span className="ml-2 bg-gray-100 text-black px-2 py-0.5 rounded-full text-xs">
                 {reservations.filter(r => r.status === 'ACCEPTED').length}
               </span>
             </button>
@@ -658,7 +658,7 @@ export default function ParkingReservationTabs() {
               className={`w-full px-4 py-3 text-left text-sm transition-colors ${
                 activeTab === 'history'
                   ? 'bg-orange-50 text-orange-600 font-medium'
-                  : 'text-gray-600 hover:bg-gray-50'
+                  : 'text-black hover:bg-gray-50'
               }`}
               onClick={() => {
                 setActiveTab('history');
@@ -666,7 +666,7 @@ export default function ParkingReservationTabs() {
               }}
             >
               Historique
-              <span className="ml-2 bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-xs">
+              <span className="ml-2 bg-gray-100 text-black px-2 py-0.5 rounded-full text-xs">
                 {reservations.length}
               </span>
             </button>
@@ -685,7 +685,7 @@ export default function ParkingReservationTabs() {
           <div className="w-full max-w-md bg-white rounded-2xl sm:rounded-[2.5rem] shadow-2xl overflow-hidden relative flex flex-col animate-slideUp">
             <div className="p-4 sm:p-8 border-b border-slate-100 flex justify-between items-center bg-white">
               <div>
-                <h2 className="text-xl sm:text-2xl font-black text-slate-900 flex items-center gap-2 sm:gap-3">
+                <h2 className="text-xl sm:text-2xl font-black text-black flex items-center gap-2 sm:gap-3">
                   <span className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-orange-100 text-orange-500 flex items-center justify-center shadow-inner">
                     <FontAwesomeIcon icon={faMoneyBillWave} />
                   </span>
@@ -694,7 +694,7 @@ export default function ParkingReservationTabs() {
               </div>
               <button
                 onClick={() => setIsCommissionModalOpen(false)}
-                className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-50 text-slate-400 hover:text-slate-900 transition-all flex items-center justify-center border border-slate-100"
+                className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-50 text-black hover:text-black transition-all flex items-center justify-center border border-slate-100"
               >
                 <FontAwesomeIcon icon={faTimes} />
               </button>
@@ -703,17 +703,17 @@ export default function ParkingReservationTabs() {
               {selectedReservation && (
                 <div className="mb-4 sm:mb-6 p-3 sm:p-5 bg-slate-50 rounded-xl sm:rounded-[1.5rem] border border-slate-100 flex justify-between items-center">
                   <div>
-                    <p className="text-[8px] sm:text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Réservation</p>
-                    <p className="text-xs sm:text-sm font-black text-slate-900">#{selectedReservation.id}</p>
+                    <p className="text-[8px] sm:text-[9px] font-black text-black uppercase tracking-widest mb-1">Réservation</p>
+                    <p className="text-xs sm:text-sm font-black text-black">#{selectedReservation.id}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-[8px] sm:text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Total</p>
+                    <p className="text-[8px] sm:text-[9px] font-black text-black uppercase tracking-widest mb-1">Total</p>
                     <p className="text-xs sm:text-sm font-black text-orange-600">{calculateTotal(selectedReservation).toLocaleString('fr-FR')} FCFA</p>
                   </div>
                 </div>
               )}
               <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
-                <label className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2 block">
+                <label className="text-[9px] sm:text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2 block">
                   Montant (FCFA)
                 </label>
                 <div className="relative">
@@ -730,7 +730,7 @@ export default function ParkingReservationTabs() {
               <div className="flex gap-3 sm:gap-4">
                 <button
                   onClick={() => setIsCommissionModalOpen(false)}
-                  className="flex-1 py-3 sm:py-4 bg-white border border-slate-200 text-slate-400 rounded-xl sm:rounded-2xl font-black text-[9px] sm:text-[10px] uppercase tracking-widest hover:text-slate-900 transition-all active:scale-95"
+                  className="flex-1 py-3 sm:py-4 bg-white border border-slate-200 text-black rounded-xl sm:rounded-2xl font-black text-[9px] sm:text-[10px] uppercase tracking-widest hover:text-black transition-all active:scale-95"
                 >
                   Annuler
                 </button>
@@ -758,27 +758,27 @@ export default function ParkingReservationTabs() {
               }`}>
                 <FontAwesomeIcon icon={statusModalConfig.icon} size="xl" />
               </div>
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900 mb-2 sm:mb-3">{statusModalConfig.title}</h2>
-              <p className="text-xs sm:text-sm text-slate-500 leading-relaxed mb-6 sm:mb-8 px-2 sm:px-4">
+              <h2 className="text-xl sm:text-2xl font-black text-black mb-2 sm:mb-3">{statusModalConfig.title}</h2>
+              <p className="text-xs sm:text-sm text-black leading-relaxed mb-6 sm:mb-8 px-2 sm:px-4">
                 {statusModalConfig.message}
               </p>
               {statusModalConfig.showReasonField && (
                 <div className="mb-6 sm:mb-8 text-left">
-                  <label className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2 mb-2 block">
+                  <label className="text-[9px] sm:text-[10px] font-black text-black uppercase tracking-widest ml-2 mb-2 block">
                     Motif (Optionnel)
                   </label>
                   <textarea
                     value={statusReason}
                     onChange={(e) => setStatusReason(e.target.value)}
                     placeholder="Pourquoi annulez-vous cette réservation ?"
-                    className="w-full px-4 sm:px-5 py-3 sm:py-4 bg-slate-50 border border-slate-100 rounded-xl sm:rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-medium text-slate-700 transition-all text-sm min-h-[80px] sm:min-h-[100px] resize-none"
+                    className="w-full px-4 sm:px-5 py-3 sm:py-4 bg-slate-50 border border-slate-100 rounded-xl sm:rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-medium text-black transition-all text-sm min-h-[80px] sm:min-h-[100px] resize-none"
                   />
                 </div>
               )}
               <div className="flex gap-3 sm:gap-4">
                 <button
                   onClick={() => setIsStatusModalOpen(false)}
-                  className="flex-1 py-3 sm:py-5 bg-slate-50 text-slate-400 rounded-xl sm:rounded-2xl font-black text-[9px] sm:text-[10px] uppercase tracking-widest hover:text-slate-900 transition-all active:scale-95"
+                  className="flex-1 py-3 sm:py-5 bg-slate-50 text-black rounded-xl sm:rounded-2xl font-black text-[9px] sm:text-[10px] uppercase tracking-widest hover:text-black transition-all active:scale-95"
                 >
                   Retour
                 </button>
@@ -810,7 +810,7 @@ export default function ParkingReservationTabs() {
           <div className="w-full max-w-lg bg-white rounded-2xl sm:rounded-[2.5rem] shadow-2xl max-h-[90vh] overflow-y-auto relative flex flex-col">
             <div className="sticky top-0 bg-white p-4 sm:p-8 border-b border-slate-100 flex justify-between items-center z-20">
               <div>
-                <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 flex items-center gap-2 sm:gap-4">
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-black flex items-center gap-2 sm:gap-4">
                   <span className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-orange-100 text-orange-500 flex items-center justify-center shadow-inner">
                     <FontAwesomeIcon icon={faEdit} />
                   </span>
@@ -819,14 +819,14 @@ export default function ParkingReservationTabs() {
                 <div className="flex items-center gap-2 sm:gap-3 mt-2">
                   <div className="flex items-center gap-1.5">
                     <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.5)] transition-all" />
-                    <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-900">
+                    <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-black">
                       #{selectedReservation.id}
                     </span>
                   </div>
                   <div className="w-6 sm:w-8 h-px bg-slate-100" />
                   <div className="flex items-center gap-1.5">
                     <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-orange-200 transition-all" />
-                    <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-widest text-slate-400 truncate max-w-[100px] sm:max-w-none">
+                    <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-widest text-black truncate max-w-[100px] sm:max-w-none">
                       {selectedReservation.vehicle.marqueRef?.name || selectedReservation.vehicle.marque}
                     </span>
                   </div>
@@ -834,40 +834,40 @@ export default function ParkingReservationTabs() {
               </div>
               <button
                 onClick={() => setIsEditModalOpen(false)}
-                className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-50 text-slate-400 hover:text-slate-900 hover:bg-white border border-slate-100 transition-all flex items-center justify-center shadow-sm"
+                className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-50 text-black hover:text-black hover:bg-white border border-slate-100 transition-all flex items-center justify-center shadow-sm"
               >
                 <FontAwesomeIcon icon={faTimes} />
               </button>
             </div>
             <div className="p-4 sm:p-8">
               <div className="mb-6 sm:mb-8 p-4 sm:p-6 bg-slate-50 rounded-xl sm:rounded-[2rem] border border-slate-200 shadow-inner">
-                <label className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2 mb-4 sm:mb-6 block flex items-center gap-2">
+                <label className="text-[9px] sm:text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2 mb-4 sm:mb-6 block flex items-center gap-2">
                   <FontAwesomeIcon icon={faCalendarAlt} className="text-orange-500" />
                   Période
                 </label>
                 <div className="grid grid-cols-2 gap-3 sm:gap-4">
                   <div>
-                    <p className="text-[8px] sm:text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Début</p>
+                    <p className="text-[8px] sm:text-[9px] font-black text-black uppercase tracking-widest mb-2 ml-1">Début</p>
                     <input
                       type="datetime-local"
                       value={editReservationData.dateDebut}
                       onChange={(e) => setEditReservationData({ ...editReservationData, dateDebut: e.target.value })}
-                      className="w-full px-3 sm:px-5 py-2 sm:py-3.5 bg-white border border-slate-200 rounded-xl sm:rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all text-xs sm:text-sm"
+                      className="w-full px-3 sm:px-5 py-2 sm:py-3.5 bg-white border border-slate-200 rounded-xl sm:rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-black transition-all text-xs sm:text-sm"
                     />
                   </div>
                   <div>
-                    <p className="text-[8px] sm:text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Fin</p>
+                    <p className="text-[8px] sm:text-[9px] font-black text-black uppercase tracking-widest mb-2 ml-1">Fin</p>
                     <input
                       type="datetime-local"
                       value={editReservationData.dateFin}
                       onChange={(e) => setEditReservationData({ ...editReservationData, dateFin: e.target.value })}
-                      className="w-full px-3 sm:px-5 py-2 sm:py-3.5 bg-white border border-slate-200 rounded-xl sm:rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all text-xs sm:text-sm"
+                      className="w-full px-3 sm:px-5 py-2 sm:py-3.5 bg-white border border-slate-200 rounded-xl sm:rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-bold text-black transition-all text-xs sm:text-sm"
                     />
                   </div>
                 </div>
               </div>
               <div className="mb-6 sm:mb-8">
-                <label className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2 mb-3 sm:mb-4 block flex items-center gap-2">
+                <label className="text-[9px] sm:text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2 mb-3 sm:mb-4 block flex items-center gap-2">
                   <FontAwesomeIcon icon={faTag} className="text-orange-500" />
                   Type
                 </label>
@@ -882,7 +882,7 @@ export default function ParkingReservationTabs() {
                       className={`py-3 sm:py-5 rounded-xl sm:rounded-2xl border-2 font-black text-[10px] sm:text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${
                         editReservationData.type === type.id
                           ? type.activeClass
-                          : 'bg-white text-slate-400 border-slate-200 hover:border-orange-200 hover:text-slate-600'
+                          : 'bg-white text-black border-slate-200 hover:border-orange-200 hover:text-black'
                       }`}
                     >
                       <FontAwesomeIcon icon={type.icon} className="text-xs sm:text-sm" />
@@ -893,7 +893,7 @@ export default function ParkingReservationTabs() {
                 </div>
               </div>
               <div className="mb-6 sm:mb-8 p-4 sm:p-6 bg-orange-50/30 rounded-xl sm:rounded-[2rem] border border-orange-100">
-                <label className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2 mb-3 sm:mb-4 block flex items-center gap-2">
+                <label className="text-[9px] sm:text-[10px] font-black text-black uppercase tracking-[0.2em] ml-2 mb-3 sm:mb-4 block flex items-center gap-2">
                   <FontAwesomeIcon icon={faMoneyBillWave} className="text-orange-500" />
                   Commission (FCFA)
                 </label>
@@ -911,7 +911,7 @@ export default function ParkingReservationTabs() {
               <div className="flex gap-3 sm:gap-4 pt-2 sm:pt-4">
                 <button
                   onClick={() => setIsEditModalOpen(false)}
-                  className="flex-1 py-3 sm:py-5 bg-white border border-slate-200 text-slate-400 rounded-xl sm:rounded-2xl font-black text-[9px] sm:text-xs uppercase tracking-widest hover:text-slate-900 hover:border-slate-400 transition-all active:scale-95 flex items-center justify-center gap-2"
+                  className="flex-1 py-3 sm:py-5 bg-white border border-slate-200 text-black rounded-xl sm:rounded-2xl font-black text-[9px] sm:text-xs uppercase tracking-widest hover:text-black hover:border-slate-400 transition-all active:scale-95 flex items-center justify-center gap-2"
                 >
                   <FontAwesomeIcon icon={faTimes} />
                   Annuler
@@ -945,14 +945,14 @@ export default function ParkingReservationTabs() {
         <div className="fixed inset-0 z-[400] flex items-end sm:items-center justify-center animate-fadeIn bg-slate-900/60 backdrop-blur-sm p-0 sm:p-4">
           <div className="w-full max-w-4xl bg-white rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl max-h-[95vh] sm:max-h-[90vh] flex flex-col relative overflow-hidden">
             <div className="sticky top-0 bg-white p-6 border-b border-slate-100 flex justify-between items-center z-10">
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900 flex items-center gap-3">
+              <h2 className="text-xl sm:text-2xl font-black text-black flex items-center gap-3">
                 <FontAwesomeIcon icon={faCar} className="text-orange-500" />
                 Détails du véhicule
               </h2>
               <button
                 title="Fermer"
                 onClick={() => setIsVehicleModalOpen(false)}
-                className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center transition-all"
+                className="w-10 h-10 rounded-full bg-slate-100 text-black hover:bg-slate-200 flex items-center justify-center transition-all"
               >
                 <FontAwesomeIcon icon={faTimes} />
               </button>
@@ -981,7 +981,7 @@ export default function ParkingReservationTabs() {
                 {/* Info */}
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-3xl font-black text-slate-900">
+                    <h3 className="text-3xl font-black text-black">
                       {selectedVehicleForModal.marque} {selectedVehicleForModal.model || selectedVehicleForModal.modele}
                     </h3>
                     <p className="text-orange-600 font-black text-xl mt-1">{formatPrice(selectedVehicleForModal.prix || 0)}</p>
@@ -989,29 +989,29 @@ export default function ParkingReservationTabs() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Carburant</p>
-                      <p className="font-bold text-slate-700 flex items-center gap-2">
+                      <p className="text-[10px] font-black text-black uppercase tracking-widest mb-1">Carburant</p>
+                      <p className="font-bold text-black flex items-center gap-2">
                         <FontAwesomeIcon icon={faGasPump} className="text-orange-500" />
                         {selectedVehicleForModal.fuelType || selectedVehicleForModal.carburant || 'N/A'}
                       </p>
                     </div>
                     <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Transmission</p>
-                      <p className="font-bold text-slate-700 flex items-center gap-2">
+                      <p className="text-[10px] font-black text-black uppercase tracking-widest mb-1">Transmission</p>
+                      <p className="font-bold text-black flex items-center gap-2">
                         <FontAwesomeIcon icon={faCogs} className="text-orange-500" />
                         {formatTransmissionForDisplay(selectedVehicleForModal.transmission || selectedVehicleForModal.boite)}
                       </p>
                     </div>
                     <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Année</p>
-                      <p className="font-bold text-slate-700 flex items-center gap-2">
+                      <p className="text-[10px] font-black text-black uppercase tracking-widest mb-1">Année</p>
+                      <p className="font-bold text-black flex items-center gap-2">
                         <FontAwesomeIcon icon={faCalendarAlt} className="text-orange-500" />
                         {selectedVehicleForModal.annee || selectedVehicleForModal.year || 'N/A'}
                       </p>
                     </div>
                     <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Kilométrage</p>
-                      <p className="font-bold text-slate-700 flex items-center gap-2">
+                      <p className="text-[10px] font-black text-black uppercase tracking-widest mb-1">Kilométrage</p>
+                      <p className="font-bold text-black flex items-center gap-2">
                         <FontAwesomeIcon icon={faTachometerAlt} className="text-orange-500" />
                         {formatMileage(selectedVehicleForModal.mileage || selectedVehicleForModal.kilometrage || 0)}
                       </p>
@@ -1020,8 +1020,8 @@ export default function ParkingReservationTabs() {
 
                   {selectedVehicleForModal.description && (
                     <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Description</p>
-                      <p className="text-sm text-slate-600 leading-relaxed">{selectedVehicleForModal.description}</p>
+                      <p className="text-[10px] font-black text-black uppercase tracking-widest mb-2">Description</p>
+                      <p className="text-sm text-black leading-relaxed">{selectedVehicleForModal.description}</p>
                     </div>
                   )}
 
@@ -1061,7 +1061,7 @@ export default function ParkingReservationTabs() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <button
             onClick={() => setViewModeTab('list')}
-            className="group flex items-center gap-2 sm:gap-3 text-slate-400 hover:text-orange-500 font-black text-[10px] sm:text-xs uppercase tracking-[0.2em] transition-all self-start"
+            className="group flex items-center gap-2 sm:gap-3 text-black hover:text-orange-500 font-black text-[10px] sm:text-xs uppercase tracking-[0.2em] transition-all self-start"
           >
             <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center group-hover:bg-orange-50 group-hover:border-orange-100 transition-all">
               <FontAwesomeIcon icon={faChevronLeft} size="xs" />
@@ -1131,7 +1131,7 @@ export default function ParkingReservationTabs() {
                 </>
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-slate-100">
-                  <FontAwesomeIcon icon={faCar} size="3x" className="text-slate-300" />
+                  <FontAwesomeIcon icon={faCar} size="3x" className="text-black" />
                 </div>
               )}
 
@@ -1175,15 +1175,15 @@ export default function ParkingReservationTabs() {
           <div className="p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-4">
               <div>
-                <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900">
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-black">
                   {v.marqueRef?.name || v.marque} {v.model || v.modele}
                 </h1>
-                <div className="flex flex-wrap items-center gap-2 mt-2 text-slate-400 text-[8px] sm:text-[10px] font-bold uppercase tracking-widest">
+                <div className="flex flex-wrap items-center gap-2 mt-2 text-black text-[8px] sm:text-[10px] font-bold uppercase tracking-widest">
                   <span className="flex items-center gap-1">
                     <FontAwesomeIcon icon={faCalendarAlt} className="text-orange-500/50" />
                     {v.annee || v.year || 'N/A'}
                   </span>
-                  <span className="text-slate-300 mx-1 hidden sm:inline">•</span>
+                  <span className="text-black mx-1 hidden sm:inline">•</span>
                   <span className="flex items-center gap-1">
                     <FontAwesomeIcon icon={faTachometerAlt} className="text-orange-500/50" />
                     {formatMileage(v.mileage || v.kilometrage || 0)}
@@ -1197,7 +1197,7 @@ export default function ParkingReservationTabs() {
 
             {(v.garantie || v.assurance || v.chauffeur) && (
               <div className="mb-6 sm:mb-8">
-                <h3 className="text-[10px] sm:text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-3 sm:mb-4 flex items-center gap-2">
+                <h3 className="text-[10px] sm:text-xs font-black text-black uppercase tracking-[0.2em] mb-3 sm:mb-4 flex items-center gap-2">
                   <span className="w-6 sm:w-8 h-[1px] bg-slate-200"></span>
                   Services & Inclusions
                 </h3>
@@ -1241,24 +1241,24 @@ export default function ParkingReservationTabs() {
 
             {v.description && (
               <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-slate-50 rounded-lg sm:rounded-xl">
-                <p className="text-xs sm:text-sm text-slate-600">{v.description}</p>
+                <p className="text-xs sm:text-sm text-black">{v.description}</p>
               </div>
             )}
 
             <div className="mb-6 sm:mb-8">
-              <h3 className="text-[10px] sm:text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-3 sm:mb-4 flex items-center gap-2">
+              <h3 className="text-[10px] sm:text-xs font-black text-black uppercase tracking-[0.2em] mb-3 sm:mb-4 flex items-center gap-2">
                 <span className="w-6 sm:w-8 h-[1px] bg-slate-200"></span>
                 Documents & Conformité
               </h3>
               <div className="grid grid-cols-3 gap-2 sm:gap-4">
                 <div className={`p-2 sm:p-4 rounded-xl sm:rounded-[1.5rem] border ${v.carteGrise ? 'bg-emerald-50/50 border-emerald-100' : 'bg-slate-50 border-slate-100'} flex flex-col items-center text-center`}>
-                  <div className={`w-8 h-8 sm:w-10 sm:h-10 mb-2 sm:mb-3 rounded-lg sm:rounded-xl flex items-center justify-center ${v.carteGrise ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-400'}`}>
+                  <div className={`w-8 h-8 sm:w-10 sm:h-10 mb-2 sm:mb-3 rounded-lg sm:rounded-xl flex items-center justify-center ${v.carteGrise ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-black'}`}>
                     <FontAwesomeIcon icon={faFileContract} size="sm" />
                   </div>
                   <p className="text-[8px] sm:text-[10px] font-black uppercase tracking-widest">Carte Grise</p>
                 </div>
                 <div className={`p-2 sm:p-4 rounded-xl sm:rounded-[1.5rem] border ${v.vignette ? 'bg-emerald-50/50 border-emerald-100' : 'bg-slate-50 border-slate-100'} flex flex-col items-center text-center`}>
-                  <div className={`w-8 h-8 sm:w-10 sm:h-10 mb-2 sm:mb-3 rounded-lg sm:rounded-xl flex items-center justify-center ${v.vignette ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-400'}`}>
+                  <div className={`w-8 h-8 sm:w-10 sm:h-10 mb-2 sm:mb-3 rounded-lg sm:rounded-xl flex items-center justify-center ${v.vignette ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-black'}`}>
                     <FontAwesomeIcon icon={faCertificate} size="sm" />
                   </div>
                   <p className="text-[8px] sm:text-[10px] font-black uppercase tracking-widest">Vignette</p>
@@ -1273,7 +1273,7 @@ export default function ParkingReservationTabs() {
             </div>
 
             <div className="mb-6 sm:mb-8">
-              <h3 className="text-[10px] sm:text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-3 sm:mb-4 flex items-center gap-2">
+              <h3 className="text-[10px] sm:text-xs font-black text-black uppercase tracking-[0.2em] mb-3 sm:mb-4 flex items-center gap-2">
                 <span className="w-6 sm:w-8 h-[1px] bg-slate-200"></span>
                 Caractéristiques
               </h3>
@@ -1288,15 +1288,15 @@ export default function ParkingReservationTabs() {
                     <div className={`w-10 h-10 sm:w-12 sm:h-12 ${spec.bg} ${spec.color} rounded-xl sm:rounded-2xl flex items-center justify-center mb-2 sm:mb-3 group-hover:scale-110 transition-transform`}>
                       <FontAwesomeIcon icon={spec.icon} size="sm" />
                     </div>
-                    <p className="text-[8px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{spec.label}</p>
-                    <p className="text-xs sm:text-sm font-black text-slate-900">{spec.value}</p>
+                    <p className="text-[8px] sm:text-[10px] font-black text-black uppercase tracking-widest mb-1">{spec.label}</p>
+                    <p className="text-xs sm:text-sm font-black text-black">{spec.value}</p>
                   </div>
                 ))}
               </div>
             </div>
             
             <div className="bg-slate-50 rounded-xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-slate-100">
-              <h3 className="text-xs sm:text-sm font-black text-slate-400 uppercase tracking-[0.2em] mb-4 sm:mb-6 flex items-center gap-2">
+              <h3 className="text-xs sm:text-sm font-black text-black uppercase tracking-[0.2em] mb-4 sm:mb-6 flex items-center gap-2">
                 <span className="w-6 sm:w-8 h-[1px] bg-slate-200"></span>
                 Actions Gestionnaire
               </h3>
@@ -1336,7 +1336,7 @@ export default function ParkingReservationTabs() {
                 {(selectedReservation.status === 'ACCEPTED' || selectedReservation.status === 'PENDING') && (
                   <button
                     onClick={() => openStatusModal(selectedReservation.id, 'CANCELED')}
-                    className="px-4 sm:px-8 py-3 sm:py-4 bg-slate-100 text-slate-600 rounded-xl sm:rounded-2xl font-black text-[10px] sm:text-xs uppercase tracking-widest hover:bg-slate-200 transition-all flex items-center justify-center gap-2 active:scale-95"
+                    className="px-4 sm:px-8 py-3 sm:py-4 bg-slate-100 text-black rounded-xl sm:rounded-2xl font-black text-[10px] sm:text-xs uppercase tracking-widest hover:bg-slate-200 transition-all flex items-center justify-center gap-2 active:scale-95"
                   >
                     <FontAwesomeIcon icon={faBan} />
                     <span className="hidden sm:inline">Annuler</span>
@@ -1367,20 +1367,20 @@ export default function ParkingReservationTabs() {
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-9 pr-3 sm:pl-10 sm:pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all font-sans text-sm"
           />
-          <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-2.5 text-gray-400 text-sm" />
+          <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-2.5 text-black text-sm" />
         </div>
         <div className="flex gap-2 justify-end">
           <div className="hidden md:flex bg-gray-200 p-1 rounded-lg">
             <button
               onClick={() => setViewMode('list')}
-              className={`px-2 sm:px-3 py-1 rounded-md text-sm transition-colors ${viewMode === 'list' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`px-2 sm:px-3 py-1 rounded-md text-sm transition-colors ${viewMode === 'list' ? 'bg-white text-black shadow-sm' : 'text-black hover:text-black'}`}
               title="Vue liste"
             >
               <FontAwesomeIcon icon={faList} />
             </button>
             <button
               onClick={() => setViewMode('grid')}
-              className={`px-2 sm:px-3 py-1 rounded-md text-sm transition-colors ${viewMode === 'grid' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`px-2 sm:px-3 py-1 rounded-md text-sm transition-colors ${viewMode === 'grid' ? 'bg-white text-black shadow-sm' : 'text-black hover:text-black'}`}
               title="Vue grille"
             >
               <FontAwesomeIcon icon={faTh} />
@@ -1389,13 +1389,13 @@ export default function ParkingReservationTabs() {
           <button
             onClick={fetchReservations}
             title="Rafraîchir"
-            className="p-2 text-gray-500 hover:text-orange-500 hover:bg-orange-50 rounded-lg transition-colors border border-gray-200 bg-white"
+            className="p-2 text-black hover:text-orange-500 hover:bg-orange-50 rounded-lg transition-colors border border-gray-200 bg-white"
           >
             <FontAwesomeIcon icon={faSync} className={loading ? 'animate-spin' : ''} />
           </button>
           <button
             onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-            className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 border rounded-lg transition-colors text-xs sm:text-sm font-medium ${showAdvancedFilters ? 'bg-orange-500 text-white border-orange-500 shadow-md shadow-orange-500/20' : 'text-gray-600 bg-white border-gray-200 hover:bg-gray-50'}`}
+            className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 border rounded-lg transition-colors text-xs sm:text-sm font-medium ${showAdvancedFilters ? 'bg-orange-500 text-white border-orange-500 shadow-md shadow-orange-500/20' : 'text-black bg-white border-gray-200 hover:bg-gray-50'}`}
           >
             <FontAwesomeIcon icon={faFilter} />
             <span className="hidden sm:inline">Filtres</span>
@@ -1408,11 +1408,11 @@ export default function ParkingReservationTabs() {
         <div className="fixed inset-0 z-[100] flex justify-end animate-fadeIn bg-slate-900/40 backdrop-blur-sm p-0 m-0 border-none transition-all">
           <div className="w-full max-w-sm h-full bg-white shadow-2xl flex flex-col animate-slideLeft">
             <div className="p-4 sm:p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-              <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Filtres</h3>
+              <h3 className="text-xl sm:text-2xl font-black text-black tracking-tight">Filtres</h3>
               <button
                 title="Fermer"
                 onClick={() => setShowAdvancedFilters(false)}
-                className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white border border-slate-100 text-slate-400 hover:text-slate-900 transition-all flex items-center justify-center shadow-sm"
+                className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white border border-slate-100 text-black hover:text-black transition-all flex items-center justify-center shadow-sm"
               >
                 <FontAwesomeIcon icon={faTimes} />
               </button>
@@ -1421,7 +1421,7 @@ export default function ParkingReservationTabs() {
             <div className="flex-1 overflow-y-auto p-4 sm:p-8 space-y-6 sm:space-y-8 custom-scrollbar">
               {/* Type Filter */}
               <div className="space-y-3 sm:space-y-4">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                <label className="text-[10px] font-black text-black uppercase tracking-widest flex items-center gap-2">
                   <FontAwesomeIcon icon={faCalendarAlt} className="text-orange-500" />
                   Type
                 </label>
@@ -1433,7 +1433,7 @@ export default function ParkingReservationTabs() {
                       className={`px-3 sm:px-4 py-2 sm:py-3 rounded-xl border text-[10px] font-black uppercase tracking-widest transition-all ${
                         advancedFilters.type === t
                           ? 'bg-slate-900 text-white border-slate-900 shadow-lg'
-                          : 'bg-white text-slate-400 border-slate-100 hover:border-slate-300'
+                          : 'bg-white text-black border-slate-100 hover:border-slate-300'
                       }`}
                     >
                       {t === 'ALL' ? 'Toutes' : t}
@@ -1444,7 +1444,7 @@ export default function ParkingReservationTabs() {
 
               {/* Budget Filter */}
               <div className="space-y-3 sm:space-y-4">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                <label className="text-[10px] font-black text-black uppercase tracking-widest flex items-center gap-2">
                   <FontAwesomeIcon icon={faMoneyBillWave} className="text-emerald-500" />
                   Budget (FCFA)
                 </label>
@@ -1454,41 +1454,41 @@ export default function ParkingReservationTabs() {
                     placeholder="Min"
                     value={advancedFilters.minPrice}
                     onChange={(e) => setAdvancedFilters({ ...advancedFilters, minPrice: e.target.value })}
-                    className="w-full px-3 sm:px-5 py-2 sm:py-3.5 bg-slate-50 border border-slate-100 rounded-xl sm:rounded-2xl outline-none focus:border-orange-500 font-bold text-slate-700 transition-all text-sm"
+                    className="w-full px-3 sm:px-5 py-2 sm:py-3.5 bg-slate-50 border border-slate-100 rounded-xl sm:rounded-2xl outline-none focus:border-orange-500 font-bold text-black transition-all text-sm"
                   />
                   <input
                     type="number"
                     placeholder="Max"
                     value={advancedFilters.maxPrice}
                     onChange={(e) => setAdvancedFilters({ ...advancedFilters, maxPrice: e.target.value })}
-                    className="w-full px-3 sm:px-5 py-2 sm:py-3.5 bg-slate-50 border border-slate-100 rounded-xl sm:rounded-2xl outline-none focus:border-orange-500 font-bold text-slate-700 transition-all text-sm"
+                    className="w-full px-3 sm:px-5 py-2 sm:py-3.5 bg-slate-50 border border-slate-100 rounded-xl sm:rounded-2xl outline-none focus:border-orange-500 font-bold text-black transition-all text-sm"
                   />
                 </div>
               </div>
 
               {/* Dates Filter */}
               <div className="space-y-3 sm:space-y-4">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                <label className="text-[10px] font-black text-black uppercase tracking-widest flex items-center gap-2">
                   <FontAwesomeIcon icon={faCalendarAlt} className="text-indigo-500" />
                   Période
                 </label>
                 <div className="space-y-3 sm:space-y-4">
                   <div className="relative">
-                    <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase">Du</span>
+                    <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-[8px] sm:text-[9px] font-bold text-black uppercase">Du</span>
                     <input
                       type="date"
                       value={advancedFilters.dateMin}
                       onChange={(e) => setAdvancedFilters({ ...advancedFilters, dateMin: e.target.value })}
-                      className="w-full pl-8 sm:pl-12 pr-3 sm:pr-5 py-2 sm:py-3.5 bg-slate-50 border border-slate-100 rounded-xl sm:rounded-2xl outline-none focus:border-orange-500 font-bold text-slate-700 transition-all text-sm"
+                      className="w-full pl-8 sm:pl-12 pr-3 sm:pr-5 py-2 sm:py-3.5 bg-slate-50 border border-slate-100 rounded-xl sm:rounded-2xl outline-none focus:border-orange-500 font-bold text-black transition-all text-sm"
                     />
                   </div>
                   <div className="relative">
-                    <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase">Au</span>
+                    <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-[8px] sm:text-[9px] font-bold text-black uppercase">Au</span>
                     <input
                       type="date"
                       value={advancedFilters.dateMax}
                       onChange={(e) => setAdvancedFilters({ ...advancedFilters, dateMax: e.target.value })}
-                      className="w-full pl-8 sm:pl-12 pr-3 sm:pr-5 py-2 sm:py-3.5 bg-slate-50 border border-slate-100 rounded-xl sm:rounded-2xl outline-none focus:border-orange-500 font-bold text-slate-700 transition-all text-sm"
+                      className="w-full pl-8 sm:pl-12 pr-3 sm:pr-5 py-2 sm:py-3.5 bg-slate-50 border border-slate-100 rounded-xl sm:rounded-2xl outline-none focus:border-orange-500 font-bold text-black transition-all text-sm"
                     />
                   </div>
                 </div>
@@ -1504,7 +1504,7 @@ export default function ParkingReservationTabs() {
                   minPrice: '',
                   maxPrice: '',
                 })}
-                className="flex-1 py-3 sm:py-4 bg-white border border-slate-200 text-slate-400 rounded-xl sm:rounded-2xl font-black text-[10px] uppercase tracking-widest hover:text-slate-900 transition-all active:scale-95"
+                className="flex-1 py-3 sm:py-4 bg-white border border-slate-200 text-black rounded-xl sm:rounded-2xl font-black text-[10px] uppercase tracking-widest hover:text-black transition-all active:scale-95"
               >
                 Réinitialiser
               </button>
@@ -1525,25 +1525,25 @@ export default function ParkingReservationTabs() {
           <table className="w-full min-w-[640px]">
             <thead>
               <tr className="bg-white border-b border-gray-100">
-                <th className="text-left py-3 sm:py-4 px-3 sm:px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">ID & Date</th>
-                <th className="text-left py-3 sm:py-4 px-3 sm:px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Client</th>
-                <th className="text-left py-3 sm:py-4 px-3 sm:px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Véhicule</th>
-                <th className="text-left py-3 sm:py-4 px-3 sm:px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Type</th>
-                <th className="text-left py-3 sm:py-4 px-3 sm:px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Montant</th>
-                <th className="text-left py-3 sm:py-4 px-3 sm:px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Statut</th>
-                <th className="text-right py-3 sm:py-4 px-3 sm:px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className="text-left py-3 sm:py-4 px-3 sm:px-6 text-xs font-semibold text-black uppercase tracking-wider">ID & Date</th>
+                <th className="text-left py-3 sm:py-4 px-3 sm:px-6 text-xs font-semibold text-black uppercase tracking-wider">Client</th>
+                <th className="text-left py-3 sm:py-4 px-3 sm:px-6 text-xs font-semibold text-black uppercase tracking-wider">Véhicule</th>
+                <th className="text-left py-3 sm:py-4 px-3 sm:px-6 text-xs font-semibold text-black uppercase tracking-wider hidden md:table-cell">Type</th>
+                <th className="text-left py-3 sm:py-4 px-3 sm:px-6 text-xs font-semibold text-black uppercase tracking-wider hidden lg:table-cell">Montant</th>
+                <th className="text-left py-3 sm:py-4 px-3 sm:px-6 text-xs font-semibold text-black uppercase tracking-wider">Statut</th>
+                <th className="text-right py-3 sm:py-4 px-3 sm:px-6 text-xs font-semibold text-black uppercase tracking-wider">Actions</th>
                </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 bg-white">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="py-8 text-center text-gray-500 font-medium">
+                  <td colSpan={7} className="py-8 text-center text-black font-medium">
                     Chargement...
                    </td>
                  </tr>
               ) : filteredReservations.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-8 text-center text-gray-500 font-medium">
+                  <td colSpan={7} className="py-8 text-center text-black font-medium">
                     Aucune réservation trouvée.
                    </td>
                  </tr>
@@ -1551,16 +1551,16 @@ export default function ParkingReservationTabs() {
                 paginatedReservations.map((res) => (
                   <tr key={res.id} className="hover:bg-gray-50/50 transition-colors">
                     <td className="py-2 sm:py-3 px-3 sm:px-6 whitespace-nowrap">
-                      <div className="text-sm font-bold text-gray-900">#{res.id}</div>
-                      <div className="text-xs text-gray-500 mt-1">
+                      <div className="text-sm font-bold text-black">#{res.id}</div>
+                      <div className="text-xs text-black mt-1">
                         {formatDate(res.dateDebut)}
                       </div>
                      </td>
                     <td className="py-2 sm:py-3 px-3 sm:px-6">
-                      <div className="text-sm font-medium text-gray-900 truncate max-w-[120px] sm:max-w-none">
+                      <div className="text-sm font-medium text-black truncate max-w-[120px] sm:max-w-none">
                         {res.user ? `${res.user.nom} ${res.user.prenom}` : 'Inconnu'}
                       </div>
-                      <div className="text-xs text-gray-500 mt-1 truncate max-w-[120px] sm:max-w-none">{res.user?.email || '-'}</div>
+                      <div className="text-xs text-black mt-1 truncate max-w-[120px] sm:max-w-none">{res.user?.email || '-'}</div>
                      </td>
                     <td 
                       className="py-2 sm:py-3 px-3 sm:px-6 cursor-pointer hover:bg-orange-50/50 transition-colors"
@@ -1569,10 +1569,10 @@ export default function ParkingReservationTabs() {
                         setIsVehicleModalOpen(true);
                       }}
                     >
-                      <div className="text-sm font-medium text-gray-900 truncate max-w-[150px]">
+                      <div className="text-sm font-medium text-black truncate max-w-[150px]">
                         {res.vehicle?.marqueRef?.name || res.vehicle?.marque} {res.vehicle?.model || res.vehicle?.modele}
                       </div>
-                      <div className="text-xs text-gray-500 mt-1 uppercase font-bold tracking-tight">
+                      <div className="text-xs text-black mt-1 uppercase font-bold tracking-tight">
                         {res.vehicle?.plate || res.vehicle?.immatriculation || 'Véhicule'}
                       </div>
                      </td>
@@ -1581,13 +1581,13 @@ export default function ParkingReservationTabs() {
                         {res.type === 'ACHAT' ? 'Achat' : 'Location'}
                       </span>
                       {res.type === 'LOCATION' && (
-                        <div className="text-xs text-gray-600 mt-1">
+                        <div className="text-xs text-black mt-1">
                           {formatDate(res.dateDebut)} → {formatDate(res.dateFin)}
                         </div>
                       )}
                      </td>
                     <td className="py-2 sm:py-3 px-3 sm:px-6 whitespace-nowrap hidden lg:table-cell">
-                      <div className="text-sm font-bold text-gray-900">
+                      <div className="text-sm font-bold text-black">
                         {calculateTotal(res).toLocaleString('fr-FR')} FCFA
                       </div>
                       {res.commission && (
@@ -1618,7 +1618,7 @@ export default function ParkingReservationTabs() {
                             setViewModeTab('details');
                             setCurrentImageIndex(0);
                           }}
-                          className="p-1.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
+                          className="p-1.5 text-black hover:text-black hover:bg-gray-100 rounded transition-colors"
                         >
                           <FontAwesomeIcon icon={faEye} />
                         </button>
@@ -1659,7 +1659,7 @@ export default function ParkingReservationTabs() {
                         <button
                           title="Modifier"
                           onClick={(e) => { e.stopPropagation(); openEditModal(res); }}
-                          className="p-1.5 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded transition-colors"
+                          className="p-1.5 text-black hover:text-orange-600 hover:bg-orange-50 rounded transition-colors"
                         >
                           <FontAwesomeIcon icon={faEdit} />
                         </button>
@@ -1674,9 +1674,9 @@ export default function ParkingReservationTabs() {
       ) : (
         <div className="p-3 sm:p-4 md:p-6">
           {loading ? (
-            <div className="text-center py-8 text-gray-500 font-medium">Chargement...</div>
+            <div className="text-center py-8 text-black font-medium">Chargement...</div>
           ) : filteredReservations.length === 0 ? (
-            <div className="text-center py-8 text-gray-500 font-medium">Aucune réservation trouvée.</div>
+            <div className="text-center py-8 text-black font-medium">Aucune réservation trouvée.</div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {paginatedReservations.map((res) => (
@@ -1698,7 +1698,7 @@ export default function ParkingReservationTabs() {
                         className="object-cover group-hover:scale-105 transition-transform duration-700"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-slate-200">
+                      <div className="w-full h-full flex items-center justify-center text-black">
                         <FontAwesomeIcon icon={faCar} size="2x" />
                       </div>
                     )}
@@ -1723,20 +1723,20 @@ export default function ParkingReservationTabs() {
                   <div className="p-3 sm:p-4 md:p-6 pt-2 flex-1 flex flex-col">
                     <div className="flex justify-between items-start mb-3">
                       <div>
-                        <span className="font-bold text-gray-900 border border-gray-200 px-2 py-0.5 rounded-lg bg-gray-50 text-xs shadow-sm">#{res.id}</span>
-                        <div className="mt-1 text-[10px] sm:text-xs text-gray-500">
+                        <span className="font-bold text-black border border-gray-200 px-2 py-0.5 rounded-lg bg-gray-50 text-xs shadow-sm">#{res.id}</span>
+                        <div className="mt-1 text-[10px] sm:text-xs text-black">
                           {res.type === 'ACHAT' ? 'Soumis' : 'Du'} {formatDate(res.dateDebut)}
                         </div>
                       </div>
                     </div>
                     <div className="space-y-2 sm:space-y-3 mb-3 flex-1">
                       <div className="flex justify-between text-xs sm:text-sm">
-                        <span className="text-gray-500">Client</span>
-                        <span className="font-medium text-gray-900 truncate max-w-[100px] sm:max-w-[150px]">{res.user?.nom} {res.user?.prenom}</span>
+                        <span className="text-black">Client</span>
+                        <span className="font-medium text-black truncate max-w-[100px] sm:max-w-[150px]">{res.user?.nom} {res.user?.prenom}</span>
                       </div>
                       <div className="flex justify-between text-xs sm:text-sm">
-                        <span className="text-gray-500">Véhicule</span>
-                        <span className="font-medium text-gray-900 truncate max-w-[100px] sm:max-w-[150px]">{res.vehicle?.marqueRef?.name || res.vehicle?.marque}</span>
+                        <span className="text-black">Véhicule</span>
+                        <span className="font-medium text-black truncate max-w-[100px] sm:max-w-[150px]">{res.vehicle?.marqueRef?.name || res.vehicle?.marque}</span>
                       </div>
                       <div className="flex justify-between items-center bg-orange-50/50 p-2 rounded-lg border border-orange-100">
                         <span className="text-orange-900 text-[8px] sm:text-[10px] uppercase font-black tracking-wider">Immat</span>
@@ -1745,9 +1745,9 @@ export default function ParkingReservationTabs() {
                         </span>
                       </div>
                       <div className="flex justify-between items-center border-t border-gray-100 pt-2 mb-4">
-                        <span className="text-gray-500 text-xs sm:text-sm">Montant</span>
+                        <span className="text-black text-xs sm:text-sm">Montant</span>
                         <div className="text-right">
-                          <span className="font-bold text-gray-900 text-sm sm:text-base">{calculateTotal(res).toLocaleString('fr-FR')} FCFA</span>
+                          <span className="font-bold text-black text-sm sm:text-base">{calculateTotal(res).toLocaleString('fr-FR')} FCFA</span>
                           {res.commission && (
                             <div className="text-[9px] sm:text-[11px] font-semibold text-orange-600">Com: {res.commission.toLocaleString('fr-FR')} FCFA</div>
                           )}
@@ -1799,7 +1799,7 @@ export default function ParkingReservationTabs() {
                           <button
                             title="Modifier"
                             onClick={(e) => { e.stopPropagation(); openEditModal(res); }}
-                            className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
+                            className="w-8 h-8 rounded-lg flex items-center justify-center text-black hover:text-indigo-600 hover:bg-indigo-50 transition-all"
                           >
                             <FontAwesomeIcon icon={faEdit} size="sm" />
                           </button>
@@ -1817,16 +1817,16 @@ export default function ParkingReservationTabs() {
       {/* Pagination - Version responsive */}
       {filteredReservations.length > 0 && (
         <div className="px-3 sm:px-6 py-3 sm:py-4 border-t border-gray-200 bg-white flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="text-xs sm:text-sm text-gray-500 text-center sm:text-left">
-            Affichage de <span className="font-medium text-gray-900">{((currentPage - 1) * itemsPerPage) + 1}</span> à <span className="font-medium text-gray-900">{Math.min(currentPage * itemsPerPage, filteredReservations.length)}</span> sur <span className="font-medium text-gray-900">{filteredReservations.length}</span>
+          <div className="text-xs sm:text-sm text-black text-center sm:text-left">
+            Affichage de <span className="font-medium text-black">{((currentPage - 1) * itemsPerPage) + 1}</span> à <span className="font-medium text-black">{Math.min(currentPage * itemsPerPage, filteredReservations.length)}</span> sur <span className="font-medium text-black">{filteredReservations.length}</span>
           </div>
           <div className="flex gap-2">
             <button
               onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
               className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-colors ${currentPage === 1
-                  ? 'text-gray-400 bg-gray-50 cursor-not-allowed'
-                  : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
+                  ? 'text-black bg-gray-50 cursor-not-allowed'
+                  : 'text-black bg-white border border-gray-300 hover:bg-gray-50'
                 }`}
             >
               Précédent
@@ -1851,7 +1851,7 @@ export default function ParkingReservationTabs() {
                       onClick={() => setCurrentPage(pageNum)}
                       className={`w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg text-xs sm:text-sm font-medium transition-colors ${currentPage === pageNum
                           ? 'bg-orange-600 text-white shadow-sm'
-                          : 'text-gray-600 hover:bg-gray-100'
+                          : 'text-black hover:bg-gray-100'
                         }`}
                     >
                       {pageNum}
@@ -1865,8 +1865,8 @@ export default function ParkingReservationTabs() {
               onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
               disabled={currentPage === totalPages}
               className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-colors ${currentPage === totalPages
-                  ? 'text-gray-400 bg-gray-50 cursor-not-allowed'
-                  : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
+                  ? 'text-black bg-gray-50 cursor-not-allowed'
+                  : 'text-black bg-white border border-gray-300 hover:bg-gray-50'
                 }`}
             >
               Suivant

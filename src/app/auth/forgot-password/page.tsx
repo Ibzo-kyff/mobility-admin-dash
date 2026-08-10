@@ -38,16 +38,16 @@ export default function ForgotPasswordPage() {
             <span className="text-white text-3xl">🔑</span>
           </div>
           <h1 className="text-2xl font-bold">Mot de passe oublié ?</h1>
-          <p className="text-gray-600 mt-2">Nous allons vous envoyer un code par email</p>
+          <p className="text-black mt-2">Nous allons vous envoyer un code par email</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl p-8">
           {!success ? (
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Votre email</label>
+                <label className="block text-sm font-medium text-black mb-2">Votre email</label>
                 <div className="relative">
-                  <FontAwesomeIcon icon={faEnvelope} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <FontAwesomeIcon icon={faEnvelope} className="absolute left-4 top-1/2 -translate-y-1/2 text-black" />
                   <input
                     type="email"
                     value={email}
@@ -79,7 +79,7 @@ export default function ForgotPasswordPage() {
             </div>
           )}
 
-          <p className="text-center text-sm text-gray-600 mt-6">
+          <p className="text-center text-sm text-black mt-6">
             <Link href="/auth/login" className="text-orange-600 hover:underline">Retour à la connexion</Link>
           </p>
         </div>

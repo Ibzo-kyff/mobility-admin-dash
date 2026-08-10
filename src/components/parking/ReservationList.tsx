@@ -42,9 +42,9 @@ export default function ReservationList() {
             <div className="flex justify-between">
               <div>
                 <p className="font-medium">{r.clientName || r.client?.name || 'Client'}</p>
-                <p className="text-xs text-gray-500">{r.vehicle?.plate || r.vehiclePlate || ''}</p>
+                <p className="text-xs text-black">{r.vehicle?.plate || r.vehiclePlate || ''}</p>
               </div>
-              <div className="text-sm text-gray-600">{r.status || r.etat}</div>
+              <div className="text-sm text-black">{r.status || r.etat}</div>
             </div>
           </li>
         ))}

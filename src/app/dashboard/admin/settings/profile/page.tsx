@@ -93,7 +93,7 @@ export default function AdminProfilePage() {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
           <FontAwesomeIcon icon={faSpinner} className="text-4xl text-orange-500 animate-spin mb-4" />
-          <p className="text-gray-500">Chargement du profil...</p>
+          <p className="text-black">Chargement du profil...</p>
         </div>
       </div>
     );
@@ -103,8 +103,8 @@ export default function AdminProfilePage() {
     <div className="max-w-4xl mx-auto p-6">
       {/* En-tête */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">Profil Administrateur</h1>
-        <p className="text-gray-500 mt-1">Gérez vos informations personnelles et votre photo de profil</p>
+        <h1 className="text-3xl font-bold text-black">Profil Administrateur</h1>
+        <p className="text-black mt-1">Gérez vos informations personnelles et votre photo de profil</p>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
@@ -138,7 +138,7 @@ export default function AdminProfilePage() {
                   className="hidden"
                 />
               </div>
-              <p className="text-sm text-gray-500 mt-3">
+              <p className="text-sm text-black mt-3">
                 JPG, PNG ou GIF. Max 5MB
               </p>
               {profile?.image && !imageFile && (
@@ -152,20 +152,20 @@ export default function AdminProfilePage() {
             {/* Informations rapides */}
             <div className="mt-6 pt-6 border-t border-gray-100">
               <div className="space-y-3">
-                <div className="flex items-center text-sm text-gray-600">
-                  <FontAwesomeIcon icon={faEnvelope} className="w-4 text-gray-400 mr-3" />
+                <div className="flex items-center text-sm text-black">
+                  <FontAwesomeIcon icon={faEnvelope} className="w-4 text-black mr-3" />
                   <span>{profile?.email}</span>
                 </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <FontAwesomeIcon icon={faPhone} className="w-4 text-gray-400 mr-3" />
+                <div className="flex items-center text-sm text-black">
+                  <FontAwesomeIcon icon={faPhone} className="w-4 text-black mr-3" />
                   <span>{profile?.phone || 'Non renseigné'}</span>
                 </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <FontAwesomeIcon icon={faCalendar} className="w-4 text-gray-400 mr-3" />
+                <div className="flex items-center text-sm text-black">
+                  <FontAwesomeIcon icon={faCalendar} className="w-4 text-black mr-3" />
                   <span>Membre depuis {new Date(profile?.createdAt || '').toLocaleDateString('fr-FR')}</span>
                 </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <FontAwesomeIcon icon={faIdCard} className="w-4 text-gray-400 mr-3" />
+                <div className="flex items-center text-sm text-black">
+                  <FontAwesomeIcon icon={faIdCard} className="w-4 text-black mr-3" />
                   <span className="capitalize">{profile?.role}</span>
                 </div>
               </div>
@@ -176,11 +176,11 @@ export default function AdminProfilePage() {
         {/* Formulaire */}
         <div className="lg:col-span-2">
           <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 lg:p-8">
-            <h2 className="text-xl font-semibold text-gray-800 mb-6">Informations personnelles</h2>
+            <h2 className="text-xl font-semibold text-black mb-6">Informations personnelles</h2>
             
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Prénom</label>
+                <label className="block text-sm font-medium text-black mb-2">Prénom</label>
                 <input
                   type="text"
                   value={form.prenom}
@@ -190,7 +190,7 @@ export default function AdminProfilePage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Nom</label>
+                <label className="block text-sm font-medium text-black mb-2">Nom</label>
                 <input
                   type="text"
                   value={form.nom}
@@ -202,7 +202,7 @@ export default function AdminProfilePage() {
             </div>
 
             <div className="mt-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+              <label className="block text-sm font-medium text-black mb-2">Email</label>
               <input
                 type="email"
                 value={form.email}
@@ -213,7 +213,7 @@ export default function AdminProfilePage() {
             </div>
 
             <div className="mt-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Téléphone</label>
+              <label className="block text-sm font-medium text-black mb-2">Téléphone</label>
               <input
                 type="tel"
                 value={form.phone}

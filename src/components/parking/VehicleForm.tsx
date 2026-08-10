@@ -35,15 +35,15 @@ export default function VehicleForm({ initial = {} as any }: { initial?: any }) 
     <form onSubmit={onSubmit} className="bg-white border border-gray-200 rounded-lg p-6">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
-          <label className="text-sm text-gray-700">Immatriculation</label>
+          <label className="text-sm text-black">Immatriculation</label>
           <input name="plate" value={form.plate} onChange={onChange} className="w-full mt-1 px-3 py-2 border rounded" />
         </div>
         <div>
-          <label className="text-sm text-gray-700">Marque</label>
+          <label className="text-sm text-black">Marque</label>
           <input name="marque" value={form.marque} onChange={onChange} className="w-full mt-1 px-3 py-2 border rounded" />
         </div>
         <div>
-          <label className="text-sm text-gray-700">Modèle</label>
+          <label className="text-sm text-black">Modèle</label>
           <input name="model" value={form.model} onChange={onChange} className="w-full mt-1 px-3 py-2 border rounded" />
         </div>
       </div>

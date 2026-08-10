@@ -62,7 +62,7 @@ export default function AdminDashboardPage() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-800">Tableau de bord Admin</h1>
+        <h1 className="text-2xl font-bold text-black">Tableau de bord Admin</h1>
         <button className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">
           Exporter rapport
         </button>
@@ -97,7 +97,7 @@ export default function AdminDashboardPage() {
           </h2>
 
           {recentReservations.length === 0 ? (
-            <div className="text-center py-12 text-gray-400">
+            <div className="text-center py-12 text-black">
               Aucune réservation récente pour le moment
             </div>
           ) : (
@@ -112,10 +112,10 @@ export default function AdminDashboardPage() {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900 truncate">
+                    <p className="font-medium text-black truncate">
                       {res.user?.prenom} {res.user?.nom}
                     </p>
-                    <p className="text-sm text-gray-500 truncate">
+                    <p className="text-sm text-black truncate">
                       {res.vehicule?.marque} {res.vehicule?.modele}
                     </p>
                   </div>
@@ -124,11 +124,11 @@ export default function AdminDashboardPage() {
                     <div className={`text-xs font-medium px-3 py-1 rounded-full inline-block ${
                       res.status === 'CONFIRMED' ? 'bg-green-100 text-green-700' :
                       res.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' :
-                      res.status === 'COMPLETED' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
+                      res.status === 'COMPLETED' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-black'
                     }`}>
                       {res.status || 'N/A'}
                     </div>
-                    <p className="text-xs text-gray-500 mt-1.5">
+                    <p className="text-xs text-black mt-1.5">
                       {new Date(res.createdAt).toLocaleDateString('fr-FR', {
                         day: 'numeric',
                         month: 'short',

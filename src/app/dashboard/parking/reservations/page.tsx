@@ -11,13 +11,13 @@ export default function ReservationsPage() {
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold border-gray-900 text-gray-900 flex items-center gap-3">
+          <h1 className="text-2xl font-bold border-gray-900 text-black flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center text-orange-600">
               <FontAwesomeIcon icon={faCalendarCheck} className="text-xl" />
             </div>
             Gestion des Réservations
           </h1>
-          <p className="text-sm text-gray-500 mt-1 ml-13">
+          <p className="text-sm text-black mt-1 ml-13">
             Gérez toutes les demandes de location et d'achat liées à votre parking.
           </p>
         </div>

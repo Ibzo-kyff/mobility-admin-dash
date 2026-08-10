@@ -74,21 +74,21 @@ export default function LoginForm() {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-500 rounded-2xl mb-4">
             <span className="text-white font-bold text-2xl">M</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-800">Mobility</h1>
-          <p className="text-gray-600">Connectez-vous à votre compte</p>
+          <h1 className="text-2xl font-bold text-black">Mobility</h1>
+          <p className="text-black">Connectez-vous à votre compte</p>
         </div>
 
         {/* Formulaire */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-black">
                 Email
               </label>
               <div className="relative">
                 <FontAwesomeIcon 
                   icon={faEnvelope} 
-                  className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" 
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 text-black" 
                 />
                 <input
                   type="email"
@@ -104,7 +104,7 @@ export default function LoginForm() {
 
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-black">
                   Mot de passe
                 </label>
                 <Link 
@@ -117,7 +117,7 @@ export default function LoginForm() {
               <div className="relative">
                 <FontAwesomeIcon 
                   icon={faLock} 
-                  className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" 
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 text-black" 
                 />
                 <input
                   type={showPassword ? "text" : "password"}
@@ -131,7 +131,7 @@ export default function LoginForm() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-black hover:text-black"
                 >
                   <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                 </button>
@@ -165,7 +165,7 @@ export default function LoginForm() {
             </button>
           </form>
 
-          <p className="text-center text-sm text-gray-600 mt-6">
+          <p className="text-center text-sm text-black mt-6">
             Pas encore de compte ?{' '}
             <Link 
               href="/auth/register"

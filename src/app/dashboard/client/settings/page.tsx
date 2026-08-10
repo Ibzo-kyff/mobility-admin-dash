@@ -31,13 +31,13 @@ export default function SettingsPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 flex items-center gap-4">
+          <h1 className="text-2xl sm:text-3xl font-black text-black flex items-center gap-4">
             <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/10">
               <FontAwesomeIcon icon={faSlidersH} className="text-xl sm:text-2xl" />
             </div>
             Paramètres
           </h1>
-          <p className="text-[10px] sm:text-xs font-black text-slate-400 mt-2 ml-1 uppercase tracking-widest">
+          <p className="text-[10px] sm:text-xs font-black text-black mt-2 ml-1 uppercase tracking-widest">
             Personnalisez votre expérience et gérez votre sécurité
           </p>
         </div>
@@ -56,8 +56,8 @@ export default function SettingsPage() {
             )}
           </div>
           <div>
-            <h2 className="text-xl font-black text-slate-900 group-hover:text-orange-500 transition-colors">{user?.prenom} {user?.nom}</h2>
-            <p className="text-xs font-bold text-slate-400 flex items-center gap-2 mt-1">
+            <h2 className="text-xl font-black text-black group-hover:text-orange-500 transition-colors">{user?.prenom} {user?.nom}</h2>
+            <p className="text-xs font-bold text-black flex items-center gap-2 mt-1">
               <FontAwesomeIcon icon={faEnvelope} className="text-orange-500" />
               {user?.email}
             </p>
@@ -187,7 +187,7 @@ function SectionHeader({ icon, title, color }: { icon: any, title: string, color
       <div className={`w-10 h-10 rounded-xl ${color} flex items-center justify-center text-sm shadow-inner`}>
         <FontAwesomeIcon icon={icon} />
       </div>
-      <h3 className="text-sm font-black text-slate-900 uppercase tracking-[0.2em]">{title}</h3>
+      <h3 className="text-sm font-black text-black uppercase tracking-[0.2em]">{title}</h3>
     </div>
   );
 }
@@ -196,8 +196,8 @@ function ToggleItem({ title, description, active, onToggle }: { title: string, d
   return (
     <div className="flex items-center justify-between p-6 hover:bg-slate-50 transition-colors">
       <div className="space-y-1">
-        <h4 className="font-black text-slate-900 text-sm">{title}</h4>
-        <p className="text-xs font-bold text-slate-400">{description}</p>
+        <h4 className="font-black text-black text-sm">{title}</h4>
+        <p className="text-xs font-bold text-black">{description}</p>
       </div>
       <button 
         onClick={onToggle}
@@ -213,17 +213,17 @@ function NavigationItem({ icon, title, description, label, labelColor = "text-or
   return (
     <div className="flex items-center justify-between p-6 hover:bg-slate-50 transition-colors cursor-pointer group">
       <div className="flex items-center gap-5">
-        <div className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-white group-hover:text-orange-500 transition-all shadow-sm">
+        <div className="w-10 h-10 rounded-xl bg-slate-50 text-black flex items-center justify-center group-hover:bg-white group-hover:text-orange-500 transition-all shadow-sm">
           <FontAwesomeIcon icon={icon} />
         </div>
         <div className="space-y-1">
-          <h4 className="font-black text-slate-900 text-sm group-hover:text-orange-500 transition-colors">{title}</h4>
-          <p className="text-xs font-bold text-slate-400">{description}</p>
+          <h4 className="font-black text-black text-sm group-hover:text-orange-500 transition-colors">{title}</h4>
+          <p className="text-xs font-bold text-black">{description}</p>
         </div>
       </div>
       <div className="flex items-center gap-3">
         {label && <span className={`text-[10px] font-black uppercase tracking-widest ${labelColor}`}>{label}</span>}
-        <FontAwesomeIcon icon={faChevronRight} className="text-slate-300 text-xs group-hover:translate-x-1 transition-transform" />
+        <FontAwesomeIcon icon={faChevronRight} className="text-black text-xs group-hover:translate-x-1 transition-transform" />
       </div>
     </div>
   );

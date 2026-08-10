@@ -47,7 +47,7 @@ export default function VehicleTable() {
   if (error) return <div className="text-red-600">{error}</div>;
   if (!vehicles || vehicles.length === 0) return (
     <div className="bg-white border border-gray-200 rounded-lg p-6">
-      <p className="text-gray-600">Aucun véhicule enregistré.</p>
+      <p className="text-black">Aucun véhicule enregistré.</p>
       <div className="mt-4">
         <Link href="/dashboard/parking/vehicles/add">
           <Button variant="primary">Ajouter un véhicule</Button>
@@ -67,7 +67,7 @@ export default function VehicleTable() {
 
       <table className="min-w-full text-sm">
         <thead>
-          <tr className="text-left text-gray-600">
+          <tr className="text-left text-black">
             <th className="py-2">Immatriculation</th>
             <th className="py-2">Marque</th>
             <th className="py-2">Modèle</th>

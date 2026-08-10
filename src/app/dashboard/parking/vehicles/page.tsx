@@ -9,8 +9,8 @@ export default function ParkingVehiclesPage() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Véhicules</h1>
-          <p className="text-slate-400 font-bold text-xs uppercase tracking-widest mt-1">Gérez votre inventaire, suivez leurs performances et documents</p>
+          <h1 className="text-2xl font-black text-black tracking-tight">Véhicules</h1>
+          <p className="text-black font-bold text-xs uppercase tracking-widest mt-1">Gérez votre inventaire, suivez leurs performances et documents</p>
         </div>
         <button
           onClick={() => {

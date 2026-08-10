@@ -254,7 +254,7 @@ export default function ParkingsPage() {
     }
     
     return (
-      <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400" title={name}>
+      <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center text-black" title={name}>
         <ImageIcon size={20} />
       </div>
     );
@@ -263,7 +263,7 @@ export default function ParkingsPage() {
   if (loading) {
     return (
       <div className="p-6 bg-gray-50 min-h-screen flex items-center justify-center">
-        <div className="text-gray-500">Chargement...</div>
+        <div className="text-black">Chargement...</div>
       </div>
     );
   }
@@ -281,10 +281,10 @@ export default function ParkingsPage() {
       {/* En-tête avec bouton d'ajout */}
       <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">
+          <h1 className="text-3xl font-bold text-black">
             Parkings & Gestionnaires
           </h1>
-          <p className="text-gray-500 mt-2">
+          <p className="text-black mt-2">
             Gestion complète des parkings enregistrés
           </p>
         </div>
@@ -304,7 +304,7 @@ export default function ParkingsPage() {
             className={`p-2 rounded-lg ${
               view === "list"
                 ? "bg-orange-100 text-orange-600"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                : "bg-gray-100 text-black hover:bg-gray-200"
             }`}
             title="Vue liste"
           >
@@ -315,7 +315,7 @@ export default function ParkingsPage() {
             className={`p-2 rounded-lg ${
               view === "grid"
                 ? "bg-orange-100 text-orange-600"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                : "bg-gray-100 text-black hover:bg-gray-200"
             }`}
             title="Vue grille"
           >
@@ -324,7 +324,7 @@ export default function ParkingsPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600">Afficher</span>
+          <span className="text-sm text-black">Afficher</span>
           <select
             value={itemsPerPage}
             onChange={handleItemsPerPageChange}
@@ -335,7 +335,7 @@ export default function ParkingsPage() {
             <option value={20}>20</option>
             <option value={50}>50</option>
           </select>
-          <span className="text-sm text-gray-600">par page</span>
+          <span className="text-sm text-black">par page</span>
         </div>
       </div>
 
@@ -343,7 +343,7 @@ export default function ParkingsPage() {
       {view === "list" ? (
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
           <table className="w-full">
-            <thead className="bg-gray-100 text-gray-600 text-sm uppercase">
+            <thead className="bg-gray-100 text-black text-sm uppercase">
               <tr>
                 <th className="p-4 text-left">Logo</th>
                 <th className="p-4 text-left">Nom</th>
@@ -360,10 +360,10 @@ export default function ParkingsPage() {
                   <td className="p-4">
                     <Logo src={parking.logo} name={parking.name} />
                    </td>
-                  <td className="p-4 font-semibold text-gray-700">{parking.name}</td>
-                  <td className="p-4 text-gray-600">{parking.address}</td>
-                  <td className="p-4 text-gray-600">{parking.capacity}</td>
-                  <td className="p-4 text-gray-600">
+                  <td className="p-4 font-semibold text-black">{parking.name}</td>
+                  <td className="p-4 text-black">{parking.address}</td>
+                  <td className="p-4 text-black">{parking.capacity}</td>
+                  <td className="p-4 text-black">
                     {parking.user ? `${parking.user.prenom} ${parking.user.nom}` : "—"}
                   </td>
                   <td className="p-4">
@@ -382,7 +382,7 @@ export default function ParkingsPage() {
             </tbody>
           </table>
           {currentParkings.length === 0 && (
-            <div className="p-6 text-center text-gray-500">Aucun parking trouvé</div>
+            <div className="p-6 text-center text-black">Aucun parking trouvé</div>
           )}
         </div>
       ) : (
@@ -395,16 +395,16 @@ export default function ParkingsPage() {
               </div>
               <div className="p-4">
                 <h3 className="font-bold text-lg mb-1">{parking.name}</h3>
-                <p className="text-gray-600 text-sm mb-2">{parking.address}</p>
-                <p className="text-gray-700 text-sm">
+                <p className="text-black text-sm mb-2">{parking.address}</p>
+                <p className="text-black text-sm">
                   <span className="font-medium">Capacité :</span> {parking.capacity} places
                 </p>
-                <p className="text-gray-700 text-sm">
+                <p className="text-black text-sm">
                   <span className="font-medium">Gestionnaire :</span>{" "}
                   {parking.user ? `${parking.user.prenom} ${parking.user.nom}` : "—"}
                 </p>
                 {parking.city && (
-                  <p className="text-gray-700 text-sm">
+                  <p className="text-black text-sm">
                     <span className="font-medium">Ville :</span> {parking.city}
                   </p>
                 )}
@@ -425,7 +425,7 @@ export default function ParkingsPage() {
       {/* Pagination */}
       {parkings.length > 0 && (
         <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-black">
             Affichage de {indexOfFirstItem + 1} à{" "}
             {Math.min(indexOfLastItem, parkings.length)} sur {parkings.length} parkings
           </div>
@@ -433,7 +433,7 @@ export default function ParkingsPage() {
             <button
               onClick={() => goToPage(currentPage - 1)}
               disabled={currentPage === 1}
-              className="p-2 rounded-lg bg-white border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-2 rounded-lg bg-white border border-gray-300 text-black hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ChevronLeft size={20} />
             </button>
@@ -443,7 +443,7 @@ export default function ParkingsPage() {
             <button
               onClick={() => goToPage(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="p-2 rounded-lg bg-white border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-2 rounded-lg bg-white border border-gray-300 text-black hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ChevronRight size={20} />
             </button>
@@ -456,7 +456,7 @@ export default function ParkingsPage() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-gray-800">Ajouter un parking</h2>
+              <h2 className="text-2xl font-bold text-black">Ajouter un parking</h2>
               <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-gray-100 rounded-lg">
                 <X size={20} />
               </button>
@@ -470,7 +470,7 @@ export default function ParkingsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Nom du parking */}
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-black mb-1">
                     Nom du parking *
                   </label>
                   <input
@@ -485,7 +485,7 @@ export default function ParkingsPage() {
 
                 {/* Adresse */}
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-black mb-1">
                     Adresse *
                   </label>
                   <input
@@ -500,7 +500,7 @@ export default function ParkingsPage() {
 
                 {/* Ville */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-black mb-1">
                     Ville *
                   </label>
                   <input
@@ -515,7 +515,7 @@ export default function ParkingsPage() {
 
                 {/* Capacité */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-black mb-1">
                     Capacité (places) *
                   </label>
                   <input
@@ -531,7 +531,7 @@ export default function ParkingsPage() {
 
                 {/* Téléphone */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-black mb-1">
                     Téléphone
                   </label>
                   <input
@@ -545,7 +545,7 @@ export default function ParkingsPage() {
 
                 {/* Email */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-black mb-1">
                     Email
                   </label>
                   <input
@@ -559,7 +559,7 @@ export default function ParkingsPage() {
 
                 {/* Heures d'ouverture */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-black mb-1">
                     Heures d'ouverture
                   </label>
                   <input
@@ -574,7 +574,7 @@ export default function ParkingsPage() {
 
                 {/* Statut */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-black mb-1">
                     Statut
                   </label>
                   <select
@@ -590,7 +590,7 @@ export default function ParkingsPage() {
 
                 {/* Gestionnaire */}
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-black mb-1">
                     Gestionnaire *
                   </label>
                   <select
@@ -617,7 +617,7 @@ export default function ParkingsPage() {
 
                 {/* Logo */}
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-black mb-1">
                     Logo du parking
                   </label>
                   <div className="flex items-center gap-4">
@@ -628,7 +628,7 @@ export default function ParkingsPage() {
                         onChange={handleFileSelect}
                         className="hidden"
                       />
-                      <div className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 flex items-center gap-2">
+                      <div className="px-4 py-2 bg-gray-100 text-black rounded-lg hover:bg-gray-200 flex items-center gap-2">
                         <Upload size={18} />
                         Choisir une image
                       </div>
@@ -637,7 +637,7 @@ export default function ParkingsPage() {
                   
                   {(previewUrl || newParking.logo) && (
                     <div className="mt-4">
-                      <p className="text-sm text-gray-500 mb-2">Aperçu :</p>
+                      <p className="text-sm text-black mb-2">Aperçu :</p>
                       <div className="relative w-32 h-32 border rounded-lg overflow-hidden">
                         <img
                           src={previewUrl || newParking.logo}
@@ -654,7 +654,7 @@ export default function ParkingsPage() {
 
                 {/* Description */}
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-black mb-1">
                     Description
                   </label>
                   <textarea
@@ -671,7 +671,7 @@ export default function ParkingsPage() {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                  className="px-6 py-2 border border-gray-300 rounded-lg text-black hover:bg-gray-50"
                 >
                   Annuler
                 </button>

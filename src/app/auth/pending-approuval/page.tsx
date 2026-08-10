@@ -11,14 +11,14 @@ export default function PendingApprovalPage() {
           <FontAwesomeIcon icon={faClock} className="text-4xl text-orange-500" />
         </div>
         
-        <h1 className="text-3xl font-bold text-gray-800 mb-3">Compte en attente d'approbation</h1>
-        <p className="text-gray-600 mb-8 text-lg">
+        <h1 className="text-3xl font-bold text-black mb-3">Compte en attente d'approbation</h1>
+        <p className="text-black mb-8 text-lg">
           Votre compte Parking est en cours de vérification par notre équipe.<br />
           Vous recevrez un email dès qu'il sera approuvé (généralement sous 24h).
         </p>
 
         <div className="bg-white rounded-2xl p-6 mb-8 shadow-sm">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-black">
             En attendant, vérifiez votre boîte email (y compris les spams) pour la confirmation.
           </p>
         </div>
@@ -32,7 +32,7 @@ export default function PendingApprovalPage() {
           </Link>
           <Link
             href="/"
-            className="block w-full py-3 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition flex items-center justify-center gap-2"
+            className="block w-full py-3 border border-gray-300 text-black font-medium rounded-xl hover:bg-gray-50 transition flex items-center justify-center gap-2"
           >
             <FontAwesomeIcon icon={faHome} />
             Retour à l'accueil

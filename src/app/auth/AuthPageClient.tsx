@@ -133,7 +133,7 @@ const AuthPageClient: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white text-gray-800 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white text-black flex items-center justify-center p-4">
       {/* Conteneur principal avec hauteur limitée */}
       <div className="w-full max-w-6xl bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row border border-orange-100 max-h-[90vh]">
        
@@ -206,7 +206,7 @@ const AuthPageClient: React.FC = () => {
           <div className="mb-6">
             <div className="flex mb-2">
               <button
-                className={`flex-1 py-3 font-semibold text-lg transition-all duration-300 relative ${authTab === 'login' ? 'text-orange-600' : 'text-gray-500 hover:text-gray-700'}`}
+                className={`flex-1 py-3 font-semibold text-lg transition-all duration-300 relative ${authTab === 'login' ? 'text-orange-600' : 'text-black hover:text-black'}`}
                 onClick={() => switchTab('login')}
               >
                 Connexion
@@ -215,7 +215,7 @@ const AuthPageClient: React.FC = () => {
                 )}
               </button>
               <button
-                className={`flex-1 py-3 font-semibold text-lg transition-all duration-300 relative ${authTab === 'register' ? 'text-orange-600' : 'text-gray-500 hover:text-gray-700'}`}
+                className={`flex-1 py-3 font-semibold text-lg transition-all duration-300 relative ${authTab === 'register' ? 'text-orange-600' : 'text-black hover:text-black'}`}
                 onClick={() => switchTab('register')}
               >
                 Inscription
@@ -231,9 +231,9 @@ const AuthPageClient: React.FC = () => {
               <form onSubmit={handleLogin} className="space-y-6 h-full flex flex-col">
                 <div className="space-y-6 flex-1">
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">Email</label>
+                    <label className="block text-sm font-medium text-black">Email</label>
                     <div className="relative">
-                      <FontAwesomeIcon icon={faEnvelope} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                      <FontAwesomeIcon icon={faEnvelope} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-black" />
                       <input
                         type="email"
                         name="email"
@@ -247,13 +247,13 @@ const AuthPageClient: React.FC = () => {
                   </div>
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <label className="block text-sm font-medium text-gray-700">Mot de passe</label>
+                      <label className="block text-sm font-medium text-black">Mot de passe</label>
                       <a href="/forgot-password" className="text-sm text-orange-600 hover:text-orange-500 transition-colors">
                         Mot de passe oublié ?
                       </a>
                     </div>
                     <div className="relative">
-                      <FontAwesomeIcon icon={faLock} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                      <FontAwesomeIcon icon={faLock} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-black" />
                       <input
                         type={showPassword ? "text" : "password"}
                         name="password"
@@ -266,7 +266,7 @@ const AuthPageClient: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-black hover:text-black transition-colors"
                       >
                         <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                       </button>
@@ -296,15 +296,15 @@ const AuthPageClient: React.FC = () => {
                       <div className="w-full border-t border-gray-200"></div>
                     </div>
                     <div className="relative flex justify-center text-sm">
-                      <span className="px-4 bg-white text-gray-500">Ou continuer avec</span>
+                      <span className="px-4 bg-white text-black">Ou continuer avec</span>
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <button type="button" className="p-3 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors flex items-center justify-center gap-2">
-                      <span className="text-sm font-medium text-gray-700">Google</span>
+                      <span className="text-sm font-medium text-black">Google</span>
                     </button>
                     <button type="button" className="p-3 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors flex items-center justify-center gap-2">
-                      <span className="text-sm font-medium text-gray-700">Apple</span>
+                      <span className="text-sm font-medium text-black">Apple</span>
                     </button>
                   </div>
                 </div>
@@ -313,7 +313,7 @@ const AuthPageClient: React.FC = () => {
               <div className="h-full overflow-y-auto pr-2 custom-scrollbar">
                 <form onSubmit={handleRegister} className="space-y-6 pb-4">
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">Rôle</label>
+                    <label className="block text-sm font-medium text-black">Rôle</label>
                     <select
                       name="role"
                       value={formData.role}
@@ -327,11 +327,11 @@ const AuthPageClient: React.FC = () => {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700">
+                      <label className="block text-sm font-medium text-black">
                         Nom <span className="text-red-500">*</span>
                       </label>
                       <div className="relative">
-                        <FontAwesomeIcon icon={faUser} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                        <FontAwesomeIcon icon={faUser} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black" />
                         <input
                           type="text"
                           name="nom"
@@ -344,11 +344,11 @@ const AuthPageClient: React.FC = () => {
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700">
+                      <label className="block text-sm font-medium text-black">
                         Prénom <span className="text-red-500">*</span>
                       </label>
                       <div className="relative">
-                        <FontAwesomeIcon icon={faUser} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                        <FontAwesomeIcon icon={faUser} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black" />
                         <input
                           type="text"
                           name="prenom"
@@ -362,11 +362,11 @@ const AuthPageClient: React.FC = () => {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-black">
                       Email <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
-                      <FontAwesomeIcon icon={faEnvelope} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                      <FontAwesomeIcon icon={faEnvelope} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black" />
                       <input
                         type="email"
                         name="email"
@@ -380,11 +380,11 @@ const AuthPageClient: React.FC = () => {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700">
+                      <label className="block text-sm font-medium text-black">
                         Téléphone <span className="text-red-500">*</span>
                       </label>
                       <div className="relative">
-                        <FontAwesomeIcon icon={faPhone} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                        <FontAwesomeIcon icon={faPhone} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black" />
                         <input
                           type="tel"
                           name="phone"
@@ -397,9 +397,9 @@ const AuthPageClient: React.FC = () => {
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700">Adresse</label>
+                      <label className="block text-sm font-medium text-black">Adresse</label>
                       <div className="relative">
-                        <FontAwesomeIcon icon={faMapMarkerAlt} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                        <FontAwesomeIcon icon={faMapMarkerAlt} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black" />
                         <input
                           type="text"
                           name="address"
@@ -412,11 +412,11 @@ const AuthPageClient: React.FC = () => {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-black">
                       Mot de passe <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
-                      <FontAwesomeIcon icon={faLock} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                      <FontAwesomeIcon icon={faLock} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black" />
                       <input
                         type={showPassword ? "text" : "password"}
                         name="password"
@@ -430,12 +430,12 @@ const AuthPageClient: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-black hover:text-black transition-colors"
                       >
                         <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                       </button>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">Minimum 6 caractères</p>
+                    <p className="text-xs text-black mt-1">Minimum 6 caractères</p>
                   </div>
                   <div className="flex items-start gap-3 p-4 bg-orange-50 rounded-lg border border-orange-100">
                     <input
@@ -444,7 +444,7 @@ const AuthPageClient: React.FC = () => {
                       className="mt-1 accent-orange-500"
                       required
                     />
-                    <label htmlFor="terms" className="text-sm text-gray-700">
+                    <label htmlFor="terms" className="text-sm text-black">
                       J'accepte les{' '}
                       <a href="/terms" className="text-orange-600 hover:text-orange-500 font-medium transition-colors">
                         conditions d'utilisation
@@ -478,7 +478,7 @@ const AuthPageClient: React.FC = () => {
           </div>
           {/* Lien pour changer d'onglet */}
           <div className="mt-6 pt-6 border-t border-gray-200">
-            <p className="text-center text-sm text-gray-600">
+            <p className="text-center text-sm text-black">
               {authTab === 'login' ? "Pas encore de compte ? " : "Déjà un compte ? "}
               <button
                 onClick={() => switchTab(authTab === 'login' ? 'register' : 'login')}

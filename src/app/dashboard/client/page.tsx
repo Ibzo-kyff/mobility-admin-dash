@@ -156,10 +156,10 @@ export default function ClientDashboard() {
     <div className="space-y-6 p-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">
+          <h1 className="text-2xl font-bold text-black">
             Bonjour, <span className="text-orange-500">{user?.prenom || 'Client'}</span>
           </h1>
-          <p className="text-gray-500 hidden sm:block">Gérez vos réservations et vos véhicules en toute simplicité.</p>
+          <p className="text-black hidden sm:block">Gérez vos réservations et vos véhicules en toute simplicité.</p>
         </div>
         <div className="flex gap-3">
           <Link 
@@ -172,7 +172,7 @@ export default function ClientDashboard() {
           <button
             title="Actualiser les statistiques"
             onClick={loadDashboardData}
-            className="p-2.5 bg-white border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 transition-colors"
+            className="p-2.5 bg-white border border-gray-200 text-black rounded-xl hover:bg-gray-50 transition-colors"
           >
             <FontAwesomeIcon icon={faChartLine} />
           </button>
@@ -202,7 +202,7 @@ export default function ClientDashboard() {
 
           {upcomingReservations.length === 0 ? (
             <div className="text-center py-20 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
-              <p className="text-gray-400 font-medium">Aucune réservation à venir</p>
+              <p className="text-black font-medium">Aucune réservation à venir</p>
               <Link href="/dashboard/client/search" className="mt-2 text-orange-500 font-bold hover:underline inline-block">
                 Trouver un parking
               </Link>
@@ -252,26 +252,26 @@ export default function ClientDashboard() {
                       })()}
                     </div>
                     <div>
-                      <h3 className="font-bold text-gray-900">
+                      <h3 className="font-bold text-black">
                         {res.parking?.nom || res.parking?.name || 
                          ((res.vehicle || res.vehicule) ? `${(res.vehicle || res.vehicule)?.marque || ''} ${(res.vehicle || res.vehicule)?.model || ''}`.trim() : null) || 
                          `Réservation #${res.id}`}
                       </h3>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-black">
                         {res.date || res.dateDebut ? new Date((res.date || res.dateDebut) as string).toLocaleDateString('fr-FR') : new Date(res.createdAt).toLocaleDateString('fr-FR')}
                       </p>
                     </div>
                   </div>
                   <div className="mt-3 sm:mt-0 flex items-center justify-between sm:justify-end gap-6">
                     <div className="text-right">
-                      <p className="text-sm font-bold text-gray-900">{res.prix || '2.500'} F</p>
+                      <p className="text-sm font-bold text-black">{res.prix || '2.500'} F</p>
                       <span className={`text-[10px] uppercase font-black px-2 py-0.5 rounded-full ${
                         res.status === 'APPROVED' || res.status === 'CONFIRMED' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
                       }`}>
                         {res.status}
                       </span>
                     </div>
-                    <FontAwesomeIcon icon={faHistory} className="text-gray-300 group-hover:text-orange-400 transition-colors cursor-pointer" />
+                    <FontAwesomeIcon icon={faHistory} className="text-black group-hover:text-orange-400 transition-colors cursor-pointer" />
                   </div>
                 </div>
               ))}
@@ -307,7 +307,7 @@ export default function ClientDashboard() {
 
           <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 text-white shadow-lg shadow-slate-900/20 relative overflow-hidden flex flex-col justify-between h-[215px]">
             <FontAwesomeIcon icon={faCar} className="absolute -right-4 -bottom-4 text-white/5 text-8xl pointer-events-none" />
-            <h3 className="font-bold text-[10px] text-slate-400 uppercase tracking-widest mb-3 relative z-10">Nos Marques Partenaires</h3>
+            <h3 className="font-bold text-[10px] text-black uppercase tracking-widest mb-3 relative z-10">Nos Marques Partenaires</h3>
             
             {marques.length > 0 ? (
               <div className="relative w-full flex-1 overflow-hidden z-10">
@@ -341,7 +341,7 @@ export default function ClientDashboard() {
                             <FontAwesomeIcon icon={faCar} className="text-xl text-orange-400 drop-shadow-md fallback-icon" />
                           )}
                         </div>
-                        <h4 className="text-[10px] font-bold text-slate-200 uppercase tracking-wider text-center line-clamp-1 w-full">
+                        <h4 className="text-[10px] font-bold text-black uppercase tracking-wider text-center line-clamp-1 w-full">
                           {marque.name}
                         </h4>
                       </div>
@@ -351,7 +351,7 @@ export default function ClientDashboard() {
               </div>
             ) : (
               <div className="flex-1 flex items-center justify-center relative z-10">
-                <p className="text-slate-400 text-sm">Chargement...</p>
+                <p className="text-black text-sm">Chargement...</p>
               </div>
             )}
             
@@ -376,8 +376,8 @@ function QuickActionLink({ icon, title, href, color }: { icon: import('@fortawes
       <div className={`w-10 h-10 ${color} rounded-lg flex items-center justify-center`}>
         <FontAwesomeIcon icon={icon} />
       </div>
-      <span className="font-medium text-gray-700 group-hover:text-gray-900 flex-1">{title}</span>
-      <FontAwesomeIcon icon={faHistory} className="text-gray-300 group-hover:text-gray-400 text-xs" />
+      <span className="font-medium text-black group-hover:text-black flex-1">{title}</span>
+      <FontAwesomeIcon icon={faHistory} className="text-black group-hover:text-black text-xs" />
     </Link>
   );
 }

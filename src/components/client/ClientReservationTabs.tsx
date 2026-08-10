@@ -206,8 +206,8 @@ export default function ClientReservationTabs() {
       APPROVED: { bg: 'bg-emerald-50', text: 'text-emerald-600', label: 'Approuvée', icon: faCheckCircle },
       CONFIRMED: { bg: 'bg-emerald-50', text: 'text-emerald-600', label: 'Confirmée', icon: faCheckCircle },
       REJECTED: { bg: 'bg-rose-50', text: 'text-rose-600', label: 'Rejetée', icon: faBan },
-      CANCELLED: { bg: 'bg-gray-100', text: 'text-gray-500', label: 'Annulée', icon: faTimes },
-      CANCELED: { bg: 'bg-gray-100', text: 'text-gray-500', label: 'Annulée', icon: faTimes },
+      CANCELLED: { bg: 'bg-gray-100', text: 'text-black', label: 'Annulée', icon: faTimes },
+      CANCELED: { bg: 'bg-gray-100', text: 'text-black', label: 'Annulée', icon: faTimes },
       COMPLETED: { bg: 'bg-blue-50', text: 'text-blue-600', label: 'Terminée', icon: faHistory },
     };
 
@@ -245,7 +245,7 @@ export default function ClientReservationTabs() {
                   className={`px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-[0.15em] transition-all ${
                     activeTab === tab
                       ? 'bg-white text-orange-500 shadow-lg shadow-orange-500/10'
-                      : 'text-slate-400 hover:text-slate-600'
+                      : 'text-black hover:text-black'
                   }`}
                 >
                   {tab === 'pending' ? 'En attente' : 
@@ -261,12 +261,12 @@ export default function ClientReservationTabs() {
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="w-full px-5 py-4 bg-slate-50 rounded-2xl flex items-center justify-between border border-slate-100"
               >
-                <span className="font-black text-[10px] uppercase tracking-widest text-slate-900">
+                <span className="font-black text-[10px] uppercase tracking-widest text-black">
                   {activeTab === 'pending' ? 'En attente' : 
                    activeTab === 'confirmed' ? 'Confirmées' : 
                    'Annulées'}
                 </span>
-                <FontAwesomeIcon icon={mobileMenuOpen ? faXmark : faBars} className="text-slate-400" />
+                <FontAwesomeIcon icon={mobileMenuOpen ? faXmark : faBars} className="text-black" />
               </button>
               {mobileMenuOpen && (
                 <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-slate-100 z-30 overflow-hidden animate-slideDown">
@@ -278,7 +278,7 @@ export default function ClientReservationTabs() {
                         setMobileMenuOpen(false);
                       }}
                       className={`w-full px-5 py-4 text-left font-black text-[10px] uppercase tracking-widest border-b border-slate-50 last:border-none ${
-                        activeTab === tab ? 'bg-orange-50 text-orange-500' : 'text-slate-500'
+                        activeTab === tab ? 'bg-orange-50 text-orange-500' : 'text-black'
                       }`}
                     >
                       {tab === 'pending' ? 'En attente' : 
@@ -294,7 +294,7 @@ export default function ClientReservationTabs() {
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full lg:w-auto">
             {/* Search Input */}
             <div className="relative flex-1 sm:w-64">
-              <FontAwesomeIcon icon={faSearch} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm" />
+              <FontAwesomeIcon icon={faSearch} className="absolute left-4 top-1/2 -translate-y-1/2 text-black text-sm" />
               <input
                 type="text"
                 placeholder="Rechercher..."
@@ -309,7 +309,7 @@ export default function ClientReservationTabs() {
               <button
                 onClick={() => setViewMode('grid')}
                 className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all ${
-                  viewMode === 'grid' ? 'bg-white text-orange-500 shadow-sm' : 'text-slate-400 hover:text-slate-600'
+                  viewMode === 'grid' ? 'bg-white text-orange-500 shadow-sm' : 'text-black hover:text-black'
                 }`}
               >
                 <FontAwesomeIcon icon={faThLarge} />
@@ -317,7 +317,7 @@ export default function ClientReservationTabs() {
               <button
                 onClick={() => setViewMode('list')}
                 className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all ${
-                  viewMode === 'list' ? 'bg-white text-orange-500 shadow-sm' : 'text-slate-400 hover:text-slate-600'
+                  viewMode === 'list' ? 'bg-white text-orange-500 shadow-sm' : 'text-black hover:text-black'
                 }`}
               >
                 <FontAwesomeIcon icon={faList} />
@@ -341,16 +341,16 @@ export default function ClientReservationTabs() {
                 <div className="absolute top-4 left-4">
                   {getStatusBadge(res.status)}
                 </div>
-                <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur px-3 py-1.5 rounded-xl font-black text-[10px] uppercase tracking-widest text-slate-900 shadow-sm">
+                <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur px-3 py-1.5 rounded-xl font-black text-[10px] uppercase tracking-widest text-black shadow-sm">
                   #{res.id}
                 </div>
               </div>
               <div className="p-6 space-y-4">
                 <div>
-                  <h3 className="font-black text-lg text-slate-900 group-hover:text-orange-500 transition-colors truncate">
+                  <h3 className="font-black text-lg text-black group-hover:text-orange-500 transition-colors truncate">
                     {getVehicle(res)?.marque} {getVehicle(res)?.model || getVehicle(res)?.modele}
                   </h3>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.15em] mt-1 flex items-center gap-2">
+                  <p className="text-[10px] font-bold text-black uppercase tracking-[0.15em] mt-1 flex items-center gap-2">
                     <FontAwesomeIcon icon={faMapMarkerAlt} className="text-orange-500" />
                     {getParkingName(res, parkings)}
                   </p>
@@ -358,15 +358,15 @@ export default function ClientReservationTabs() {
 
                 <div className="grid grid-cols-2 gap-4 py-4 border-y border-slate-50">
                   <div className="space-y-1">
-                    <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest">Type</p>
-                    <p className="text-[10px] font-black text-slate-700 uppercase tracking-widest flex items-center gap-2">
+                    <p className="text-[8px] font-black text-black uppercase tracking-widest">Type</p>
+                    <p className="text-[10px] font-black text-black uppercase tracking-widest flex items-center gap-2">
                       <FontAwesomeIcon icon={res.type === 'LOCATION' ? faClock : faCar} className="text-orange-300" />
                       {res.type}
                     </p>
                   </div>
                   <div className="space-y-1 text-right">
-                    <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest">Date</p>
-                    <p className="text-[10px] font-black text-slate-700 uppercase tracking-widest">
+                    <p className="text-[8px] font-black text-black uppercase tracking-widest">Date</p>
+                    <p className="text-[10px] font-black text-black uppercase tracking-widest">
                       {formatDate(res.dateDebut)}
                     </p>
                   </div>
@@ -381,7 +381,7 @@ export default function ClientReservationTabs() {
                       setSelectedReservation(res);
                       setViewModeTab('details');
                     }}
-                    className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-orange-500 hover:text-white transition-all shadow-inner"
+                    className="w-10 h-10 rounded-xl bg-slate-50 text-black flex items-center justify-center hover:bg-orange-500 hover:text-white transition-all shadow-inner"
                   >
                     <FontAwesomeIcon icon={faEye} />
                   </button>
@@ -396,37 +396,37 @@ export default function ClientReservationTabs() {
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-100">
-                  <th className="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">ID</th>
-                  <th className="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Véhicule</th>
-                  <th className="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Parking</th>
-                  <th className="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Date</th>
-                  <th className="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Type</th>
-                  <th className="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Statut</th>
-                  <th className="px-6 py-5 text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Action</th>
+                  <th className="px-6 py-5 text-left text-[10px] font-black text-black uppercase tracking-[0.2em]">ID</th>
+                  <th className="px-6 py-5 text-left text-[10px] font-black text-black uppercase tracking-[0.2em]">Véhicule</th>
+                  <th className="px-6 py-5 text-left text-[10px] font-black text-black uppercase tracking-[0.2em]">Parking</th>
+                  <th className="px-6 py-5 text-left text-[10px] font-black text-black uppercase tracking-[0.2em]">Date</th>
+                  <th className="px-6 py-5 text-left text-[10px] font-black text-black uppercase tracking-[0.2em]">Type</th>
+                  <th className="px-6 py-5 text-left text-[10px] font-black text-black uppercase tracking-[0.2em]">Statut</th>
+                  <th className="px-6 py-5 text-right text-[10px] font-black text-black uppercase tracking-[0.2em]">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {paginatedReservations.map((res) => (
                   <tr key={res.id} className="hover:bg-slate-50/50 transition-colors group">
-                    <td className="px-6 py-5 font-black text-xs text-slate-400">#{res.id}</td>
+                    <td className="px-6 py-5 font-black text-xs text-black">#{res.id}</td>
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-100 shadow-inner">
                           <img src={getPhotoUrl(getVehicle(res)?.photos)} className="w-full h-full object-cover" />
                         </div>
-                        <div className="font-black text-sm text-slate-900 group-hover:text-orange-500 transition-colors">
+                        <div className="font-black text-sm text-black group-hover:text-orange-500 transition-colors">
                           {getVehicle(res)?.marque} {getVehicle(res)?.model || getVehicle(res)?.modele}
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-5">
-                      <span className="font-bold text-xs text-slate-600">{getParkingName(res, parkings)}</span>
+                      <span className="font-bold text-xs text-black">{getParkingName(res, parkings)}</span>
                     </td>
                     <td className="px-6 py-5">
-                      <span className="font-bold text-xs text-slate-600">{formatDate(res.dateDebut)}</span>
+                      <span className="font-bold text-xs text-black">{formatDate(res.dateDebut)}</span>
                     </td>
                     <td className="px-6 py-5">
-                      <span className="px-3 py-1 bg-slate-100 rounded-lg font-black text-[9px] uppercase tracking-widest text-slate-600">{res.type}</span>
+                      <span className="px-3 py-1 bg-slate-100 rounded-lg font-black text-[9px] uppercase tracking-widest text-black">{res.type}</span>
                     </td>
                     <td className="px-6 py-5">
                       {getStatusBadge(res.status)}
@@ -437,7 +437,7 @@ export default function ClientReservationTabs() {
                           setSelectedReservation(res);
                           setViewModeTab('details');
                         }}
-                        className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-orange-500 hover:text-white transition-all shadow-inner ml-auto"
+                        className="w-10 h-10 rounded-xl bg-slate-50 text-black flex items-center justify-center hover:bg-orange-500 hover:text-white transition-all shadow-inner ml-auto"
                       >
                         <FontAwesomeIcon icon={faEye} />
                       </button>
@@ -453,11 +453,11 @@ export default function ClientReservationTabs() {
       {/* Empty State */}
       {filteredReservations.length === 0 && (
         <div className="bg-white border-2 border-dashed border-slate-100 rounded-[2.5rem] py-20 text-center">
-          <div className="w-20 h-20 bg-slate-50 rounded-[2rem] flex items-center justify-center mx-auto mb-6 text-slate-200">
+          <div className="w-20 h-20 bg-slate-50 rounded-[2rem] flex items-center justify-center mx-auto mb-6 text-black">
             <FontAwesomeIcon icon={faHistory} className="text-4xl" />
           </div>
-          <h3 className="text-xl font-black text-slate-900 mb-2">Aucune réservation</h3>
-          <p className="text-slate-400 font-bold text-xs uppercase tracking-widest">Votre historique est actuellement vide.</p>
+          <h3 className="text-xl font-black text-black mb-2">Aucune réservation</h3>
+          <p className="text-black font-bold text-xs uppercase tracking-widest">Votre historique est actuellement vide.</p>
         </div>
       )}
 
@@ -465,7 +465,7 @@ export default function ClientReservationTabs() {
       {filteredReservations.length > 0 && (
         <div className="mt-8 px-6 py-4 bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-700 font-medium">
+            <span className="text-sm text-black font-medium">
               Affichage de <span className="font-bold">{(currentPage - 1) * itemsPerPage + 1}</span> à <span className="font-bold">{Math.min(currentPage * itemsPerPage, filteredReservations.length)}</span> sur <span className="font-bold text-orange-600">{filteredReservations.length}</span> réservations
             </span>
             <select
@@ -475,7 +475,7 @@ export default function ClientReservationTabs() {
                 setItemsPerPage(Number(e.target.value));
                 setCurrentPage(1);
               }}
-              className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm font-bold text-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500/20 cursor-pointer transition-all hover:bg-gray-100"
+              className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm font-bold text-black focus:outline-none focus:ring-2 focus:ring-orange-500/20 cursor-pointer transition-all hover:bg-gray-100"
             >
               <option value={6}>6 par page</option>
               <option value={10}>10 par page</option>
@@ -492,13 +492,13 @@ export default function ClientReservationTabs() {
                 window.scrollTo({ top: 300, behavior: 'smooth' });
               }}
               disabled={currentPage === 1}
-              className="w-10 h-10 border border-gray-200 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-50 hover:text-orange-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              className="w-10 h-10 border border-gray-200 rounded-lg flex items-center justify-center text-black hover:bg-gray-50 hover:text-orange-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
               <FontAwesomeIcon icon={faChevronLeft} />
             </button>
 
             <div className="px-4 py-2 bg-gray-50 rounded-lg border border-gray-100">
-              <span className="text-sm font-bold text-gray-700">
+              <span className="text-sm font-bold text-black">
                 Page <span className="text-orange-600">{currentPage}</span> sur {Math.ceil(filteredReservations.length / itemsPerPage) || 1}
               </span>
             </div>
@@ -510,7 +510,7 @@ export default function ClientReservationTabs() {
                 window.scrollTo({ top: 300, behavior: 'smooth' });
               }}
               disabled={currentPage === Math.ceil(filteredReservations.length / itemsPerPage) || filteredReservations.length === 0}
-              className="w-10 h-10 border border-gray-200 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-50 hover:text-orange-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              className="w-10 h-10 border border-gray-200 rounded-lg flex items-center justify-center text-black hover:bg-gray-50 hover:text-orange-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
               <FontAwesomeIcon icon={faChevronRight} />
             </button>
@@ -523,7 +523,7 @@ export default function ClientReservationTabs() {
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fadeIn">
           <div className="w-full max-w-4xl bg-white rounded-[2.5rem] shadow-2xl max-h-[90vh] overflow-y-auto animate-slideUp">
             <div className="sticky top-0 bg-white/80 backdrop-blur-md p-6 sm:p-8 border-b border-slate-50 flex justify-between items-center z-20">
-              <h2 className="text-2xl font-black text-slate-900 flex items-center gap-4">
+              <h2 className="text-2xl font-black text-black flex items-center gap-4">
                 <span className="w-12 h-12 rounded-2xl bg-orange-100 text-orange-500 flex items-center justify-center shadow-inner">
                   <FontAwesomeIcon icon={faCar} />
                 </span>
@@ -531,7 +531,7 @@ export default function ClientReservationTabs() {
               </h2>
               <button
                 onClick={() => setViewModeTab('list')}
-                className="w-12 h-12 rounded-full bg-slate-50 text-slate-400 hover:text-slate-900 transition-all flex items-center justify-center border border-slate-100 shadow-inner"
+                className="w-12 h-12 rounded-full bg-slate-50 text-black hover:text-black transition-all flex items-center justify-center border border-slate-100 shadow-inner"
               >
                 <FontAwesomeIcon icon={faTimes} />
               </button>
@@ -554,11 +554,11 @@ export default function ClientReservationTabs() {
                   <div className="p-6 bg-slate-50 rounded-[2rem] border border-slate-100 space-y-4">
                     <div className="flex justify-between items-end">
                       <div>
-                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Véhicule</p>
-                        <h4 className="text-xl font-black text-slate-900">{getVehicle(selectedReservation)?.marque} {getVehicle(selectedReservation)?.model || getVehicle(selectedReservation)?.modele}</h4>
+                        <p className="text-[10px] font-black text-black uppercase tracking-widest mb-1">Véhicule</p>
+                        <h4 className="text-xl font-black text-black">{getVehicle(selectedReservation)?.marque} {getVehicle(selectedReservation)?.model || getVehicle(selectedReservation)?.modele}</h4>
                       </div>
                       <div className="text-right">
-                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Total</p>
+                        <p className="text-[10px] font-black text-black uppercase tracking-widest mb-1">Total</p>
                         <p className="text-xl font-black text-orange-600">{(selectedReservation.montant || selectedReservation.prix || 0).toLocaleString()} F</p>
                       </div>
                     </div>
@@ -612,11 +612,11 @@ export default function ClientReservationTabs() {
 function DetailBlock({ icon, label, value }: { icon: any, label: string, value: string }) {
   return (
     <div className="p-5 bg-white rounded-2xl border border-slate-50 shadow-sm space-y-1">
-      <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest flex items-center gap-1.5">
+      <p className="text-[8px] font-black text-black uppercase tracking-widest flex items-center gap-1.5">
         <FontAwesomeIcon icon={icon} className="text-orange-300" />
         {label}
       </p>
-      <p className="text-xs font-black text-slate-800">{value}</p>
+      <p className="text-xs font-black text-black">{value}</p>
     </div>
   );
 }

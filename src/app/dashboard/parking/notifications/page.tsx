@@ -161,7 +161,7 @@ export default function ParkingNotificationsPage() {
       case 'RESERVATION': return 'bg-blue-50 text-blue-600 border-blue-100';
       case 'PAIEMENT': return 'bg-emerald-50 text-emerald-600 border-emerald-100';
       case 'MISE_A_JOUR': return 'bg-purple-50 text-purple-600 border-purple-100';
-      default: return 'bg-gray-50 text-gray-500 border-gray-100';
+      default: return 'bg-gray-50 text-black border-gray-100';
     }
   };
 
@@ -180,7 +180,7 @@ export default function ParkingNotificationsPage() {
         <div className="max-w-4xl mx-auto p-6">
           <button
             onClick={() => setSelectedNotification(null)}
-            className="group flex items-center gap-3 text-slate-400 hover:text-orange-500 font-black text-xs uppercase tracking-[0.2em] transition-all mb-8"
+            className="group flex items-center gap-3 text-black hover:text-orange-500 font-black text-xs uppercase tracking-[0.2em] transition-all mb-8"
           >
             <div className="w-10 h-10 rounded-2xl bg-white border border-slate-100 flex items-center justify-center group-hover:bg-orange-50 group-hover:border-orange-100 transition-all shadow-sm">
               <FontAwesomeIcon icon={faChevronLeft} size="xs" />
@@ -200,12 +200,12 @@ export default function ParkingNotificationsPage() {
             </div>
 
             <div className="p-8">
-              <div className="flex items-center justify-center gap-4 mb-8 text-gray-400 text-sm">
+              <div className="flex items-center justify-center gap-4 mb-8 text-black text-sm">
                 <span className="flex items-center gap-2"><FontAwesomeIcon icon={faCalendarAlt} /> {new Date(selectedNotification.createdAt).toLocaleDateString('fr-FR')}</span>
                 <span className="flex items-center gap-2"><FontAwesomeIcon icon={faClock} /> {new Date(selectedNotification.createdAt).toLocaleTimeString('fr-FR')}</span>
               </div>
 
-              <div className="bg-gray-50 rounded-2xl p-6 mb-8 text-center text-gray-700 font-medium">
+              <div className="bg-gray-50 rounded-2xl p-6 mb-8 text-center text-black font-medium">
                 {selectedNotification.message}
               </div>
 
@@ -224,7 +224,7 @@ export default function ParkingNotificationsPage() {
               <div className="flex gap-3">
                 <button
                   onClick={() => setSelectedNotification(null)}
-                  className="flex-1 py-4 rounded-xl bg-gray-100 text-gray-600 font-black text-xs uppercase tracking-widest hover:bg-gray-200 transition-all"
+                  className="flex-1 py-4 rounded-xl bg-gray-100 text-black font-black text-xs uppercase tracking-widest hover:bg-gray-200 transition-all"
                 >
                   Fermer
                 </button>
@@ -247,13 +247,13 @@ export default function ParkingNotificationsPage() {
     <div className="space-y-6 max-w-6xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-black text-gray-900 tracking-tight">Notifications</h1>
-          <p className="text-gray-500">Alertes et mises à jour de votre parking.</p>
+          <h1 className="text-3xl font-black text-black tracking-tight">Notifications</h1>
+          <p className="text-black">Alertes et mises à jour de votre parking.</p>
         </div>
         <div className="flex gap-2">
           <button
             onClick={handleMarkAllAsRead}
-            className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 transition-all"
+            className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-bold text-black hover:bg-gray-50 transition-all"
           >
             Tout marquer lu
           </button>
@@ -269,13 +269,13 @@ export default function ParkingNotificationsPage() {
       <div className="flex gap-2 p-1 bg-gray-100 rounded-2xl w-fit">
         <button
           onClick={() => setActiveTab('all')}
-          className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'all' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+          className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'all' ? 'bg-white text-orange-600 shadow-sm' : 'text-black hover:text-black'}`}
         >
           Toutes ({notifications.length})
         </button>
         <button
           onClick={() => setActiveTab('unread')}
-          className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'unread' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+          className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'unread' ? 'bg-white text-orange-600 shadow-sm' : 'text-black hover:text-black'}`}
         >
           Non lues ({notifications.filter(n => !n.read).length})
         </button>
@@ -284,15 +284,15 @@ export default function ParkingNotificationsPage() {
       {loading && notifications.length === 0 ? (
         <div className="bg-white rounded-3xl p-16 text-center border border-gray-100 shadow-sm">
           <FontAwesomeIcon icon={faSync} className="text-4xl text-orange-500 animate-spin mb-4" />
-          <p className="text-gray-500 font-medium">Chargement...</p>
+          <p className="text-black font-medium">Chargement...</p>
         </div>
       ) : filteredNotifications.length === 0 ? (
         <div className="bg-white rounded-3xl p-16 text-center border border-gray-100 shadow-sm">
           <div className="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <FontAwesomeIcon icon={faInbox} className="text-3xl text-gray-200" />
+            <FontAwesomeIcon icon={faInbox} className="text-3xl text-black" />
           </div>
-          <h3 className="text-xl font-black text-gray-900">Aucune notification</h3>
-          <p className="text-gray-500 mt-2">Vous êtes à jour !</p>
+          <h3 className="text-xl font-black text-black">Aucune notification</h3>
+          <p className="text-black mt-2">Vous êtes à jour !</p>
         </div>
       ) : (
         <div className="grid gap-4">
@@ -305,23 +305,23 @@ export default function ParkingNotificationsPage() {
               }}
               className={`bg-white rounded-2xl border p-5 transition-all cursor-pointer hover:shadow-lg hover:-translate-y-0.5 flex gap-4 ${!n.read ? 'border-l-4 border-l-orange-500 border-gray-200' : 'border-gray-100 opacity-80'}`}
             >
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${!n.read ? 'bg-orange-500 text-white shadow-lg shadow-orange-200' : 'bg-gray-100 text-gray-400'}`}>
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${!n.read ? 'bg-orange-500 text-white shadow-lg shadow-orange-200' : 'bg-gray-100 text-black'}`}>
                 <FontAwesomeIcon icon={getIcon(n.type, n.read)} />
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <h3 className={`text-gray-900 ${!n.read ? 'font-bold' : 'text-sm'}`}>{n.title}</h3>
+                  <h3 className={`text-black ${!n.read ? 'font-bold' : 'text-sm'}`}>{n.title}</h3>
                   <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${getTypeColor(n.type)}`}>
                     {getTypeLabel(n.type)}
                   </span>
                 </div>
-                <p className="text-sm text-gray-600 line-clamp-1 mb-2">{n.message}</p>
-                <div className="flex items-center justify-between text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                <p className="text-sm text-black line-clamp-1 mb-2">{n.message}</p>
+                <div className="flex items-center justify-between text-[10px] text-black font-bold uppercase tracking-widest">
                   <span className="flex items-center gap-3">
                     <span className="flex items-center gap-1"><FontAwesomeIcon icon={faCalendarAlt} /> {new Date(n.createdAt).toLocaleDateString('fr-FR')}</span>
                     <span className="flex items-center gap-1"><FontAwesomeIcon icon={faClock} /> {new Date(n.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
                   </span>
-                  <FontAwesomeIcon icon={faArrowRight} className="text-gray-200 group-hover:text-orange-500 transition-all" />
+                  <FontAwesomeIcon icon={faArrowRight} className="text-black group-hover:text-orange-500 transition-all" />
                 </div>
               </div>
             </div>

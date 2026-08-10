@@ -87,7 +87,7 @@ export default function AdminSidebar({
             <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">A</span>
             </div>
-            <span className="font-bold text-gray-800">Admin Panel</span>
+            <span className="font-bold text-black">Admin Panel</span>
           </Link>
         )}
         {collapsed && (
@@ -99,7 +99,7 @@ export default function AdminSidebar({
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500"
+          className="p-1.5 rounded-lg hover:bg-gray-100 text-black"
         >
           <FontAwesomeIcon icon={collapsed ? faChevronRight : faChevronLeft} />
         </button>
@@ -115,7 +115,7 @@ export default function AdminSidebar({
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
                   isActive(item.href, item.exact)
                     ? 'bg-orange-50 text-orange-600'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    : 'text-black hover:bg-gray-100'
                 }`}
               >
                 <FontAwesomeIcon icon={item.icon} className="w-5 h-5" />
@@ -131,7 +131,7 @@ export default function AdminSidebar({
               className={`w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg transition-colors ${
                 isSettingsActive || settingsOpen
                   ? 'bg-orange-50 text-orange-600'
-                  : 'text-gray-700 hover:bg-gray-100'
+                  : 'text-black hover:bg-gray-100'
               }`}
             >
               <div className="flex items-center gap-3">
@@ -157,7 +157,7 @@ export default function AdminSidebar({
                       className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
                         isActive(sub.href)
                           ? 'bg-orange-50/70 text-orange-700'
-                          : 'text-gray-600 hover:bg-gray-50'
+                          : 'text-black hover:bg-gray-50'
                       }`}
                     >
                       <FontAwesomeIcon icon={sub.icon} className="w-4 h-4" />
@@ -175,12 +175,12 @@ export default function AdminSidebar({
       <div className="p-4 border-t border-gray-200">
         <div className={`flex items-center gap-3 ${collapsed ? 'justify-center' : ''}`}>
           <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-            <FontAwesomeIcon icon={faShieldAlt} className="text-gray-600 text-sm" />
+            <FontAwesomeIcon icon={faShieldAlt} className="text-black text-sm" />
           </div>
           {!collapsed && (
             <div className="flex-1">
-              <p className="text-xs text-gray-500">Version</p>
-              <p className="text-sm font-medium text-gray-800">1.0.0</p>
+              <p className="text-xs text-black">Version</p>
+              <p className="text-sm font-medium text-black">1.0.0</p>
             </div>
           )}
         </div>

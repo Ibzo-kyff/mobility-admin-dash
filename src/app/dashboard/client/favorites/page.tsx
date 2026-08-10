@@ -46,11 +46,11 @@ export default function FavoritesPage() {
     <div className="space-y-6 p-4 sm:p-6">
       <div className="flex justify-between items-end">
         <div>
-          <h1 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-3">
+          <h1 className="text-2xl font-black text-black tracking-tight flex items-center gap-3">
             <FontAwesomeIcon icon={faHeart} className="text-rose-500" />
             Mes Véhicules Favoris
           </h1>
-          <p className="text-gray-500 mt-1">Retrouvez les véhicules que vous avez sauvegardés.</p>
+          <p className="text-black mt-1">Retrouvez les véhicules que vous avez sauvegardés.</p>
         </div>
         {favorites.length > 0 && (
           <button 
@@ -89,7 +89,7 @@ export default function FavoritesPage() {
                       onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-300">
+                    <div className="w-full h-full flex items-center justify-center text-black">
                       <FontAwesomeIcon icon={faCar} className="text-5xl" />
                     </div>
                   )}
@@ -119,20 +119,20 @@ export default function FavoritesPage() {
                       </div>
                     )}
                     <div>
-                      <h3 className="font-black text-gray-900 text-lg leading-tight group-hover:text-orange-500 transition-colors">
+                      <h3 className="font-black text-black text-lg leading-tight group-hover:text-orange-500 transition-colors">
                         {fav.marqueRef?.name || 'Véhicule'} {fav.model}
                       </h3>
-                      <p className="text-xs font-bold text-gray-400 mt-1 uppercase tracking-wider">{fav.parking?.city || 'Localisation inconnue'}</p>
+                      <p className="text-xs font-bold text-black mt-1 uppercase tracking-wider">{fav.parking?.city || 'Localisation inconnue'}</p>
                     </div>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-3 my-4">
-                    <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-xl">
-                      <FontAwesomeIcon icon={faCalendarAlt} className="text-gray-400" />
+                    <div className="flex items-center gap-2 text-sm text-black bg-gray-50 px-3 py-2 rounded-xl">
+                      <FontAwesomeIcon icon={faCalendarAlt} className="text-black" />
                       <span className="font-medium">{fav.year || 'N/A'}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-xl">
-                      <FontAwesomeIcon icon={faGasPump} className="text-gray-400" />
+                    <div className="flex items-center gap-2 text-sm text-black bg-gray-50 px-3 py-2 rounded-xl">
+                      <FontAwesomeIcon icon={faGasPump} className="text-black" />
                       <span className="font-medium truncate">{fav.fuelType || 'Essence'}</span>
                     </div>
                   </div>
@@ -149,11 +149,11 @@ export default function FavoritesPage() {
         </div>
       ) : (
         <div className="py-24 text-center bg-white rounded-3xl border border-gray-100 shadow-sm flex flex-col items-center justify-center">
-          <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center text-gray-300 mb-6">
+          <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center text-black mb-6">
             <FontAwesomeIcon icon={faHeart} className="text-5xl" />
           </div>
-          <h3 className="text-xl font-black text-gray-800 mb-2">Aucun favori pour le moment</h3>
-          <p className="text-gray-500 max-w-sm mx-auto mb-8">
+          <h3 className="text-xl font-black text-black mb-2">Aucun favori pour le moment</h3>
+          <p className="text-black max-w-sm mx-auto mb-8">
             Explorez les véhicules et parkings disponibles et ajoutez-les à vos favoris pour les retrouver facilement ici.
           </p>
           <Link href="/dashboard/client/search" className="px-8 py-3.5 bg-gray-900 text-white rounded-xl text-sm font-black uppercase tracking-wider hover:bg-gray-800 transition-all shadow-xl shadow-gray-900/20">

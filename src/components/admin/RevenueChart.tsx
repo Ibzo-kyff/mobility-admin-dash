@@ -53,8 +53,8 @@ export default function RevenueChart({ reservations }: Props) {
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 h-full flex flex-col">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-semibold text-gray-800">Revenus mensuels</h2>
-        <div className="flex items-center gap-2 text-sm text-gray-600">
+        <h2 className="text-lg font-semibold text-black">Revenus mensuels</h2>
+        <div className="flex items-center gap-2 text-sm text-black">
           <FontAwesomeIcon icon={faChartLine} className="text-orange-500" />
           <span>+23% vs mois dernier</span>
         </div>
@@ -79,7 +79,7 @@ export default function RevenueChart({ reservations }: Props) {
               </div>
             </div>
 
-            <span className="mt-3 text-xs font-medium text-gray-600">
+            <span className="mt-3 text-xs font-medium text-black">
               {item.month}
             </span>
           </div>
@@ -89,14 +89,14 @@ export default function RevenueChart({ reservations }: Props) {
       {/* Résumé en bas */}
       <div className="mt-auto pt-6 border-t border-gray-100 grid grid-cols-2 gap-6">
         <div>
-          <p className="text-sm text-gray-500">Revenu total (12 mois)</p>
-          <p className="text-3xl font-bold text-gray-800 mt-1">
+          <p className="text-sm text-black">Revenu total (12 mois)</p>
+          <p className="text-3xl font-bold text-black mt-1">
             {totalRevenue.toLocaleString('fr-FR')} €
           </p>
         </div>
         <div className="text-right">
-          <p className="text-sm text-gray-500">Moyenne mensuelle</p>
-          <p className="text-3xl font-bold text-gray-800 mt-1">
+          <p className="text-sm text-black">Moyenne mensuelle</p>
+          <p className="text-3xl font-bold text-black mt-1">
             {averageRevenue.toLocaleString('fr-FR')} €
           </p>
         </div>
@@ -104,7 +104,7 @@ export default function RevenueChart({ reservations }: Props) {
 
       {reservations.length === 0 && (
         <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-lg">
-          <p className="text-gray-400 text-lg">Aucune réservation pour le moment</p>
+          <p className="text-black text-lg">Aucune réservation pour le moment</p>
         </div>
       )}
     </div>

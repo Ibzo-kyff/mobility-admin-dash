@@ -26,7 +26,7 @@ function TransactionItem({ reservation }: { reservation: Reservation }) {
           <p className="font-medium">
             {user?.prenom} {user?.nom}
           </p>
-          <p className="text-sm text-gray-500">{user?.email}</p>
+          <p className="text-sm text-black">{user?.email}</p>
         </div>
       </div>
       <div className="text-right">
@@ -39,7 +39,7 @@ function TransactionItem({ reservation }: { reservation: Reservation }) {
         >
           {reservation.type === "LOCATION" ? "Location" : "Achat"}
         </span>
-        <p className="text-xs text-gray-400 mt-1">
+        <p className="text-xs text-black mt-1">
           {new Date(reservation.date).toLocaleDateString()}
         </p>
       </div>
@@ -59,7 +59,7 @@ export default function TransactionListWithMore({ reservations }: { reservations
         <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
           <Calendar size={20} className="text-orange-600" /> Transactions récentes
         </h2>
-        <p className="text-gray-500 text-center py-8">Aucune transaction</p>
+        <p className="text-black text-center py-8">Aucune transaction</p>
       </div>
     );
   }

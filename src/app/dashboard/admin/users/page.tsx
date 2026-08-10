@@ -244,8 +244,8 @@ export default function AdminUsersPage() {
     <div className="p-2 sm:p-6 w-full max-w-full overflow-hidden">
       <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Gestion des utilisateurs</h1>
-          <p className="text-gray-600">Gérez tous les utilisateurs de la plateforme</p>
+          <h1 className="text-2xl font-bold text-black">Gestion des utilisateurs</h1>
+          <p className="text-black">Gérez tous les utilisateurs de la plateforme</p>
         </div>
         <button
           onClick={handleAddUser}
@@ -272,7 +272,7 @@ export default function AdminUsersPage() {
           <div className="flex-1 relative">
             <FontAwesomeIcon
               icon={faSearch}
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black"
             />
             <input
               type="text"
@@ -307,7 +307,7 @@ export default function AdminUsersPage() {
                   setFilterStatus('all');
                   setFilterDate('');
                 }}
-                className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200"
+                className="px-4 py-2 bg-gray-100 text-black rounded-lg hover:bg-gray-200"
               >
                 Réinitialiser
               </button>
@@ -327,7 +327,7 @@ export default function AdminUsersPage() {
               </div>
             </div>
           ) : paginatedUsers.length === 0 ? (
-            <div className="bg-white rounded-2xl p-8 text-center text-gray-500 shadow-sm font-bold">
+            <div className="bg-white rounded-2xl p-8 text-center text-black shadow-sm font-bold">
               Aucun utilisateur trouvé
             </div>
           ) : (
@@ -343,27 +343,27 @@ export default function AdminUsersPage() {
                           className="w-full h-full object-cover"
                           onError={(e) => {
                             e.currentTarget.style.display = 'none';
-                            e.currentTarget.parentElement!.innerHTML = `<span class="text-sm font-black text-slate-700">${user.prenom?.[0] || ''}${user.nom?.[0] || ''}</span>`;
+                            e.currentTarget.parentElement!.innerHTML = `<span class="text-sm font-black text-black">${user.prenom?.[0] || ''}${user.nom?.[0] || ''}</span>`;
                           }}
                         />
                       ) : (
-                        <span className="text-sm font-black text-slate-700">
+                        <span className="text-sm font-black text-black">
                           {user.prenom?.[0]}{user.nom?.[0]}
                         </span>
                       )}
                     </div>
                     <div>
-                      <h3 className="font-black text-sm text-slate-900 leading-snug">
+                      <h3 className="font-black text-sm text-black leading-snug">
                         {user.prenom} {user.nom}
                       </h3>
-                      <p className="text-xs text-slate-400 font-bold truncate max-w-[180px] mt-0.5">{user.email}</p>
+                      <p className="text-xs text-black font-bold truncate max-w-[180px] mt-0.5">{user.email}</p>
                     </div>
                   </div>
 
                   <div className="relative">
                     <button
                       onClick={() => setActiveMenu(activeMenu === user.id ? null : user.id)}
-                      className="w-8 h-8 rounded-xl bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center hover:bg-slate-200/70 transition-colors"
+                      className="w-8 h-8 rounded-xl bg-slate-100 text-black hover:text-black flex items-center justify-center hover:bg-slate-200/70 transition-colors"
                     >
                       <FontAwesomeIcon icon={faEllipsisVertical} />
                     </button>
@@ -376,16 +376,16 @@ export default function AdminUsersPage() {
                       >
                         <button
                           onClick={() => handleViewUser(user)}
-                          className="flex w-full items-center px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors"
+                          className="flex w-full items-center px-4 py-2.5 text-xs font-bold text-black hover:bg-slate-50 transition-colors"
                         >
-                          <FontAwesomeIcon icon={faEye} className="mr-2.5 text-slate-400" />
+                          <FontAwesomeIcon icon={faEye} className="mr-2.5 text-black" />
                           Voir détails
                         </button>
                         <button
                           onClick={() => handleEditUser(user)}
-                          className="flex w-full items-center px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors"
+                          className="flex w-full items-center px-4 py-2.5 text-xs font-bold text-black hover:bg-slate-50 transition-colors"
                         >
-                          <FontAwesomeIcon icon={faEdit} className="mr-2.5 text-slate-400" />
+                          <FontAwesomeIcon icon={faEdit} className="mr-2.5 text-black" />
                           Modifier
                         </button>
                         <button
@@ -402,7 +402,7 @@ export default function AdminUsersPage() {
 
                 <div className="grid grid-cols-2 gap-3 py-3 border-y border-slate-100/50">
                   <div className="space-y-0.5">
-                    <p className="text-[9px] font-black text-slate-300 uppercase tracking-wider">Rôle & Statut</p>
+                    <p className="text-[9px] font-black text-black uppercase tracking-wider">Rôle & Statut</p>
                     <div className="flex flex-wrap items-center gap-1.5 mt-1">
                       <span className={`px-2 py-0.5 text-[10px] font-black uppercase tracking-wider rounded-md ${
                         user.role === 'ADMIN' ? 'bg-purple-100 text-purple-800' :
@@ -422,16 +422,16 @@ export default function AdminUsersPage() {
                   </div>
 
                   <div className="space-y-0.5 text-right">
-                    <p className="text-[9px] font-black text-slate-300 uppercase tracking-wider">Email vérifié</p>
+                    <p className="text-[9px] font-black text-black uppercase tracking-wider">Email vérifié</p>
                     <p className={`text-[11px] font-bold mt-1 ${user.emailVerified ? 'text-green-600' : 'text-yellow-600'}`}>
                       {user.emailVerified ? 'Vérifié' : 'En attente'}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between text-[10px] font-bold text-slate-400">
+                <div className="flex items-center justify-between text-[10px] font-bold text-black">
                   <span>Inscrit le :</span>
-                  <span className="text-slate-600 font-extrabold">{new Date(user.createdAt).toLocaleDateString()}</span>
+                  <span className="text-black font-extrabold">{new Date(user.createdAt).toLocaleDateString()}</span>
                 </div>
               </div>
             ))
@@ -443,22 +443,22 @@ export default function AdminUsersPage() {
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
                   Utilisateur
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
                   Rôle
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
                   Statut
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
                   Email vérifié
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
                   Date d'inscription
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-right text-xs font-medium text-black uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -474,7 +474,7 @@ export default function AdminUsersPage() {
                 </tr>
               ) : paginatedUsers.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
+                  <td colSpan={6} className="px-6 py-4 text-center text-black">
                     Aucun utilisateur trouvé
                   </td>
                 </tr>
@@ -492,20 +492,20 @@ export default function AdminUsersPage() {
                               onError={(e) => {
                                 // En cas d'erreur de chargement, afficher les initiales
                                 e.currentTarget.style.display = 'none';
-                                e.currentTarget.parentElement!.innerHTML = `<span class="text-sm font-medium text-gray-600">${user.prenom?.[0] || ''}${user.nom?.[0] || ''}</span>`;
+                                e.currentTarget.parentElement!.innerHTML = `<span class="text-sm font-medium text-black">${user.prenom?.[0] || ''}${user.nom?.[0] || ''}</span>`;
                               }}
                             />
                           ) : (
-                            <span className="text-sm font-medium text-gray-600">
+                            <span className="text-sm font-medium text-black">
                               {user.prenom?.[0]}{user.nom?.[0]}
                             </span>
                           )}
                         </div>
                         <div className="ml-3">
-                          <p className="text-sm font-medium text-gray-900">
+                          <p className="text-sm font-medium text-black">
                             {user.prenom} {user.nom}
                           </p>
-                          <p className="text-sm text-gray-500">{user.email}</p>
+                          <p className="text-sm text-black">{user.email}</p>
                         </div>
                       </div>
                     </td>
@@ -536,13 +536,13 @@ export default function AdminUsersPage() {
                         <span className="text-yellow-600">En attente</span>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
+                    <td className="px-6 py-4 text-sm text-black">
                       {new Date(user.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 text-right relative">
                       <button
                         onClick={() => setActiveMenu(activeMenu === user.id ? null : user.id)}
-                        className="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100"
+                        className="text-black hover:text-black p-2 rounded-full hover:bg-gray-100"
                       >
                         <FontAwesomeIcon icon={faEllipsisVertical} />
                       </button>
@@ -556,14 +556,14 @@ export default function AdminUsersPage() {
                           <div className="py-1">
                             <button
                               onClick={() => handleViewUser(user)}
-                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              className="block w-full text-left px-4 py-2 text-sm text-black hover:bg-gray-100"
                             >
                               <FontAwesomeIcon icon={faEye} className="mr-2" />
                               Voir détails
                             </button>
                             <button
                               onClick={() => handleEditUser(user)}
-                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              className="block w-full text-left px-4 py-2 text-sm text-black hover:bg-gray-100"
                             >
                               <FontAwesomeIcon icon={faEdit} className="mr-2" />
                               Modifier
@@ -589,7 +589,7 @@ export default function AdminUsersPage() {
         {/* Pagination */}
         <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-700">
+            <span className="text-sm text-black">
               Affichage de {(currentPage - 1) * itemsPerPage + 1} à {Math.min(currentPage * itemsPerPage, filteredUsers.length)} sur {filteredUsers.length} utilisateurs
             </span>
             <select
@@ -632,14 +632,14 @@ export default function AdminUsersPage() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200 flex justify-between items-center">
-              <h2 className="text-xl font-bold text-gray-800">
+              <h2 className="text-xl font-bold text-black">
                 {modalMode === 'add' && 'Ajouter un utilisateur'}
                 {modalMode === 'edit' && 'Modifier l\'utilisateur'}
                 {modalMode === 'view' && 'Détails de l\'utilisateur'}
               </h2>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-black hover:text-black"
               >
                 <FontAwesomeIcon icon={faTimes} />
               </button>
@@ -657,44 +657,44 @@ export default function AdminUsersPage() {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <FontAwesomeIcon icon={faUser} className="text-4xl text-gray-400" />
+                        <FontAwesomeIcon icon={faUser} className="text-4xl text-black" />
                       )}
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Nom</label>
-                      <p className="mt-1 text-sm text-gray-900">{selectedUser.nom}</p>
+                      <label className="block text-sm font-medium text-black">Nom</label>
+                      <p className="mt-1 text-sm text-black">{selectedUser.nom}</p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Prénom</label>
-                      <p className="mt-1 text-sm text-gray-900">{selectedUser.prenom}</p>
+                      <label className="block text-sm font-medium text-black">Prénom</label>
+                      <p className="mt-1 text-sm text-black">{selectedUser.prenom}</p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Email</label>
-                      <p className="mt-1 text-sm text-gray-900">{selectedUser.email}</p>
+                      <label className="block text-sm font-medium text-black">Email</label>
+                      <p className="mt-1 text-sm text-black">{selectedUser.email}</p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Téléphone</label>
-                      <p className="mt-1 text-sm text-gray-900">{selectedUser.phone || 'Non renseigné'}</p>
+                      <label className="block text-sm font-medium text-black">Téléphone</label>
+                      <p className="mt-1 text-sm text-black">{selectedUser.phone || 'Non renseigné'}</p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Rôle</label>
-                      <p className="mt-1 text-sm text-gray-900">{selectedUser.role}</p>
+                      <label className="block text-sm font-medium text-black">Rôle</label>
+                      <p className="mt-1 text-sm text-black">{selectedUser.role}</p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Statut</label>
-                      <p className="mt-1 text-sm text-gray-900">{selectedUser.status}</p>
+                      <label className="block text-sm font-medium text-black">Statut</label>
+                      <p className="mt-1 text-sm text-black">{selectedUser.status}</p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Email vérifié</label>
-                      <p className="mt-1 text-sm text-gray-900">
+                      <label className="block text-sm font-medium text-black">Email vérifié</label>
+                      <p className="mt-1 text-sm text-black">
                         {selectedUser.emailVerified ? 'Oui' : 'Non'}
                       </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Date d'inscription</label>
-                      <p className="mt-1 text-sm text-gray-900">
+                      <label className="block text-sm font-medium text-black">Date d'inscription</label>
+                      <p className="mt-1 text-sm text-black">
                         {new Date(selectedUser.createdAt).toLocaleDateString()}
                       </p>
                     </div>
@@ -706,7 +706,7 @@ export default function AdminUsersPage() {
                 <div className="space-y-4">
                   {/* Champ d'upload d'image */}
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-black mb-2">
                       <FontAwesomeIcon icon={faImage} className="mr-2" />
                       Photo de profil
                     </label>
@@ -724,17 +724,17 @@ export default function AdminUsersPage() {
                         type="file"
                         accept="image/*"
                         onChange={handleImageChange}
-                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
+                        className="block w-full text-sm text-black file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
                       />
                     </div>
-                    <p className="mt-2 text-xs text-gray-500">
+                    <p className="mt-2 text-xs text-black">
                       Formats acceptés : JPG, PNG, GIF. Taille max : 5MB
                     </p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Nom *</label>
+                      <label className="block text-sm font-medium text-black">Nom *</label>
                       <input
                         type="text"
                         value={formData.nom || ''}
@@ -744,7 +744,7 @@ export default function AdminUsersPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Prénom *</label>
+                      <label className="block text-sm font-medium text-black">Prénom *</label>
                       <input
                         type="text"
                         value={formData.prenom || ''}
@@ -754,7 +754,7 @@ export default function AdminUsersPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Email *</label>
+                      <label className="block text-sm font-medium text-black">Email *</label>
                       <input
                         type="email"
                         value={formData.email || ''}
@@ -764,7 +764,7 @@ export default function AdminUsersPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Téléphone</label>
+                      <label className="block text-sm font-medium text-black">Téléphone</label>
                       <input
                         type="tel"
                         value={formData.phone || ''}
@@ -773,7 +773,7 @@ export default function AdminUsersPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Rôle *</label>
+                      <label className="block text-sm font-medium text-black">Rôle *</label>
                       <select
                         value={formData.role || 'CLIENT'}
                         onChange={(e) => setFormData({ ...formData, role: e.target.value as 'CLIENT' | 'PARKING' | 'ADMIN' })}
@@ -786,7 +786,7 @@ export default function AdminUsersPage() {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Statut *</label>
+                      <label className="block text-sm font-medium text-black">Statut *</label>
                       <select
                         value={formData.status || 'PENDING'}
                         onChange={(e) => setFormData({ ...formData, status: e.target.value as 'PENDING' | 'APPROVED' | 'REJECTED' })}
@@ -800,7 +800,7 @@ export default function AdminUsersPage() {
                     </div>
                     {modalMode === 'add' && (
                       <div className="col-span-2">
-                        <label className="block text-sm font-medium text-gray-700">Mot de passe *</label>
+                        <label className="block text-sm font-medium text-black">Mot de passe *</label>
                         <input
                           type="password"
                           value={formData.password || ''}
@@ -818,7 +818,7 @@ export default function AdminUsersPage() {
                           onChange={(e) => setFormData({ ...formData, emailVerified: e.target.checked })}
                           className="rounded border-gray-300 text-orange-600 focus:ring-orange-500"
                         />
-                        <span className="text-sm font-medium text-gray-700">Email vérifié</span>
+                        <span className="text-sm font-medium text-black">Email vérifié</span>
                       </label>
                     </div>
                   </div>
@@ -829,7 +829,7 @@ export default function AdminUsersPage() {
             <div className="p-6 border-t border-gray-200 flex justify-end gap-3">
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                className="px-4 py-2 border border-gray-300 rounded-lg text-black hover:bg-gray-50"
               >
                 Fermer
               </button>
@@ -911,8 +911,8 @@ function StatCard({ title, value, icon, color }: { title: string; value: number;
     <div className="bg-white rounded-lg shadow-sm p-4">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm text-gray-600">{title}</p>
-          <p className="text-2xl font-bold text-gray-800">{value}</p>
+          <p className="text-sm text-black">{title}</p>
+          <p className="text-2xl font-bold text-black">{value}</p>
         </div>
         <div className={`w-10 h-10 ${color} rounded-lg flex items-center justify-center text-white`}>
           <FontAwesomeIcon icon={icon} />

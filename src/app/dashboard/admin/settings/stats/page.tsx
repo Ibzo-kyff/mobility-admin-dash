@@ -67,7 +67,7 @@ export default function AnalyticsPage() {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
           <FontAwesomeIcon icon={faSpinner} className="text-4xl text-orange-500 animate-spin mx-auto mb-4" />
-          <p className="text-gray-500">Chargement des analyses...</p>
+          <p className="text-black">Chargement des analyses...</p>
         </div>
       </div>
     );
@@ -76,7 +76,7 @@ export default function AnalyticsPage() {
   if (!analytics) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <p className="text-gray-500">Aucune donnée disponible</p>
+        <p className="text-black">Aucune donnée disponible</p>
       </div>
     );
   }
@@ -100,11 +100,11 @@ export default function AnalyticsPage() {
       {/* En-tête */}
       <div className="flex flex-wrap justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Analyses Avancées</h1>
-          <p className="text-gray-500 mt-1">Statistiques détaillées et tendances de la plateforme</p>
+          <h1 className="text-3xl font-bold text-black">Analyses Avancées</h1>
+          <p className="text-black mt-1">Statistiques détaillées et tendances de la plateforme</p>
         </div>
         <button className="px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 flex items-center gap-2">
-          <FontAwesomeIcon icon={faDownload} className="text-gray-500" />
+          <FontAwesomeIcon icon={faDownload} className="text-black" />
           Exporter
         </button>
       </div>
@@ -118,8 +118,8 @@ export default function AnalyticsPage() {
                 <FontAwesomeIcon icon={card.icon} className={`text-2xl ${card.color}`} />
               </div>
             </div>
-            <p className="text-3xl font-bold text-gray-800">{card.value.toLocaleString()}</p>
-            <p className="text-gray-500 text-sm mt-1">{card.title}</p>
+            <p className="text-3xl font-bold text-black">{card.value.toLocaleString()}</p>
+            <p className="text-black text-sm mt-1">{card.title}</p>
           </div>
         ))}
       </div>
@@ -129,7 +129,7 @@ export default function AnalyticsPage() {
         {/* Graphique d'évolution */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-black flex items-center gap-2">
               <FontAwesomeIcon icon={faChartLine} className="text-orange-500" />
               Évolution (6 derniers mois)
             </h2>
@@ -139,7 +139,7 @@ export default function AnalyticsPage() {
                 className={`px-3 py-1 text-sm rounded-lg transition-colors ${
                   selectedMetric === 'users'
                     ? 'bg-orange-500 text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    : 'bg-gray-100 text-black hover:bg-gray-200'
                 }`}
               >
                 Utilisateurs
@@ -149,7 +149,7 @@ export default function AnalyticsPage() {
                 className={`px-3 py-1 text-sm rounded-lg transition-colors ${
                   selectedMetric === 'reservations'
                     ? 'bg-orange-500 text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    : 'bg-gray-100 text-black hover:bg-gray-200'
                 }`}
               >
                 Réservations
@@ -183,7 +183,7 @@ export default function AnalyticsPage() {
 
         {/* Distribution des utilisateurs */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-          <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-6">
+          <h2 className="text-lg font-semibold text-black flex items-center gap-2 mb-6">
             <FontAwesomeIcon icon={faChartPie} className="text-orange-500" />
             Distribution des utilisateurs
           </h2>
@@ -214,7 +214,7 @@ export default function AnalyticsPage() {
       <div className="grid lg:grid-cols-2 gap-6 mb-8">
         {/* Top Parkings */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-          <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-6">
+          <h2 className="text-lg font-semibold text-black flex items-center gap-2 mb-6">
             <FontAwesomeIcon icon={faMapMarkerAlt} className="text-orange-500" />
             Top 5 Parkings
           </h2>
@@ -230,9 +230,9 @@ export default function AnalyticsPage() {
                   </div>
                 )}
                 <div className="flex-1">
-                  <p className="font-medium text-gray-800">{parking.name}</p>
+                  <p className="font-medium text-black">{parking.name}</p>
                   <div className="flex items-center gap-4 mt-1">
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-black">
                       <FontAwesomeIcon icon={faCalendarCheck} className="mr-1 text-xs" />
                       {parking.reservations} réservations
                     </span>
@@ -241,14 +241,14 @@ export default function AnalyticsPage() {
               </div>
             ))}
             {analytics.topParkings.length === 0 && (
-              <p className="text-center text-gray-500 py-8">Aucun parking avec réservations</p>
+              <p className="text-center text-black py-8">Aucun parking avec réservations</p>
             )}
           </div>
         </div>
 
         {/* Activité horaire */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-          <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-6">
+          <h2 className="text-lg font-semibold text-black flex items-center gap-2 mb-6">
             <FontAwesomeIcon icon={faClock} className="text-orange-500" />
             Activité par tranche horaire
           </h2>
@@ -263,7 +263,7 @@ export default function AnalyticsPage() {
               <Bar dataKey="reservations" name="Réservations" fill="#F97316" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
-          <p className="text-xs text-gray-400 text-center mt-4">
+          <p className="text-xs text-black text-center mt-4">
             Répartition des réservations par tranche horaire
           </p>
         </div>
@@ -271,44 +271,44 @@ export default function AnalyticsPage() {
 
       {/* Résumé */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-6">
+        <h2 className="text-lg font-semibold text-black flex items-center gap-2 mb-6">
           <FontAwesomeIcon icon={faTurnUp} className="text-orange-500" />
           Vue d'ensemble
         </h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="p-4 bg-gray-50 rounded-xl">
-            <p className="text-sm text-gray-600">Utilisateurs par mois</p>
-            <p className="text-lg font-semibold text-gray-800">
+            <p className="text-sm text-black">Utilisateurs par mois</p>
+            <p className="text-lg font-semibold text-black">
               {analytics.monthlyTrends[analytics.monthlyTrends.length - 1]?.users || 0}
             </p>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-black mt-1">
               Dernier mois
             </p>
           </div>
           <div className="p-4 bg-gray-50 rounded-xl">
-            <p className="text-sm text-gray-600">Réservations par mois</p>
-            <p className="text-lg font-semibold text-gray-800">
+            <p className="text-sm text-black">Réservations par mois</p>
+            <p className="text-lg font-semibold text-black">
               {analytics.monthlyTrends[analytics.monthlyTrends.length - 1]?.reservations || 0}
             </p>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-black mt-1">
               Dernier mois
             </p>
           </div>
           <div className="p-4 bg-gray-50 rounded-xl">
-            <p className="text-sm text-gray-600">Moyenne utilisateurs/mois</p>
-            <p className="text-lg font-semibold text-gray-800">
+            <p className="text-sm text-black">Moyenne utilisateurs/mois</p>
+            <p className="text-lg font-semibold text-black">
               {Math.round(analytics.monthlyTrends.reduce((sum, t) => sum + t.users, 0) / analytics.monthlyTrends.length) || 0}
             </p>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-black mt-1">
               Sur 6 mois
             </p>
           </div>
           <div className="p-4 bg-gray-50 rounded-xl">
-            <p className="text-sm text-gray-600">Moyenne réservations/mois</p>
-            <p className="text-lg font-semibold text-gray-800">
+            <p className="text-sm text-black">Moyenne réservations/mois</p>
+            <p className="text-lg font-semibold text-black">
               {Math.round(analytics.monthlyTrends.reduce((sum, t) => sum + t.reservations, 0) / analytics.monthlyTrends.length) || 0}
             </p>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-black mt-1">
               Sur 6 mois
             </p>
           </div>

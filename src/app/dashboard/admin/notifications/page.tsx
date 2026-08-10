@@ -180,7 +180,7 @@ export default function NotificationsPage() {
       case 'RESERVATION': return 'bg-blue-50 text-blue-600 border-blue-100';
       case 'PAIEMENT': return 'bg-emerald-50 text-emerald-600 border-emerald-100';
       case 'MISE_A_JOUR': return 'bg-purple-50 text-purple-600 border-purple-100';
-      default: return 'bg-gray-50 text-gray-500 border-gray-100';
+      default: return 'bg-gray-50 text-black border-gray-100';
     }
   };
 
@@ -201,7 +201,7 @@ export default function NotificationsPage() {
           <div className="mb-8">
             <button
               onClick={() => setSelectedNotification(null)}
-              className="group flex items-center gap-3 text-slate-400 hover:text-orange-500 font-black text-xs uppercase tracking-[0.2em] transition-all"
+              className="group flex items-center gap-3 text-black hover:text-orange-500 font-black text-xs uppercase tracking-[0.2em] transition-all"
             >
               <div className="w-10 h-10 rounded-2xl bg-white border border-slate-100 flex items-center justify-center group-hover:bg-orange-50 group-hover:border-orange-100 transition-all shadow-sm">
                 <FontAwesomeIcon icon={faChevronLeft} size="xs" />
@@ -228,7 +228,7 @@ export default function NotificationsPage() {
               <div className="p-8">
                 {/* Date et heure */}
                 <div className="flex items-center justify-center gap-4 mb-8 pb-6 border-b border-gray-100">
-                  <div className="flex items-center gap-2 text-gray-400 text-sm">
+                  <div className="flex items-center gap-2 text-black text-sm">
                     <FontAwesomeIcon icon={faCalendarAlt} />
                     <span>{new Date(selectedNotification.createdAt).toLocaleDateString('fr-FR', {
                       day: 'numeric',
@@ -237,7 +237,7 @@ export default function NotificationsPage() {
                     })}</span>
                   </div>
                   <div className="w-1 h-1 rounded-full bg-gray-300" />
-                  <div className="flex items-center gap-2 text-gray-400 text-sm">
+                  <div className="flex items-center gap-2 text-black text-sm">
                     <FontAwesomeIcon icon={faClock} />
                     <span>{new Date(selectedNotification.createdAt).toLocaleTimeString('fr-FR', {
                       hour: '2-digit',
@@ -248,7 +248,7 @@ export default function NotificationsPage() {
 
                 {/* Message */}
                 <div className="bg-gray-50 rounded-2xl p-8 mb-8">
-                  <p className="text-gray-700 leading-relaxed text-center text-lg font-medium">
+                  <p className="text-black leading-relaxed text-center text-lg font-medium">
                     {selectedNotification.message}
                   </p>
                 </div>
@@ -276,7 +276,7 @@ export default function NotificationsPage() {
                 <div className="flex gap-3">
                   <button
                     onClick={() => setSelectedNotification(null)}
-                    className="flex-1 py-4 rounded-xl bg-gray-100 text-gray-600 font-black text-sm uppercase tracking-widest hover:bg-gray-200 transition-all"
+                    className="flex-1 py-4 rounded-xl bg-gray-100 text-black font-black text-sm uppercase tracking-widest hover:bg-gray-200 transition-all"
                   >
                     Fermer
                   </button>
@@ -302,15 +302,15 @@ export default function NotificationsPage() {
         {/* Header avec actions */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-black text-gray-900 tracking-tight">Notifications</h1>
-            <p className="text-gray-500 mt-1">Gérez vos alertes et communications système.</p>
+            <h1 className="text-3xl font-black text-black tracking-tight">Notifications</h1>
+            <p className="text-black mt-1">Gérez vos alertes et communications système.</p>
           </div>
           
           <div className="flex gap-2">
             {notifications.filter(n => !n.read).length > 0 && (
               <button
                 onClick={handleMarkAllAsRead}
-                className="px-4 py-2.5 rounded-2xl text-sm font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all flex items-center gap-2"
+                className="px-4 py-2.5 rounded-2xl text-sm font-bold bg-gray-100 text-black hover:bg-gray-200 transition-all flex items-center gap-2"
               >
                 <FontAwesomeIcon icon={faCheckDouble} />
                 Tout marquer lu
@@ -335,7 +335,7 @@ export default function NotificationsPage() {
             className={`px-6 py-3 rounded-2xl text-sm font-bold transition-all ${
               activeTab === 'all' 
                 ? 'bg-orange-500 text-white shadow-lg shadow-orange-200' 
-                : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-100'
+                : 'bg-white text-black hover:bg-gray-50 border border-gray-100'
             }`}
           >
             Toutes
@@ -348,7 +348,7 @@ export default function NotificationsPage() {
             className={`px-6 py-3 rounded-2xl text-sm font-bold transition-all ${
               activeTab === 'unread' 
                 ? 'bg-orange-500 text-white shadow-lg shadow-orange-200' 
-                : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-100'
+                : 'bg-white text-black hover:bg-gray-50 border border-gray-100'
             }`}
           >
             Non lues
@@ -364,15 +364,15 @@ export default function NotificationsPage() {
             <div className="animate-spin mb-4 inline-block">
               <FontAwesomeIcon icon={faSync} className="text-4xl text-orange-500" />
             </div>
-            <p className="text-gray-500 font-medium">Chargement des notifications...</p>
+            <p className="text-black font-medium">Chargement des notifications...</p>
           </div>
         ) : filteredNotifications.length === 0 ? (
           <div className="bg-white rounded-[2rem] p-16 text-center border border-gray-100">
             <div className="w-24 h-24 bg-gray-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
-              <FontAwesomeIcon icon={faInbox} className="text-3xl text-gray-300" />
+              <FontAwesomeIcon icon={faInbox} className="text-3xl text-black" />
             </div>
-            <h3 className="text-xl font-black text-gray-900">Aucune notification</h3>
-            <p className="text-gray-500 max-w-xs mx-auto mt-2">
+            <h3 className="text-xl font-black text-black">Aucune notification</h3>
+            <p className="text-black max-w-xs mx-auto mt-2">
               {activeTab === 'unread' 
                 ? "Vous avez lu toutes vos notifications. Bravo !" 
                 : "Vous n'avez pas de notifications à afficher pour le moment."}
@@ -399,7 +399,7 @@ export default function NotificationsPage() {
                     <div className={`w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 transition-all ${
                       !n.read 
                         ? 'bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-lg' 
-                        : 'bg-gray-100 text-gray-400'
+                        : 'bg-gray-100 text-black'
                     }`}>
                       <FontAwesomeIcon icon={getIcon(n.type)} className="text-xl" />
                     </div>
@@ -407,7 +407,7 @@ export default function NotificationsPage() {
                     <div className="flex-1 min-w-0">
                       {/* En-tête */}
                       <div className="flex items-center gap-2 mb-2 flex-wrap">
-                        <h3 className={`font-black text-gray-900 ${!n.read ? 'text-base' : 'text-sm'}`}>
+                        <h3 className={`font-black text-black ${!n.read ? 'text-base' : 'text-sm'}`}>
                           {n.title}
                         </h3>
                         <span className={`text-[10px] uppercase tracking-tighter font-black px-2 py-1 rounded-full ${getTypeColor(n.type)}`}>
@@ -422,13 +422,13 @@ export default function NotificationsPage() {
                       </div>
                       
                       {/* Message */}
-                      <p className={`text-gray-600 ${!n.read ? 'font-medium' : ''} line-clamp-2 mb-3`}>
+                      <p className={`text-black ${!n.read ? 'font-medium' : ''} line-clamp-2 mb-3`}>
                         {n.message}
                       </p>
                       
                       {/* Footer */}
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3 text-xs text-gray-400">
+                        <div className="flex items-center gap-3 text-xs text-black">
                           <span className="flex items-center gap-1">
                             <FontAwesomeIcon icon={faCalendarAlt} size="xs" />
                             {new Date(n.createdAt).toLocaleDateString('fr-FR')}
@@ -459,7 +459,7 @@ export default function NotificationsPage() {
                               e.stopPropagation();
                               handleDelete(n.id);
                             }}
-                            className="p-2 text-gray-300 hover:text-red-500 transition-colors rounded-xl hover:bg-red-50"
+                            className="p-2 text-black hover:text-red-500 transition-colors rounded-xl hover:bg-red-50"
                           >
                             <FontAwesomeIcon icon={faTrash} className="text-sm" />
                           </button>
@@ -468,7 +468,7 @@ export default function NotificationsPage() {
                     </div>
                     
                     {/* Flèche d'indication */}
-                    <div className="hidden sm:flex items-center text-gray-300 group-hover:text-orange-500 transition-colors">
+                    <div className="hidden sm:flex items-center text-black group-hover:text-orange-500 transition-colors">
                       <FontAwesomeIcon icon={faArrowRight} />
                     </div>
                   </div>

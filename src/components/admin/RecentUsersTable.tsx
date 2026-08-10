@@ -52,7 +52,7 @@ export default function RecentUsersTable({ users: initialUsers }: Props) {
   if (users.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500 text-lg">Aucune demande d'approbation en attente</p>
+        <p className="text-black text-lg">Aucune demande d'approbation en attente</p>
       </div>
     );
   }
@@ -62,19 +62,19 @@ export default function RecentUsersTable({ users: initialUsers }: Props) {
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
               Utilisateur
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
               Rôle
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
               Contact
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
               Date d'inscription
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
               Actions
             </th>
           </tr>
@@ -100,10 +100,10 @@ export default function RecentUsersTable({ users: initialUsers }: Props) {
                     )}
                   </div>
                   <div className="ml-4">
-                    <div className="text-sm font-medium text-gray-900">
+                    <div className="text-sm font-medium text-black">
                       {user.prenom} {user.nom}
                     </div>
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm text-black">
                       {user.email}
                     </div>
                   </div>
@@ -119,10 +119,10 @@ export default function RecentUsersTable({ users: initialUsers }: Props) {
                   </span>
                 )}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
                 {user.phone || 'Non renseigné'}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
                 {new Date(user.createdAt).toLocaleDateString('fr-FR')}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">

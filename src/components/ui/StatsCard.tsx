@@ -17,8 +17,8 @@ export default function StatsCard({ title, value, icon, color, trend }: StatsCar
     <div className="bg-white rounded-lg shadow-sm p-6">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-gray-500 text-sm">{title}</p>
-          <p className="text-2xl font-bold text-gray-800 mt-1">{value}</p>
+          <p className="text-black text-sm">{title}</p>
+          <p className="text-2xl font-bold text-black mt-1">{value}</p>
           {trend && (
             <p className="text-xs text-green-600 mt-2">+{trend} ce mois</p>
           )}

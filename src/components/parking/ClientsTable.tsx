@@ -109,7 +109,7 @@ export default function ClientsTable() {
     return (
       <div className="p-8 flex flex-col items-center justify-center space-y-4">
         <div className="w-10 h-10 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin"></div>
-        <p className="text-gray-500 text-sm animate-pulse">Chargement des données clients...</p>
+        <p className="text-black text-sm animate-pulse">Chargement des données clients...</p>
       </div>
     );
   }
@@ -146,7 +146,7 @@ export default function ClientsTable() {
     <div className="relative">
       <div className="p-4 border-b border-gray-50 bg-gray-50/10 flex flex-col sm:flex-row gap-4 items-center justify-between">
         <div className="relative w-full sm:w-96">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-black" />
           <input 
             type="text" 
             placeholder="Rechercher par nom, email, téléphone..."
@@ -174,21 +174,21 @@ export default function ClientsTable() {
         {!filteredClients || filteredClients.length === 0 ? (
           <div className="p-12 text-center">
             <div className="bg-gray-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-              <User className="w-8 h-8 text-gray-300" />
+              <User className="w-8 h-8 text-black" />
             </div>
-            <h3 className="text-gray-900 font-semibold">Aucun résultat</h3>
-            <p className="text-gray-500 text-sm mt-1">Aucun client ne correspond à votre recherche.</p>
+            <h3 className="text-black font-semibold">Aucun résultat</h3>
+            <p className="text-black text-sm mt-1">Aucun client ne correspond à votre recherche.</p>
           </div>
         ) : (
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-gray-50/50 border-b border-gray-100">
-                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Client</th>
-                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Contact</th>
-                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Statut</th>
-                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Inscrit le</th>
-                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Dépenses</th>
-                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider"></th>
+                <th className="px-6 py-4 text-xs font-semibold text-black uppercase tracking-wider">Client</th>
+                <th className="px-6 py-4 text-xs font-semibold text-black uppercase tracking-wider">Contact</th>
+                <th className="px-6 py-4 text-xs font-semibold text-black uppercase tracking-wider">Statut</th>
+                <th className="px-6 py-4 text-xs font-semibold text-black uppercase tracking-wider">Inscrit le</th>
+                <th className="px-6 py-4 text-xs font-semibold text-black uppercase tracking-wider text-right">Dépenses</th>
+                <th className="px-6 py-4 text-xs font-semibold text-black uppercase tracking-wider"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
@@ -207,8 +207,8 @@ export default function ClientsTable() {
                         {client.prenom[0]}{client.nom[0]}
                       </div>
                       <div>
-                        <div className="font-semibold text-gray-900">{client.prenom} {client.nom}</div>
-                        <div className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                        <div className="font-semibold text-black">{client.prenom} {client.nom}</div>
+                        <div className="text-xs text-black flex items-center gap-1 mt-0.5">
                           <User className="w-3 h-3" />
                           ID: #{client.id}
                         </div>
@@ -217,12 +217,12 @@ export default function ClientsTable() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="space-y-1">
-                      <div className="text-sm text-gray-600 flex items-center gap-2">
-                        <Mail className="w-3.5 h-3.5 text-gray-400" />
+                      <div className="text-sm text-black flex items-center gap-2">
+                        <Mail className="w-3.5 h-3.5 text-black" />
                         {client.email}
                       </div>
-                      <div className="text-sm text-gray-600 flex items-center gap-2">
-                        <Phone className="w-3.5 h-3.5 text-gray-400" />
+                      <div className="text-sm text-black flex items-center gap-2">
+                        <Phone className="w-3.5 h-3.5 text-black" />
                         {client.phone}
                       </div>
                     </div>
@@ -230,9 +230,9 @@ export default function ClientsTable() {
                   <td className="px-6 py-4">
                     {getStatusBadge(client.status)}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">
+                  <td className="px-6 py-4 text-sm text-black">
                     <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-gray-400" />
+                      <Calendar className="w-4 h-4 text-black" />
                       {new Date(client.createdAt).toLocaleDateString('fr-FR', {
                         day: 'numeric',
                         month: 'short',
@@ -241,12 +241,12 @@ export default function ClientsTable() {
                     </div>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <div className="text-sm font-bold text-gray-900">
+                    <div className="text-sm font-bold text-black">
                       {client.totalSpent ? client.totalSpent.toLocaleString('fr-FR') : '0'} FCFA
                     </div>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button className="p-2 hover:bg-white rounded-lg border border-transparent hover:border-gray-200 transition-all text-gray-400 hover:text-gray-600">
+                    <button className="p-2 hover:bg-white rounded-lg border border-transparent hover:border-gray-200 transition-all text-black hover:text-black">
                       <MoreHorizontal className="w-5 h-5" />
                     </button>
                   </td>
@@ -262,10 +262,10 @@ export default function ClientsTable() {
         {!filteredClients || filteredClients.length === 0 ? (
           <div className="p-12 text-center bg-white rounded-3xl border border-slate-100">
             <div className="bg-gray-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-              <User className="w-8 h-8 text-gray-300" />
+              <User className="w-8 h-8 text-black" />
             </div>
-            <h3 className="text-gray-900 font-semibold">Aucun résultat</h3>
-            <p className="text-gray-500 text-sm mt-1">Aucun client ne correspond à votre recherche.</p>
+            <h3 className="text-black font-semibold">Aucun résultat</h3>
+            <p className="text-black text-sm mt-1">Aucun client ne correspond à votre recherche.</p>
           </div>
         ) : (
           filteredClients.map((client) => (
@@ -283,31 +283,31 @@ export default function ClientsTable() {
                     {client.prenom[0]}{client.nom[0]}
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">{client.prenom} {client.nom}</h3>
-                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">ID: #{client.id}</p>
+                    <h3 className="font-semibold text-black">{client.prenom} {client.nom}</h3>
+                    <p className="text-[10px] text-black font-bold uppercase tracking-wider mt-0.5">ID: #{client.id}</p>
                   </div>
                 </div>
                 {getStatusBadge(client.status)}
               </div>
 
-              <div className="space-y-1.5 text-sm text-gray-600">
+              <div className="space-y-1.5 text-sm text-black">
                 <div className="flex items-center gap-2">
-                  <Mail className="w-3.5 h-3.5 text-gray-400" />
+                  <Mail className="w-3.5 h-3.5 text-black" />
                   <span className="truncate">{client.email}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Phone className="w-3.5 h-3.5 text-gray-400" />
+                  <Phone className="w-3.5 h-3.5 text-black" />
                   <span>{client.phone}</span>
                 </div>
               </div>
 
-              <div className="border-t border-slate-100/50 pt-3 flex justify-between items-center text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+              <div className="border-t border-slate-100/50 pt-3 flex justify-between items-center text-[10px] text-black font-bold uppercase tracking-widest">
                 <span className="flex items-center gap-1.5">
-                  <Calendar className="w-3.5 h-3.5 text-gray-400" />
+                  <Calendar className="w-3.5 h-3.5 text-black" />
                   {new Date(client.createdAt).toLocaleDateString('fr-FR')}
                 </span>
-                <span className="text-sm font-black text-slate-900">
-                  {client.totalSpent ? client.totalSpent.toLocaleString('fr-FR') : '0'} <span className="text-[9px] text-gray-400 font-bold">FCFA</span>
+                <span className="text-sm font-black text-black">
+                  {client.totalSpent ? client.totalSpent.toLocaleString('fr-FR') : '0'} <span className="text-[9px] text-black font-bold">FCFA</span>
                 </span>
               </div>
             </div>
@@ -317,11 +317,11 @@ export default function ClientsTable() {
       
       {filteredClients && filteredClients.length > 0 && (
         <div className="p-4 border-t border-gray-50 bg-gray-50/30 flex items-center justify-between">
-          <p className="text-sm text-gray-500">
-            Affichage de <span className="font-medium text-gray-900">{filteredClients.length}</span> sur <span className="font-medium text-gray-900">{clients?.length}</span> clients
+          <p className="text-sm text-black">
+            Affichage de <span className="font-medium text-black">{filteredClients.length}</span> sur <span className="font-medium text-black">{clients?.length}</span> clients
           </p>
           <div className="flex items-center gap-2">
-            <button className="px-3 py-1 text-sm font-medium text-gray-400 bg-white border border-gray-200 rounded-md cursor-not-allowed">Précédent</button>
+            <button className="px-3 py-1 text-sm font-medium text-black bg-white border border-gray-200 rounded-md cursor-not-allowed">Précédent</button>
             <button className="px-3 py-1 text-sm font-medium text-blue-600 bg-white border border-gray-200 rounded-md hover:bg-gray-50">Suivant</button>
           </div>
         </div>
@@ -334,7 +334,7 @@ export default function ClientsTable() {
           <div className="absolute inset-y-0 right-0 max-w-full flex">
             <div className="w-screen max-w-md bg-white shadow-2xl flex flex-col">
               <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-                <h2 className="text-xl font-bold text-gray-900">Détails du Client</h2>
+                <h2 className="text-xl font-bold text-black">Détails du Client</h2>
                 <button onClick={() => setIsPanelOpen(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                   <MoreHorizontal className="w-5 h-5 rotate-90" />
                 </button>
@@ -346,8 +346,8 @@ export default function ClientsTable() {
                   <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg mb-4">
                     {selectedClient.prenom[0]}{selectedClient.nom[0]}
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900">{selectedClient.prenom} {selectedClient.nom}</h3>
-                  <p className="text-gray-500 flex items-center gap-2 mt-1">
+                  <h3 className="text-2xl font-bold text-black">{selectedClient.prenom} {selectedClient.nom}</h3>
+                  <p className="text-black flex items-center gap-2 mt-1">
                     <User className="w-4 h-4" />
                     ID Client: #{selectedClient.id}
                   </p>
@@ -358,19 +358,19 @@ export default function ClientsTable() {
 
                 {/* Contact Info */}
                 <div className="space-y-4 bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
-                  <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Informations de Contact</h4>
+                  <h4 className="text-sm font-semibold text-black uppercase tracking-wider">Informations de Contact</h4>
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-white rounded-lg shadow-sm">
                         <Mail className="w-4 h-4 text-blue-600" />
                       </div>
-                      <div className="text-sm text-gray-700 font-medium">{selectedClient.email}</div>
+                      <div className="text-sm text-black font-medium">{selectedClient.email}</div>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-white rounded-lg shadow-sm">
                         <Phone className="w-4 h-4 text-emerald-600" />
                       </div>
-                      <div className="text-sm text-gray-700 font-medium">{selectedClient.phone}</div>
+                      <div className="text-sm text-black font-medium">{selectedClient.phone}</div>
                     </div>
                   </div>
                 </div>
@@ -378,18 +378,18 @@ export default function ClientsTable() {
                 {/* Account Activity */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
-                    <p className="text-xs text-gray-500 mb-1">Total Dépensé</p>
-                    <p className="text-lg font-bold text-gray-900">{selectedClient.totalSpent?.toLocaleString('fr-FR')} FCFA</p>
+                    <p className="text-xs text-black mb-1">Total Dépensé</p>
+                    <p className="text-lg font-bold text-black">{selectedClient.totalSpent?.toLocaleString('fr-FR')} FCFA</p>
                   </div>
                   <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
-                    <p className="text-xs text-gray-500 mb-1">Inscrit le</p>
-                    <p className="text-sm font-bold text-gray-900">{new Date(selectedClient.createdAt).toLocaleDateString()}</p>
+                    <p className="text-xs text-black mb-1">Inscrit le</p>
+                    <p className="text-sm font-bold text-black">{new Date(selectedClient.createdAt).toLocaleDateString()}</p>
                   </div>
                 </div>
 
                 {/* Actions */}
                 <div className="space-y-3">
-                  <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Actions de Gestion</h4>
+                  <h4 className="text-sm font-semibold text-black uppercase tracking-wider">Actions de Gestion</h4>
                   <div className="grid grid-cols-1 gap-2">
                     {selectedClient.status !== 'APPROVED' && (
                       <button 

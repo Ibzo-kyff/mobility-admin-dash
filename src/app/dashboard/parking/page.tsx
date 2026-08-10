@@ -130,7 +130,7 @@ export default function ParkingDashboardPage() {
   return (
     <div className="space-y-4 sm:space-y-6 w-full max-w-full">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-2xl font-bold text-gray-800">Tableau de bord Parking</h1>
+        <h1 className="text-2xl font-bold text-black">Tableau de bord Parking</h1>
         <button
           onClick={loadDashboardData}
           className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl flex items-center gap-2 transition-colors"
@@ -182,7 +182,7 @@ export default function ParkingDashboardPage() {
         <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
           <h2 className="text-lg font-semibold mb-4">Dernières Réservations</h2>
           {recentReservations.length === 0 ? (
-            <div className="text-center py-20 text-gray-400">Aucune réservation récente</div>
+            <div className="text-center py-20 text-black">Aucune réservation récente</div>
           ) : (
             <div className="space-y-4 max-h-[420px] overflow-y-auto">
               {recentReservations.map((res: any) => (
@@ -196,7 +196,7 @@ export default function ParkingDashboardPage() {
                     <p className="font-medium">
                       {res.user?.prenom || res.client?.prenom} {res.user?.nom || res.client?.nom}
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-black">
                       {res.vehicule?.marque || res.vehicle?.marque} {res.vehicule?.modele || res.vehicle?.modele}
                     </p>
                   </div>
@@ -208,7 +208,7 @@ export default function ParkingDashboardPage() {
                     }`}>
                       {res.status}
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-black mt-1">
                       {new Date(res.createdAt || res.startDate || Date.now()).toLocaleDateString('fr-FR', {
                         day: 'numeric',
                         month: 'short',

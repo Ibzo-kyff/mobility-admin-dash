@@ -94,8 +94,8 @@ export default function LogsPage() {
     <div className="p-2 sm:p-4 md:p-8 max-w-[1400px] mx-auto">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-4xl font-bold text-gray-900">Journaux d'Activité</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-4xl font-bold text-black">Journaux d'Activité</h1>
+          <p className="text-black mt-2">
             {totalLogs > 0 ? `${totalLogs} logs au total` : 'Suivi complet des actions sur la plateforme'}
           </p>
         </div>
@@ -110,7 +110,7 @@ export default function LogsPage() {
         <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="lg:col-span-2">
             <div className="flex-1 relative">
-              <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black" />
               <input
                 type="text"
                 placeholder="Rechercher par utilisateur ou détails..."
@@ -141,7 +141,7 @@ export default function LogsPage() {
           <input type="date" value={dateFrom} onChange={(e) => { setDateFrom(e.target.value); setPage(1); }} className="border border-gray-300 rounded-2xl px-4 py-3" />
           <input type="date" value={dateTo} onChange={(e) => { setDateTo(e.target.value); setPage(1); }} className="border border-gray-300 rounded-2xl px-4 py-3" />
 
-          <button type="button" onClick={resetFilters} className="text-gray-600 hover:text-gray-800 font-medium">
+          <button type="button" onClick={resetFilters} className="text-black hover:text-black font-medium">
             Réinitialiser
           </button>
         </form>
@@ -154,28 +154,28 @@ export default function LogsPage() {
             <FontAwesomeIcon icon={faSpinner} className="text-4xl animate-spin text-orange-500" />
           </div>
         ) : logs.length === 0 ? (
-          <div className="text-center py-20 text-gray-500">Aucun log trouvé</div>
+          <div className="text-center py-20 text-black">Aucun log trouvé</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 w-48">Date & Heure</th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 w-52">Utilisateur</th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 w-36">Action</th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 w-40">Entité</th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500">Détails</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-black w-48">Date & Heure</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-black w-52">Utilisateur</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-black w-36">Action</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-black w-40">Entité</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-black">Détails</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {logs.map((log) => (
                   <tr key={log.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
+                    <td className="px-6 py-4 text-sm text-black whitespace-nowrap">
                       {new Date(log.createdAt).toLocaleString('fr-FR')}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
-                        <FontAwesomeIcon icon={faUser} className="text-gray-400" />
+                        <FontAwesomeIcon icon={faUser} className="text-black" />
                         <span className="font-medium">{log.userName || 'Système'}</span>
                       </div>
                     </td>
@@ -188,12 +188,12 @@ export default function LogsPage() {
                         {log.action}
                       </span>
                     </td>
-                    <td className="px-6 py-4 font-medium text-gray-700">{log.entity}</td>
+                    <td className="px-6 py-4 font-medium text-black">{log.entity}</td>
 
                     {/* Colonne Détails optimisée */}
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="flex-1 text-sm text-gray-600 truncate pr-2">
+                        <div className="flex-1 text-sm text-black truncate pr-2">
                           {log.details 
                             ? typeof log.details === 'string' 
                               ? log.details 
@@ -248,7 +248,7 @@ export default function LogsPage() {
           <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
             <div className="flex justify-between items-center border-b px-8 py-5">
               <h2 className="text-2xl font-semibold">Détails du Log</h2>
-              <button onClick={closeModal} className="text-gray-500 hover:text-gray-700 text-2xl">
+              <button onClick={closeModal} className="text-black hover:text-black text-2xl">
                 <FontAwesomeIcon icon={faTimes} />
               </button>
             </div>
@@ -256,37 +256,37 @@ export default function LogsPage() {
             <div className="p-8 space-y-6 overflow-y-auto max-h-[calc(90vh-80px)]">
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <p className="text-sm text-gray-500">Date</p>
+                  <p className="text-sm text-black">Date</p>
                   <p className="font-medium">{new Date(selectedLog.createdAt).toLocaleString('fr-FR')}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Utilisateur</p>
+                  <p className="text-sm text-black">Utilisateur</p>
                   <p className="font-medium">{selectedLog.userName || 'Système'}</p>
                 </div>
               </div>
 
               <div>
-                <p className="text-sm text-gray-500">Action</p>
+                <p className="text-sm text-black">Action</p>
                 <p className="inline-flex px-4 py-1.5 bg-orange-100 text-orange-700 rounded-full text-sm font-medium">
                   {selectedLog.action}
                 </p>
               </div>
 
               <div>
-                <p className="text-sm text-gray-500">Entité</p>
+                <p className="text-sm text-black">Entité</p>
                 <p className="font-medium">{selectedLog.entity}</p>
               </div>
 
               {selectedLog.entityId && (
                 <div>
-                  <p className="text-sm text-gray-500">ID Entité</p>
+                  <p className="text-sm text-black">ID Entité</p>
                   <p className="font-mono bg-gray-100 px-3 py-1.5 rounded-lg inline-block">{selectedLog.entityId}</p>
                 </div>
               )}
 
               <div>
-                <p className="text-sm text-gray-500 mb-3">Détails complets</p>
-                <pre className="bg-gray-900 text-gray-100 p-6 rounded-2xl overflow-auto text-sm font-mono leading-relaxed">
+                <p className="text-sm text-black mb-3">Détails complets</p>
+                <pre className="bg-gray-900 text-black p-6 rounded-2xl overflow-auto text-sm font-mono leading-relaxed">
                   {typeof selectedLog.details === 'string' 
                     ? selectedLog.details 
                     : JSON.stringify(selectedLog.details, null, 2)}
