@@ -44,7 +44,7 @@ export default function RegisterPage() {
     }
 
     try {
-      const data = await register(formData); // ← on récupère la réponse maintenant
+      await register(formData);
 
       // Redirection conditionnelle selon le rôle
       if (formData.role === 'PARKING') {
@@ -52,8 +52,8 @@ export default function RegisterPage() {
       } else {
         router.push('/auth/verify-email'); // CLIENT → vérification email
       }
-    } catch (err: any) {
-      setError(err.message || "Erreur lors de l'inscription");
+    } catch (err) {
+      setError((err as Error).message || "Erreur lors de l'inscription");
     }
   };
 
@@ -224,9 +224,9 @@ export default function RegisterPage() {
                 required
               />
               <label htmlFor="terms" className="text-sm text-gray-700">
-                J'accepte les{' '}
+                J&apos;accepte les{' '}
                 <Link href="/terms" className="text-orange-600 hover:text-orange-500 font-medium">
-                  conditions d'utilisation
+                  conditions d&apos;utilisation
                 </Link>{' '}
                 et la{' '}
                 <Link href="/privacy" className="text-orange-600 hover:text-orange-500 font-medium">
