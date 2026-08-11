@@ -154,7 +154,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setState(prev => ({ ...prev, isLoading: true, error: null }));
     try {
       const response = await mobilityAPI.register(userData);
-      setState(prev => ({ ...prev, isLoading: false }));
+      
+      const newUser = mobilityAPI.getCurrentUserSync();
+      if (newUser) {
+        setState(prev => ({
+          ...prev,
+          user: newUser,
+          isAuthenticated: true,
+          isLoading: false,
+        }));
+      } else {
+        setState(prev => ({ ...prev, isLoading: false }));
+      }
+      
       return response;
     } catch (error: any) {
       setState(prev => ({ ...prev, isLoading: false, error: error.message }));

@@ -412,7 +412,7 @@ export default function ClientReservationTabs() {
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-100 shadow-inner">
-                          <img src={getPhotoUrl(getVehicle(res)?.photos)} className="w-full h-full object-cover" />
+                          <img src={getPhotoUrl(getVehicle(res)?.photos)} className="w-full h-full object-cover" alt="Photo du véhicule" />
                         </div>
                         <div className="font-black text-sm text-slate-900 group-hover:text-orange-500 transition-colors">
                           {getVehicle(res)?.marque} {getVehicle(res)?.model || getVehicle(res)?.modele}
@@ -545,6 +545,7 @@ export default function ClientReservationTabs() {
                     <img 
                       src={getPhotoUrl(getVehicle(selectedReservation)?.photos)} 
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      alt="Photo du véhicule"
                     />
                     <div className="absolute top-6 right-6">
                       {getStatusBadge(selectedReservation.status)}
