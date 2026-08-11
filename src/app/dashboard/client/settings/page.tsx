@@ -201,6 +201,7 @@ function ToggleItem({ title, description, active, onToggle }: { title: string, d
       </div>
       <button 
         onClick={onToggle}
+        aria-label={`Activer ${title}`}
         className={`w-14 h-8 rounded-full relative transition-all duration-300 ${active ? 'bg-orange-500' : 'bg-slate-200'}`}
       >
         <div className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow-lg transition-all duration-300 ${active ? 'right-1' : 'left-1'}`}></div>

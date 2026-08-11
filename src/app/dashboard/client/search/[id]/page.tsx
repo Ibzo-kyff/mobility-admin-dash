@@ -207,7 +207,7 @@ export default function ParkingDetailsPage() {
                 {vehicles.map((v) => (
                   <Link key={v.id} href={`/dashboard/client/search/${v.id}`} className="bg-white p-4 rounded-2xl border border-gray-100 flex gap-4 hover:shadow-md transition-all group">
                     <div className="w-24 h-24 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0">
-                      <img src={(Array.isArray(v.photos) ? v.photos[0] : v.photos) || 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b'} className="w-full h-full object-cover" />
+                      <img src={(Array.isArray(v.photos) ? v.photos[0] : v.photos) || 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b'} alt={`${v.marque || v.marqueRef?.name} ${v.model}`} className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1 flex flex-col justify-between">
                       <div>
