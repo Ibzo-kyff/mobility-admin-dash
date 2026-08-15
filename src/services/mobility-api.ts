@@ -1,4 +1,3 @@
-//services/mobility-api.ts
 import { setCookie, getCookie, deleteCookie } from 'cookies-next';
 import type { User, Vehicule, LoginResponse, RegisterData, RegisterResponse, ReservationData, Parking } from '@/types';
 
@@ -400,6 +399,78 @@ class MobilityAPI {
     return this.handleResponse<{ totalVehicules: number; totalParkings: number }>(response);
   }
 
+  // ==================== PARKING ====================
+
+  /**
+   * Récupère le parking de l'utilisateur connecté
+   * Endpoint : GET /parkings/me
+   */
+  async getMyParking(): Promise<Parking> {
+    if (!this.token) {
+      throw new Error('Non authentifié');
+    }
+
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/parkings/me`,
+      {
+        headers: this.getHeaders(),
+      }
+    );
+
+    return this.handleResponse<Parking>(response);
+  }
+
+  /**
+   * Met à jour un parking
+   * Endpoint : PUT /parkings/:id
+   * Accepte JSON ou FormData (pour le logo)
+   */
+  async updateParking(
+    id: number,
+    data: Partial<Parking> | FormData
+  ): Promise<Parking> {
+    if (!this.token) {
+      throw new Error('Non authentifié');
+    }
+
+    const isFormData = data instanceof FormData;
+    const headers = this.getHeaders();
+
+    // Si FormData → on laisse le navigateur gérer le Content-Type
+    if (isFormData) {
+      if (headers instanceof Headers) {
+        headers.delete('Content-Type');
+      } else if (typeof headers === 'object' && headers !== null) {
+        delete (headers as Record<string, string>)['Content-Type'];
+      }
+    }
+
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/parkings/${id}`,
+      {
+        method: 'PUT',
+        headers,
+        body: isFormData ? data : JSON.stringify(data),
+      }
+    );
+
+    return this.handleResponse<Parking>(response);
+  }
+
+  /**
+   * Récupère un parking par ID
+   */
+  async getParkingById(id: number | string): Promise<Parking> {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/parkings/${id}`,
+      {
+        headers: this.getHeaders(),
+      }
+    );
+
+    return this.handleResponse<Parking>(response);
+  }
+
   async forgotPassword(email: string): Promise<{ message: string }> {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/auth/forgot-password`,
@@ -507,6 +578,7 @@ class MobilityAPI {
   }
 
   // Méthodes utilitaires
+
   isAuthenticated(): boolean {
     return !!this.token;
   }
@@ -534,6 +606,7 @@ class MobilityAPI {
   }
 
   // Méthode pour la compatibilité avec votre code existant
+
   async loginOld(email: string, password: string): Promise<{ token: string; user: User }> {
     const data = await this.login(email, password);
     return {
@@ -555,6 +628,7 @@ class MobilityAPI {
   }
 
   // Méthode pour la compatibilité avec votre code existant
+
   async registerOld(userData: { name: string; email: string; password: string; role: string }): Promise<{ token: string; user: User }> {
     const [nom, prenom] = userData.name.split(' ');
     const registerData: RegisterData = {
@@ -584,6 +658,7 @@ class MobilityAPI {
       }
     };
   }
+
   async getAllUsers(): Promise<User[]> {
     if (!this.token) {
       throw new Error('Non authentifié');
@@ -677,6 +752,7 @@ class MobilityAPI {
 
     return this.handleResponse<Vehicule>(response);
   }
+
   // ==================== MÉTHODES ADMIN ====================
 
   async getAdminVehicules(): Promise<Vehicule[]> {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCar,
@@ -46,10 +46,6 @@ import {
   faShield,
   faUserTie,
   faLocationDot,
-  faFire,
-  faOilCan,
-  faBolt,
-  faLeaf,
   faMobile,
   faWaveSquare,
   faThLarge,
@@ -57,12 +53,14 @@ import {
 import { faClock as faClockRegular } from '@fortawesome/free-regular-svg-icons';
 import { vehiclesAPI } from '@/services/vehicles-api';
 import { mobilityAPI } from '@/services/mobility-api';
-import type { Vehicule, Parking, ReservationData } from '@/types';
+import type { Vehicule, Parking, VehicleStatus  } from '@/types';
 import Image from 'next/image';
-import { getCookie } from 'cookies-next';
+import { getCookie, deleteCookie } from 'cookies-next';
 import { useSearchParams } from 'next/navigation';
 
 type TabType = 'list' | 'details' | 'history' | 'stats' | 'documents';
+// types/index.ts
+// export type VehicleStatus = 'DISPONIBLE' | 'EN_MAINTENANCE' | 'INDISPONIBLE' | 'PENDING' | 'APPROVED' | 'BLOCKED';
 
 // Motifs de location disponibles
 const MOTIFS_LOCATION = [
@@ -103,7 +101,7 @@ export default function AdminVehicleTabs() {
   const [conditionsAccepted, setConditionsAccepted] = useState(false);
   const [selectedDays, setSelectedDays] = useState<number>(1);
   const [calculatedPrice, setCalculatedPrice] = useState<number>(0);
-  const [currentReservation, setCurrentReservation] = useState<any>(null);
+  const [currentReservation, setCurrentReservation] = useState<Record<string, unknown> | null>(null);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   // Edit State
@@ -241,7 +239,7 @@ export default function AdminVehicleTabs() {
     return `${BASE_URL}${photo.startsWith('/') ? '' : '/'}${photo}`;
   };
 
-  const getAllPhotoUrls = (photos: string[] | string | undefined): string[] => {
+  const getAllPhotoUrls = useCallback((photos: string[] | string | undefined): string[] => {
     if (!photos) return [];
 
     try {
@@ -267,7 +265,7 @@ export default function AdminVehicleTabs() {
       console.error('Erreur formatage photos:', error);
       return [];
     }
-  };
+  }, [BASE_URL]);
 
   const availableFuelTypes = [...new Set(vehicles.map(v => v.fuelType || v.carburant).filter(Boolean))];
 
@@ -307,7 +305,7 @@ export default function AdminVehicleTabs() {
       if (data && data.id) {
         setAddParkingId(data.id.toString());
       }
-    } catch (e) {
+    } catch {
       // Ne loguer l'erreur que si ce n'est pas un 404 attendu pour certains rôles
       console.warn("Info: Pas de parking personnel trouvé pour cet utilisateur.");
     }
@@ -425,7 +423,7 @@ export default function AdminVehicleTabs() {
       loadVehicles();
     } catch (error: unknown) {
       console.error('Erreur API détaillée:', error);
-      const apiError = error as { message: string, details?: any };
+      const apiError = error as { message: string, details?: unknown };
       showNotification('error', "Erreur lors de l'ajout", apiError.message + (apiError.details ? ` : ${JSON.stringify(apiError.details)}` : ''));
     } finally {
       setSavingAdd(false);
@@ -490,8 +488,13 @@ export default function AdminVehicleTabs() {
       setLoading(true);
       const data = await vehiclesAPI.getAllVehiculesAdmin();
       setVehicles(data);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error loading vehicles:', error);
+      const err = error as { status?: number, message?: string };
+      if (err.status === 401 || (err.message && err.message.toLowerCase().includes('token'))) {
+        deleteCookie('accessToken');
+        window.location.href = '/auth/login';
+      }
     } finally {
       setLoading(false);
     }
@@ -566,7 +569,7 @@ export default function AdminVehicleTabs() {
     }
   };
 
-  const handleAction = async (id: string, action: 'APPROVE' | 'DELETE') => {
+  const handleAction = async (id: string, action: 'APPROVE' | 'DELETE' | 'DISPONIBLE' | 'INDISPONIBLE' | 'EN_MAINTENANCE') => {
     try {
       if (action === 'DELETE') {
         if (!confirm('Êtes-vous sûr de vouloir supprimer ce véhicule ?')) return;
@@ -579,13 +582,16 @@ export default function AdminVehicleTabs() {
         return;
       }
 
-      const status = 'APPROVED';
+      let status: VehicleStatus = 'DISPONIBLE';
+      if (action === 'INDISPONIBLE') status = 'INDISPONIBLE';
+      if (action === 'EN_MAINTENANCE') status = 'EN_MAINTENANCE';
+
       await vehiclesAPI.updateVehicule(id, { status });
 
       setVehicles(vehicles.map(v => v.id === id ? { ...v, status } : v));
       if (selectedVehicle?.id === id) setSelectedVehicle({ ...selectedVehicle, status });
-      showNotification('success', "Action effectuée", `Le véhicule a été ${action === 'APPROVE' ? 'approuvé' : 'mis à jour'}.`);
 
+      showNotification('success', "Action effectuée", "Le statut du véhicule a été mis à jour.");
     } catch (error) {
       console.error(`Error performing action ${action}:`, error);
       showNotification('error', "Erreur d'action", "L'opération a échoué. Veuillez réessayer.");
@@ -593,7 +599,7 @@ export default function AdminVehicleTabs() {
   };
 
   // Fonctions de réservation
-  const calculateDurationAndPrice = (start: Date, end: Date) => {
+  const calculateDurationAndPrice = useCallback((start: Date, end: Date) => {
     const diffMs = end.getTime() - start.getTime();
     if (diffMs <= 0) {
       setSelectedDays(0);
@@ -608,13 +614,13 @@ export default function AdminVehicleTabs() {
       setCalculatedPrice(diffDays * dailyPrice);
     }
     return { diffDays, diffHours };
-  };
+  }, [selectedVehicle]);
 
   useEffect(() => {
     if (reservationType === 'LOCATION' && startDateTime && endDateTime) {
       calculateDurationAndPrice(startDateTime, endDateTime);
     }
-  }, [startDateTime, endDateTime, reservationType, selectedVehicle]);
+  }, [startDateTime, endDateTime, reservationType, selectedVehicle, calculateDurationAndPrice]);
 
   const formatForDateTimeLocal = (date: Date | null) => {
     if (!date) return '';
@@ -745,7 +751,7 @@ export default function AdminVehicleTabs() {
       };
 
       console.log('📤 Envoi réservation:', reservationData);
-      await mobilityAPI.createReservation(reservationData as any);
+      await mobilityAPI.createReservation(reservationData as unknown as Parameters<typeof mobilityAPI.createReservation>[0]);
       
       const message = paymentMethod === 'ESPECES'
         ? 'Votre réservation est confirmée !\n\nLe parking vous contactera bientôt pour organiser le paiement en espèces et la remise du véhicule.'
@@ -762,15 +768,16 @@ export default function AdminVehicleTabs() {
       setConditionsAccepted(false);
       setReservationType(null);
 
-    } catch (error: any) {
-      console.error('Erreur lors du traitement:', error);
+    } catch (error: unknown) {
+      const err = error as { message?: string, details?: string, status?: number, stack?: string };
+      console.error('Erreur lors du traitement:', err);
       console.error('Détails complets:', {
-        message: error.message,
-        details: error.details,
-        status: error.status,
-        stack: error.stack
+        message: err.message,
+        details: err.details,
+        status: err.status,
+        stack: err.stack
       });
-      const errorMessage = error.details || error.message || 'Une erreur est survenue lors de la confirmation.';
+      const errorMessage = err.details || err.message || 'Une erreur est survenue lors de la confirmation.';
       showNotification('error', "Échec de l'opération", errorMessage);
     } finally {
       setIsProcessingPayment(false);
@@ -843,8 +850,10 @@ export default function AdminVehicleTabs() {
     switch (status) {
       case 'APPROVED': return 'text-emerald-600 bg-emerald-50 border-emerald-100';
       case 'PENDING': return 'text-amber-600 bg-amber-50 border-amber-100';
-
       case 'BLOCKED': return 'text-slate-600 bg-slate-50 border-slate-100';
+      case 'DISPONIBLE': return 'text-emerald-600 bg-emerald-50 border-emerald-100';
+      case 'EN_MAINTENANCE': return 'text-amber-600 bg-amber-50 border-amber-100';
+      case 'INDISPONIBLE': return 'text-rose-600 bg-rose-50 border-rose-100';
       default: return 'text-slate-400 bg-slate-50 border-slate-50';
     }
   };
@@ -899,8 +908,10 @@ export default function AdminVehicleTabs() {
               <option value="ALL">Statut: Tous</option>
               <option value="PENDING">Statut: Attente</option>
               <option value="APPROVED">Statut: Validé</option>
-
               <option value="BLOCKED">Statut: Bloqué</option>
+              <option value="DISPONIBLE">Statut: Disponible</option>
+              <option value="EN_MAINTENANCE">Statut: En maintenance</option>
+              <option value="INDISPONIBLE">Statut: Indisponible</option>
             </select>
             <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
               <FontAwesomeIcon icon={faFilter} size="xs" />
@@ -1019,7 +1030,7 @@ export default function AdminVehicleTabs() {
 
                     <div className="absolute top-3 right-3">
                       <span className={`inline-flex items-center px-3.5 py-1.5 rounded-xl text-[10px] font-black uppercase border backdrop-blur-md shadow-sm ${getStatusColor(vehicle.status)} bg-white/90`}>
-                        {vehicle.status === 'PENDING' ? 'Attente' : vehicle.status === 'APPROVED' ? 'Validé' : vehicle.status}
+                        {vehicle.status === 'PENDING' ? 'Attente' : vehicle.status === 'APPROVED' ? 'Validé' : vehicle.status === 'DISPONIBLE' ? 'Disponible' : vehicle.status === 'EN_MAINTENANCE' ? 'En maintenance' : vehicle.status === 'INDISPONIBLE' ? 'Indisponible' : vehicle.status}
                       </span>
                     </div>
                   </div>
@@ -1174,7 +1185,7 @@ export default function AdminVehicleTabs() {
                           {vehicle.annee || vehicle.year} • {vehicle.categorie || 'Standard'}
                         </p>
                         <span className={`inline-flex items-center px-3.5 py-1.5 rounded-full text-[11px] font-black uppercase border ${getStatusColor(vehicle.status)} bg-white`}>
-                          {vehicle.status === 'PENDING' ? 'En attente' : vehicle.status === 'APPROVED' ? 'Validé' : vehicle.status}
+                          {vehicle.status === 'PENDING' ? 'En attente' : vehicle.status === 'APPROVED' ? 'Validé' : vehicle.status === 'DISPONIBLE' ? 'Disponible' : vehicle.status === 'EN_MAINTENANCE' ? 'En maintenance' : vehicle.status === 'INDISPONIBLE' ? 'Indisponible' : vehicle.status}
                         </span>
                       </div>
                     </div>
@@ -1552,6 +1563,31 @@ export default function AdminVehicleTabs() {
                 <FontAwesomeIcon icon={faCheckCircle} />
                 Approuver
               </button>
+            )}
+            {selectedVehicle.status !== 'PENDING' && (
+              <>
+                <button
+                  onClick={() => handleAction(selectedVehicle.id, 'DISPONIBLE')}
+                  className="flex-1 sm:px-4 py-3 bg-emerald-500 text-white rounded-2xl hover:bg-emerald-600 transition-all font-black text-[10px] uppercase tracking-widest shadow-lg shadow-emerald-500/20 active:scale-95 flex items-center justify-center gap-2"
+                >
+                  <FontAwesomeIcon icon={faCheckCircle} />
+                  Disponible
+                </button>
+                <button
+                  onClick={() => handleAction(selectedVehicle.id, 'EN_MAINTENANCE')}
+                  className="flex-1 sm:px-4 py-3 bg-amber-500 text-white rounded-2xl hover:bg-amber-600 transition-all font-black text-[10px] uppercase tracking-widest shadow-lg shadow-amber-500/20 active:scale-95 flex items-center justify-center gap-2"
+                >
+                  <FontAwesomeIcon icon={faWrench} />
+                  En maintenance
+                </button>
+                <button
+                  onClick={() => handleAction(selectedVehicle.id, 'INDISPONIBLE')}
+                  className="flex-1 sm:px-4 py-3 bg-rose-500 text-white rounded-2xl hover:bg-rose-600 transition-all font-black text-[10px] uppercase tracking-widest shadow-lg shadow-rose-500/20 active:scale-95 flex items-center justify-center gap-2"
+                >
+                  <FontAwesomeIcon icon={faTimesCircle} />
+                  Indisponible
+                </button>
+              </>
             )}
             <button
               onClick={() => setIsEditing(true)}
@@ -2130,7 +2166,7 @@ export default function AdminVehicleTabs() {
                     <div className="flex justify-between">
                       <span className="text-sm text-slate-600">Dates</span>
                       <span className="text-sm font-black text-slate-900">
-                        {new Date(currentReservation.dateDebut).toLocaleDateString('fr-FR')} - {new Date(currentReservation.dateFin).toLocaleDateString('fr-FR')}
+                        {new Date(currentReservation.dateDebut as string).toLocaleDateString('fr-FR')} - {new Date(currentReservation.dateFin as string).toLocaleDateString('fr-FR')}
                       </span>
                     </div>
                     <div className="flex justify-between">
@@ -2141,7 +2177,7 @@ export default function AdminVehicleTabs() {
                 )}
                 <div className="flex justify-between pt-2 border-t border-slate-200">
                   <span className="text-base font-black text-slate-900">Total</span>
-                  <span className="text-xl font-black text-orange-600">{formatPrice(currentReservation.montant)}</span>
+                  <span className="text-xl font-black text-orange-600">{formatPrice(currentReservation.montant as number)}</span>
                 </div>
               </div>
             </div>
@@ -2508,6 +2544,9 @@ export default function AdminVehicleTabs() {
                   <option value="PENDING">En attente</option>
                   <option value="APPROVED">Approuvé</option>
                   <option value="BLOCKED">Bloqué</option>
+                  <option value="DISPONIBLE">Disponible</option>
+                  <option value="EN_MAINTENANCE">En maintenance</option>
+                  <option value="INDISPONIBLE">Indisponible</option>
                 </select>
               </div>
 
@@ -3098,5 +3137,5 @@ export default function AdminVehicleTabs() {
       {isEditing && renderEditModal()}
       {isAdding && renderAddModal()}
     </div>
-  );
+);
 }

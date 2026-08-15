@@ -35,11 +35,11 @@ export default function ParkingSidebar({
       href: '/dashboard/parking',
       exact: true
     },
-    {
-      title: 'Ma Flotte',
-      icon: faCar,
-      href: '/dashboard/parking/fleet',
-    },
+    // {
+    //   title: 'Ma Flotte',
+    //   icon: faCar,
+    //   href: '/dashboard/parking/fleet',
+    // },
     {
       title: 'Véhicules',
       icon: faCar,
@@ -50,21 +50,21 @@ export default function ParkingSidebar({
       icon: faCalendarCheck,
       href: '/dashboard/parking/reservations',
     },
-    {
-      title: 'Revenus',
-      icon: faEuroSign,
-      href: '/dashboard/parking/revenue',
-    },
+    // {
+    //   title: 'Revenus',
+    //   icon: faEuroSign,
+    //   href: '/dashboard/parking/revenue',
+    // },
     {
       title: 'Statistiques',
       icon: faChartLine,
       href: '/dashboard/parking/analytics',
     },
-    {
-      title: 'Clients',
-      icon: faUsers,
-      href: '/dashboard/parking/clients',
-    },
+    // {
+    //   title: 'Clients',
+    //   icon: faUsers,
+    //   href: '/dashboard/parking/clients',
+    // },
     {
       title: 'Paramètres',
       icon: faCog,

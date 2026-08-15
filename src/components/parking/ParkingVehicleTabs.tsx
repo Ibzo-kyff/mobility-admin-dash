@@ -79,6 +79,7 @@ import {
 } from 'recharts';
 
 type TabType = 'list' | 'details' | 'history' | 'stats' | 'documents';
+type VehicleStatus = 'DISPONIBLE' | 'EN_MAINTENANCE' | 'INDISPONIBLE';
 
 // Motifs de location disponibles
 const MOTIFS_LOCATION = [
@@ -123,7 +124,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
   // Edit State
   const [isEditing, setIsEditing] = useState(false);
   const [editPrice, setEditPrice] = useState(0);
-  const [editStatus, setEditStatus] = useState('');
+  const [editStatus, setEditStatus] = useState<VehicleStatus>('DISPONIBLE');
   const [editDescription, setEditDescription] = useState("");
   const [editFuelType, setEditFuelType] = useState("ESSENCE");
   const [editTransmission, setEditTransmission] = useState("MANUAL");
@@ -480,7 +481,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
   useEffect(() => {
     if (selectedVehicle) {
       setEditPrice(selectedVehicle.prixJour || selectedVehicle.prix || 0);
-      setEditStatus(selectedVehicle.status || 'PENDING');
+      setEditStatus((selectedVehicle.status as VehicleStatus) || 'DISPONIBLE');
       setEditDescription(selectedVehicle.description || "");
       setEditFuelType(selectedVehicle.fuelType || selectedVehicle.carburant || "ESSENCE");
       setEditTransmission(selectedVehicle.transmission || selectedVehicle.boite || "MANUAL");
@@ -676,29 +677,33 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
     }
   };
 
-  const handleAction = async (id: string, action: 'APPROVE' | 'DELETE') => {
+  const handleAction = async (id: string, action: 'DELETE') => {
     try {
-      if (action === 'DELETE') {
-        if (!confirm('Êtes-vous sûr de vouloir supprimer ce véhicule ?')) return;
-        await vehiclesAPI.deleteVehicule(id);
-        setVehicles(vehicles.filter(v => v.id !== id));
-        if (selectedVehicle?.id === id) {
-          setSelectedVehicle(null);
-          setActiveTab('list');
-        }
-        return;
+      if (action !== 'DELETE') return;
+
+      if (!confirm('Êtes-vous sûr de vouloir supprimer ce véhicule ?')) return;
+
+      await vehiclesAPI.deleteVehicule(id);
+
+      setVehicles(prev => prev.filter(v => v.id !== id));
+
+      if (selectedVehicle?.id === id) {
+        setSelectedVehicle(null);
+        setActiveTab('list');
       }
 
-      const status = 'APPROVED';
-      await vehiclesAPI.updateVehicule(id, { status });
-
-      setVehicles(vehicles.map(v => v.id === id ? { ...v, status } : v));
-      if (selectedVehicle?.id === id) setSelectedVehicle({ ...selectedVehicle, status });
-      showNotification('success', "Action effectuée", `Le véhicule a été ${action === 'APPROVE' ? 'approuvé' : 'mis à jour'}.`);
-
+      showNotification(
+        'success',
+        'Véhicule supprimé',
+        'Le véhicule a été supprimé avec succès.'
+      );
     } catch (error) {
-      console.error(`Error performing action ${action}:`, error);
-      showNotification('error', "Erreur d'action", "L'opération a échoué. Veuillez réessayer.");
+      console.error('Erreur suppression véhicule:', error);
+      showNotification(
+        'error',
+        'Erreur',
+        "Impossible de supprimer le véhicule."
+      );
     }
   };
 
@@ -757,6 +762,15 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
   const confirmReservation = () => {
     if (!reservationType || !selectedVehicle) {
       showNotification('warning', "Type requis", "Veuillez sélectionner un type de réservation (Location ou Achat).");
+      return;
+    }
+
+    if (String(selectedVehicle.status) !== 'DISPONIBLE') {
+      showNotification(
+        'error',
+        'Véhicule indisponible',
+        `Ce véhicule est actuellement ${getStatusLabel(String(selectedVehicle.status))}. Il doit être disponible pour être réservé.`
+      );
       return;
     }
 
@@ -951,11 +965,87 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
 
   const getStatusColor = (status?: string) => {
     switch (status) {
-      case 'APPROVED': return 'text-emerald-600 bg-emerald-50 border-emerald-100';
-      case 'PENDING': return 'text-amber-600 bg-amber-50 border-amber-100';
+      case 'DISPONIBLE':
+        return 'text-emerald-600 bg-emerald-50 border-emerald-100';
+      case 'EN_MAINTENANCE':
+        return 'text-amber-600 bg-amber-50 border-amber-100';
+      case 'INDISPONIBLE':
+        return 'text-rose-600 bg-rose-50 border-rose-100';
+      default:
+        return 'text-slate-400 bg-slate-50 border-slate-100';
+    }
+  };
 
-      case 'BLOCKED': return 'text-slate-600 bg-slate-50 border-slate-100';
-      default: return 'text-slate-400 bg-slate-50 border-slate-50';
+  const getStatusLabel = (status?: string) => {
+    switch (status) {
+      case 'DISPONIBLE':
+        return 'Disponible';
+      case 'EN_MAINTENANCE':
+        return 'En maintenance';
+      case 'INDISPONIBLE':
+        return 'Indisponible';
+      default:
+        return status || 'Statut inconnu';
+    }
+  };
+
+  const handleStatusChange = async (id: string, status: VehicleStatus) => {
+    const previousVehicle = vehicles.find(v => String(v.id) === String(id));
+    const previousStatus = previousVehicle?.status as VehicleStatus | undefined;
+
+    try {
+      // Mise à jour optimiste de l'interface.
+      setVehicles(prev =>
+        prev.map(vehicle =>
+          String(vehicle.id) === String(id)
+            ? { ...vehicle, status: status as Vehicule['status'] }
+            : vehicle
+        )
+      );
+
+      if (selectedVehicle && String(selectedVehicle.id) === String(id)) {
+        setSelectedVehicle(prev =>
+          prev
+            ? { ...prev, status: status as Vehicule['status'] }
+            : null
+        );
+      }
+
+      // Le backend reçoit exactement l'une des trois valeurs Prisma.
+      await vehiclesAPI.updateVehicule(id, { status });
+
+      showNotification(
+        'success',
+        'Statut modifié',
+        `Le véhicule est maintenant : ${getStatusLabel(status)}.`
+      );
+    } catch (error) {
+      console.error('Erreur changement statut:', error);
+
+      // Annuler la mise à jour optimiste en cas d'échec.
+      if (previousVehicle) {
+        setVehicles(prev =>
+          prev.map(vehicle =>
+            String(vehicle.id) === String(id)
+              ? { ...vehicle, status: previousStatus as Vehicule['status'] }
+              : vehicle
+          )
+        );
+
+        if (selectedVehicle && String(selectedVehicle.id) === String(id)) {
+          setSelectedVehicle(prev =>
+            prev
+              ? { ...prev, status: previousStatus as Vehicule['status'] }
+              : null
+          );
+        }
+      }
+
+      showNotification(
+        'error',
+        'Erreur',
+        'Impossible de modifier le statut du véhicule.'
+      );
     }
   };
 
@@ -1095,10 +1185,9 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
               onChange={(e) => setFilterStatus(e.target.value)}
             >
               <option value="ALL">Statut: Tous</option>
-              <option value="PENDING">Statut: Attente</option>
-              <option value="APPROVED">Statut: Validé</option>
-
-              <option value="BLOCKED">Statut: Bloqué</option>
+              <option value="DISPONIBLE">Statut: Disponible</option>
+              <option value="EN_MAINTENANCE">Statut: En maintenance</option>
+              <option value="INDISPONIBLE">Statut: Indisponible</option>
             </select>
             <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
               <FontAwesomeIcon icon={faFilter} size="xs" />
@@ -1217,7 +1306,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
 
                     <div className="absolute top-3 right-3">
                       <span className={`inline-flex items-center px-3.5 py-1.5 rounded-xl text-[10px] font-black uppercase border backdrop-blur-md shadow-sm ${getStatusColor(vehicle.status)} bg-white/90`}>
-                        {vehicle.status === 'PENDING' ? 'Attente' : vehicle.status === 'APPROVED' ? 'Validé' : vehicle.status}
+                        {getStatusLabel(vehicle.status)}
                       </span>
                     </div>
                   </div>
@@ -1321,22 +1410,70 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                     </p>
                   </div>
 
-                  <div className="mt-auto flex gap-2">
+                  <div className="mt-auto flex items-center gap-2">
                     <button
-                      title="Voir les détails du véhicule"
-                      className="flex-1 py-3 bg-slate-50 hover:bg-orange-50 text-slate-600 hover:text-orange-600 rounded-2xl font-black text-sm uppercase tracking-widest transition-all"
+                      title="Voir les détails"
+                      className="w-11 h-11 bg-slate-50 hover:bg-orange-50 text-slate-500 hover:text-orange-600 rounded-2xl flex items-center justify-center transition-all"
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectedVehicle(vehicle);
                         setActiveTab('details');
                       }}
                     >
-                      Détails
+                      <FontAwesomeIcon icon={faEye} />
+                    </button>
+                    <button
+                      type="button"
+                      title="Mettre le véhicule disponible"
+                      aria-label="Mettre le véhicule disponible"
+                      className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all ${
+                        String(vehicle.status) === 'DISPONIBLE'
+                          ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
+                          : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600'
+                      }`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleStatusChange(String(vehicle.id), 'DISPONIBLE');
+                      }}
+                    >
+                      <FontAwesomeIcon icon={faCheckCircle} />
+                    </button>
+                    <button
+                      type="button"
+                      title="Mettre le véhicule en maintenance"
+                      aria-label="Mettre le véhicule en maintenance"
+                      className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all ${
+                        String(vehicle.status) === 'EN_MAINTENANCE'
+                          ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20'
+                          : 'bg-amber-50 hover:bg-amber-100 text-amber-600'
+                      }`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleStatusChange(String(vehicle.id), 'EN_MAINTENANCE');
+                      }}
+                    >
+                      <FontAwesomeIcon icon={faWrench} />
+                    </button>
+                    <button
+                      type="button"
+                      title="Rendre le véhicule indisponible"
+                      aria-label="Rendre le véhicule indisponible"
+                      className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all ${
+                        String(vehicle.status) === 'INDISPONIBLE'
+                          ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/20'
+                          : 'bg-rose-50 hover:bg-rose-100 text-rose-500'
+                      }`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleStatusChange(String(vehicle.id), 'INDISPONIBLE');
+                      }}
+                    >
+                      <FontAwesomeIcon icon={faTimesCircle} />
                     </button>
                     <button
                       title="Supprimer le véhicule"
                       aria-label="Supprimer le véhicule"
-                      className="w-12 py-3 bg-rose-50 hover:bg-rose-100 text-rose-500 rounded-2xl flex items-center justify-center transition-all"
+                      className="w-11 h-11 bg-slate-50 hover:bg-rose-50 text-slate-400 hover:text-rose-500 rounded-2xl flex items-center justify-center transition-all ml-auto"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleAction(vehicle.id, 'DELETE');
@@ -1405,7 +1542,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                           {vehicle.annee || vehicle.year} • {vehicle.categorie || 'Standard'}
                         </p>
                         <span className={`inline-flex items-center px-3.5 py-1.5 rounded-full text-[11px] font-black uppercase border ${getStatusColor(vehicle.status)} bg-white`}>
-                          {vehicle.status === 'PENDING' ? 'En attente' : vehicle.status === 'APPROVED' ? 'Validé' : vehicle.status}
+                          {getStatusLabel(vehicle.status)}
                         </span>
                       </div>
                     </div>
@@ -1460,20 +1597,68 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                     </div>
                     <div className="flex gap-2">
                       <button
-                        title="Voir les détails du véhicule"
-                        className="px-6 py-2 bg-slate-50 hover:bg-orange-50 text-slate-600 hover:text-orange-600 rounded-xl font-black text-xs uppercase tracking-widest transition-all"
+                        title="Voir les détails"
+                        className="w-10 h-10 bg-slate-50 hover:bg-orange-50 text-slate-500 hover:text-orange-600 rounded-xl flex items-center justify-center transition-all"
                         onClick={(e) => {
                           e.stopPropagation();
                           setSelectedVehicle(vehicle);
                           setActiveTab('details');
                         }}
                       >
-                        Détails
+                        <FontAwesomeIcon icon={faEye} />
+                      </button>
+                      <button
+                        type="button"
+                        title="Mettre le véhicule disponible"
+                        aria-label="Mettre le véhicule disponible"
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                          String(vehicle.status) === 'DISPONIBLE'
+                            ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
+                            : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600'
+                        }`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleStatusChange(String(vehicle.id), 'DISPONIBLE');
+                        }}
+                      >
+                        <FontAwesomeIcon icon={faCheckCircle} />
+                      </button>
+                      <button
+                        type="button"
+                        title="Mettre le véhicule en maintenance"
+                        aria-label="Mettre le véhicule en maintenance"
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                          String(vehicle.status) === 'EN_MAINTENANCE'
+                            ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20'
+                            : 'bg-amber-50 hover:bg-amber-100 text-amber-600'
+                        }`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleStatusChange(String(vehicle.id), 'EN_MAINTENANCE');
+                        }}
+                      >
+                        <FontAwesomeIcon icon={faWrench} />
+                      </button>
+                      <button
+                        type="button"
+                        title="Rendre le véhicule indisponible"
+                        aria-label="Rendre le véhicule indisponible"
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                          String(vehicle.status) === 'INDISPONIBLE'
+                            ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/20'
+                            : 'bg-rose-50 hover:bg-rose-100 text-rose-500'
+                        }`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleStatusChange(String(vehicle.id), 'INDISPONIBLE');
+                        }}
+                      >
+                        <FontAwesomeIcon icon={faTimesCircle} />
                       </button>
                       <button
                         title="Supprimer le véhicule"
                         aria-label="Supprimer le véhicule"
-                        className="w-10 h-10 bg-rose-50 hover:bg-rose-100 text-rose-500 rounded-xl flex items-center justify-center transition-all"
+                        className="w-10 h-10 bg-slate-50 hover:bg-rose-50 text-slate-400 hover:text-rose-500 rounded-xl flex items-center justify-center transition-all"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleAction(vehicle.id, 'DELETE');
@@ -2725,12 +2910,12 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                 <select
                   title="Statut du véhicule"
                   value={editStatus}
-                  onChange={(e) => setEditStatus(e.target.value)}
+                  onChange={(e) => setEditStatus(e.target.value as VehicleStatus)}
                   className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all"
                 >
-                  <option value="PENDING">En attente</option>
-                  <option value="APPROVED">Approuvé</option>
-                  <option value="BLOCKED">Bloqué</option>
+                  <option value="DISPONIBLE">Disponible</option>
+                  <option value="EN_MAINTENANCE">En maintenance</option>
+                  <option value="INDISPONIBLE">Indisponible</option>
                 </select>
               </div>
 

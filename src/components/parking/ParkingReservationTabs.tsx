@@ -72,7 +72,7 @@ export interface Reservation {
   dateFin: string | null;
   motifLocation?: string | null;
   localisation?: 'BAMAKO' | 'HORS_BAMAKO' | null;
-  commission?: number;
+  // commission?: number;
   user?: {
     id: number;
     nom: string;
@@ -157,7 +157,7 @@ export default function ParkingReservationTabs() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Modals state
-  const [isCommissionModalOpen, setIsCommissionModalOpen] = useState(false);
+  // const [isCommissionModalOpen, setIsCommissionModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [statusModalConfig, setStatusModalConfig] = useState<any>({
@@ -172,7 +172,7 @@ export default function ParkingReservationTabs() {
   const [statusReason, setStatusReason] = useState('');
   const [editReservationData, setEditReservationData] = useState<any>(null);
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
-  const [commissionAmount, setCommissionAmount] = useState('');
+  // const [commissionAmount, setCommissionAmount] = useState('');
   const [updating, setUpdating] = useState(false);
   const [allParkings, setAllParkings] = useState<any[]>([]);
   const [selectedVehicleForModal, setSelectedVehicleForModal] = useState<any>(null);
@@ -334,25 +334,25 @@ export default function ParkingReservationTabs() {
     setIsStatusModalOpen(true);
   };
 
-  const handleUpdateCommission = () => {
-    if (!selectedReservation || !commissionAmount) return;
-
-    console.log(`Mise à jour de la commission pour la résa #${selectedReservation.id} avec montant: ${commissionAmount}`);
-
-    setReservations(prev => prev.map(res =>
-      res.id === selectedReservation.id ? { ...res, commission: parseFloat(commissionAmount) } : res
-    ));
-
-    setIsCommissionModalOpen(false);
-    setSelectedReservation(null);
-    setCommissionAmount('');
-  };
-
-  const openCommissionModal = (reservation: Reservation) => {
-    setSelectedReservation(reservation);
-    setCommissionAmount(reservation.commission ? reservation.commission.toString() : '');
-    setIsCommissionModalOpen(true);
-  };
+  // const handleUpdateCommission = () => {
+  //   if (!selectedReservation || !commissionAmount) return;
+  //
+  //   console.log(`Mise à jour de la commission pour la résa #${selectedReservation.id} avec montant: ${commissionAmount}`);
+  //
+  //   setReservations(prev => prev.map(res =>
+  //     res.id === selectedReservation.id ? { ...res, commission: parseFloat(commissionAmount) } : res
+  //   ));
+  //
+  //   setIsCommissionModalOpen(false);
+  //   setSelectedReservation(null);
+  //   setCommissionAmount('');
+  // };
+  //
+  // const openCommissionModal = (reservation: Reservation) => {
+  //   setSelectedReservation(reservation);
+  //   setCommissionAmount(reservation.commission ? reservation.commission.toString() : '');
+  //   setIsCommissionModalOpen(true);
+  // };
 
   const openEditModal = (reservation: Reservation) => {
     setSelectedReservation(reservation);
@@ -367,7 +367,7 @@ export default function ParkingReservationTabs() {
       dateDebut: formatForDateTimeLocal(reservation.dateDebut),
       dateFin: formatForDateTimeLocal(reservation.dateFin),
       type: reservation.type,
-      commission: reservation.commission || 0,
+      // commission: reservation.commission || 0,
       motifLocation: MOTIFS_LOCATION.find(m => m.label === reservation.motifLocation)?.id || (reservation.motifLocation ? 'autre' : ''),
       autreMotif: MOTIFS_LOCATION.find(m => m.label === reservation.motifLocation) ? '' : (reservation.motifLocation || ''),
       localisation: reservation.localisation?.toLowerCase() || '',
@@ -394,9 +394,9 @@ export default function ParkingReservationTabs() {
       
       if (dateD && !isNaN(dateD.getTime())) payload.dateDebut = dateD.toISOString();
       if (dateF && !isNaN(dateF.getTime())) payload.dateFin = dateF.toISOString();
-      if (editReservationData.commission !== undefined) {
-        payload.commission = parseFloat(editReservationData.commission.toString());
-      }
+      // if (editReservationData.commission !== undefined) {
+      //   payload.commission = parseFloat(editReservationData.commission.toString());
+      // }
 
       console.log('Envoi au backend:', payload);
 
@@ -679,72 +679,9 @@ export default function ParkingReservationTabs() {
   const renderModals = () => (
     <>
       {/* Modals - Version responsive (même structure avec classes responsives) */}
-      {/* Commission Modal */}
-      {isCommissionModalOpen && (
-        <div className="fixed inset-0 z-[250] flex items-center justify-center animate-fadeIn bg-slate-900/60 backdrop-blur-sm p-3 sm:p-4">
-          <div className="w-full max-w-md bg-white rounded-2xl sm:rounded-[2.5rem] shadow-2xl overflow-hidden relative flex flex-col animate-slideUp">
-            <div className="p-4 sm:p-8 border-b border-slate-100 flex justify-between items-center bg-white">
-              <div>
-                <h2 className="text-xl sm:text-2xl font-black text-slate-900 flex items-center gap-2 sm:gap-3">
-                  <span className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-orange-100 text-orange-500 flex items-center justify-center shadow-inner">
-                    <FontAwesomeIcon icon={faMoneyBillWave} />
-                  </span>
-                  Commission
-                </h2>
-              </div>
-              <button
-                onClick={() => setIsCommissionModalOpen(false)}
-                className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-50 text-slate-400 hover:text-slate-900 transition-all flex items-center justify-center border border-slate-100"
-              >
-                <FontAwesomeIcon icon={faTimes} />
-              </button>
-            </div>
-            <div className="p-4 sm:p-8">
-              {selectedReservation && (
-                <div className="mb-4 sm:mb-6 p-3 sm:p-5 bg-slate-50 rounded-xl sm:rounded-[1.5rem] border border-slate-100 flex justify-between items-center">
-                  <div>
-                    <p className="text-[8px] sm:text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Réservation</p>
-                    <p className="text-xs sm:text-sm font-black text-slate-900">#{selectedReservation.id}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[8px] sm:text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Total</p>
-                    <p className="text-xs sm:text-sm font-black text-orange-600">{calculateTotal(selectedReservation).toLocaleString('fr-FR')} FCFA</p>
-                  </div>
-                </div>
-              )}
-              <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
-                <label className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2 block">
-                  Montant (FCFA)
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 font-black text-orange-300 text-xs sm:text-sm">FCFA</span>
-                  <input
-                    type="number"
-                    value={commissionAmount}
-                    onChange={(e) => setCommissionAmount(e.target.value)}
-                    placeholder="0"
-                    className="w-full pl-16 sm:pl-20 pr-3 sm:pr-5 py-3 sm:py-4 bg-slate-50 border border-slate-200 rounded-xl sm:rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none font-black text-orange-600 transition-all text-base sm:text-lg"
-                  />
-                </div>
-              </div>
-              <div className="flex gap-3 sm:gap-4">
-                <button
-                  onClick={() => setIsCommissionModalOpen(false)}
-                  className="flex-1 py-3 sm:py-4 bg-white border border-slate-200 text-slate-400 rounded-xl sm:rounded-2xl font-black text-[9px] sm:text-[10px] uppercase tracking-widest hover:text-slate-900 transition-all active:scale-95"
-                >
-                  Annuler
-                </button>
-                <button
-                  onClick={handleUpdateCommission}
-                  className="flex-1 py-3 sm:py-4 bg-orange-500 text-white rounded-xl sm:rounded-2xl font-black text-[9px] sm:text-[10px] uppercase tracking-widest shadow-xl shadow-orange-500/20 hover:bg-orange-600 transition-all active:scale-95"
-                >
-                  Enregistrer
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Commission Modal - commenté (désactivé pour parking)
+      {isCommissionModalOpen && ( ... )}
+      */}
 
       {/* Status Modal - Version responsive */}
       {isStatusModalOpen && (
@@ -892,6 +829,7 @@ export default function ParkingReservationTabs() {
                   ))}
                 </div>
               </div>
+              {/* Commission field - commenté
               <div className="mb-6 sm:mb-8 p-4 sm:p-6 bg-orange-50/30 rounded-xl sm:rounded-[2rem] border border-orange-100">
                 <label className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2 mb-3 sm:mb-4 block flex items-center gap-2">
                   <FontAwesomeIcon icon={faMoneyBillWave} className="text-orange-500" />
@@ -908,6 +846,7 @@ export default function ParkingReservationTabs() {
                   />
                 </div>
               </div>
+              */}
               <div className="flex gap-3 sm:gap-4 pt-2 sm:pt-4">
                 <button
                   onClick={() => setIsEditModalOpen(false)}
@@ -1590,11 +1529,11 @@ export default function ParkingReservationTabs() {
                       <div className="text-sm font-bold text-gray-900">
                         {calculateTotal(res).toLocaleString('fr-FR')} FCFA
                       </div>
-                      {res.commission && (
+                      {/* {res.commission && (
                         <div className="text-xs font-medium text-orange-600 mt-1">
                           Com: {res.commission.toLocaleString('fr-FR')} FCFA
                         </div>
-                      )}
+                      )} */}
                      </td>
                     <td className="py-2 sm:py-3 px-3 sm:px-6 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${
@@ -1649,13 +1588,13 @@ export default function ParkingReservationTabs() {
                             <FontAwesomeIcon icon={res.status === 'PENDING' ? faTimes : faBan} />
                           </button>
                         )}
-                        <button
+                        {/* <button
                           title="Commission"
                           onClick={() => openCommissionModal(res)}
                           className="p-1.5 text-orange-500 hover:bg-orange-50 rounded transition-colors"
                         >
                           <FontAwesomeIcon icon={faMoneyBillWave} />
-                        </button>
+                        </button> */}
                         <button
                           title="Modifier"
                           onClick={(e) => { e.stopPropagation(); openEditModal(res); }}
@@ -1748,9 +1687,9 @@ export default function ParkingReservationTabs() {
                         <span className="text-gray-500 text-xs sm:text-sm">Montant</span>
                         <div className="text-right">
                           <span className="font-bold text-gray-900 text-sm sm:text-base">{calculateTotal(res).toLocaleString('fr-FR')} FCFA</span>
-                          {res.commission && (
+                          {/* {res.commission && (
                             <div className="text-[9px] sm:text-[11px] font-semibold text-orange-600">Com: {res.commission.toLocaleString('fr-FR')} FCFA</div>
-                          )}
+                          )} */}
                         </div>
                       </div>
 
@@ -1789,13 +1728,13 @@ export default function ParkingReservationTabs() {
                         </div>
 
                         <div className="flex gap-1">
-                          <button
+                          {/* <button
                             title="Commission"
                             onClick={(e) => { e.stopPropagation(); openCommissionModal(res); }}
                             className="w-8 h-8 rounded-lg flex items-center justify-center text-orange-500 hover:bg-orange-50 transition-all"
                           >
                             <FontAwesomeIcon icon={faMoneyBillWave} size="sm" />
-                          </button>
+                          </button> */}
                           <button
                             title="Modifier"
                             onClick={(e) => { e.stopPropagation(); openEditModal(res); }}
