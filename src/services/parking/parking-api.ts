@@ -50,7 +50,7 @@ class ParkingAPI {
   }
 
   private get baseUrl() {
-    return process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api';
+    return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
   }
 
   // === ENDPOINTS RÉELS POUR PARKING (selon doc) ===

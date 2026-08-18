@@ -14,10 +14,10 @@ import {
   faCheckCircle,
   faSpinner,
   faEye,
-  faEyeSlash,
-  faArrowLeft
+  faEyeSlash
 } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
+import SocialLoginButtons from '@/components/auth/SocialLoginButtons';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -44,7 +44,7 @@ export default function RegisterPage() {
     }
 
     try {
-      await register(formData);
+      const data = await register(formData); // ← on récupère la réponse maintenant
 
       // Redirection conditionnelle selon le rôle
       if (formData.role === 'PARKING') {
@@ -52,17 +52,14 @@ export default function RegisterPage() {
       } else {
         router.push('/auth/verify-email'); // CLIENT → vérification email
       }
-    } catch (err) {
-      setError((err as Error).message || "Erreur lors de l'inscription");
+    } catch (err: any) {
+      setError(err.message || "Erreur lors de l'inscription");
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white flex items-center justify-center p-4 relative">
-      <Link href="/" className="absolute top-6 left-6 sm:top-8 sm:left-8 w-10 h-10 sm:w-12 sm:h-12 bg-orange-500 flex items-center justify-center text-white hover:bg-orange-600 rounded-full shadow-md transition-all group z-10" title="Retour au site">
-        <FontAwesomeIcon icon={faArrowLeft} className="group-hover:-translate-x-1 transition-transform" />
-      </Link>
-      <div className="max-w-2xl w-full mt-12 sm:mt-0">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white flex items-center justify-center p-4">
+      <div className="max-w-2xl w-full">
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-500 rounded-2xl mb-4">
@@ -224,9 +221,9 @@ export default function RegisterPage() {
                 required
               />
               <label htmlFor="terms" className="text-sm text-gray-700">
-                J&apos;accepte les{' '}
+                J'accepte les{' '}
                 <Link href="/terms" className="text-orange-600 hover:text-orange-500 font-medium">
-                  conditions d&apos;utilisation
+                  conditions d'utilisation
                 </Link>{' '}
                 et la{' '}
                 <Link href="/privacy" className="text-orange-600 hover:text-orange-500 font-medium">
@@ -258,6 +255,7 @@ export default function RegisterPage() {
                 </>
               )}
             </button>
+            <SocialLoginButtons />
           </form>
 
           <p className="text-center text-sm text-gray-600 mt-6">

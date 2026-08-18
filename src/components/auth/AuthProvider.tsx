@@ -9,6 +9,8 @@ import type { User, AuthState, UserRole } from '@/types';
 
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>;
+  loginWithGoogle: (idToken: string) => Promise<void>;
+  loginWithFacebook: (accessToken: string) => Promise<void>;
   register: (userData: any) => Promise<any>;
   logout: () => Promise<void>;
   hasRole: (roles: UserRole | UserRole[]) => boolean;
@@ -67,7 +69,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 });
               }
             } catch (refreshError) {
-              console.warn('Refresh failed:', refreshError);
+              console.error('Refresh failed:', refreshError);
               // Ne pas déconnecter, garder l'utilisateur actuel
             }
           } catch (e) {
@@ -150,23 +152,87 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const loginWithGoogle = async (idToken: string) => {
+    setState(prev => ({ ...prev, isLoading: true, error: null }));
+    try {
+      await mobilityAPI.loginWithGoogle(idToken);
+      const user = await mobilityAPI.getCurrentUser();
+
+      setState({
+        user,
+        isAuthenticated: true,
+        isLoading: false,
+        error: null,
+      });
+
+      setCookie('user', JSON.stringify(user), {
+        maxAge: 7 * 24 * 60 * 60,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        path: '/',
+      });
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const callbackUrl = urlParams.get('callbackUrl');
+
+      if (callbackUrl && callbackUrl.startsWith('/')) {
+        router.replace(callbackUrl);
+      } else {
+        router.replace(getDashboardPath(user.role));
+      }
+    } catch (error: any) {
+      setState(prev => ({
+        ...prev,
+        isLoading: false,
+        error: error.message || 'Erreur de connexion Google',
+      }));
+      throw error;
+    }
+  };
+
+  const loginWithFacebook = async (accessToken: string) => {
+    setState(prev => ({ ...prev, isLoading: true, error: null }));
+    try {
+      await mobilityAPI.loginWithFacebook(accessToken);
+      const user = await mobilityAPI.getCurrentUser();
+
+      setState({
+        user,
+        isAuthenticated: true,
+        isLoading: false,
+        error: null,
+      });
+
+      setCookie('user', JSON.stringify(user), {
+        maxAge: 7 * 24 * 60 * 60,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        path: '/',
+      });
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const callbackUrl = urlParams.get('callbackUrl');
+
+      if (callbackUrl && callbackUrl.startsWith('/')) {
+        router.replace(callbackUrl);
+      } else {
+        router.replace(getDashboardPath(user.role));
+      }
+    } catch (error: any) {
+      setState(prev => ({
+        ...prev,
+        isLoading: false,
+        error: error.message || 'Erreur de connexion Facebook',
+      }));
+      throw error;
+    }
+  };
+
   const register = async (userData: any) => {
     setState(prev => ({ ...prev, isLoading: true, error: null }));
     try {
       const response = await mobilityAPI.register(userData);
-      
-      const newUser = mobilityAPI.getCurrentUserSync();
-      if (newUser) {
-        setState(prev => ({
-          ...prev,
-          user: newUser,
-          isAuthenticated: true,
-          isLoading: false,
-        }));
-      } else {
-        setState(prev => ({ ...prev, isLoading: false }));
-      }
-      
+      setState(prev => ({ ...prev, isLoading: false }));
       return response;
     } catch (error: any) {
       setState(prev => ({ ...prev, isLoading: false, error: error.message }));
@@ -224,13 +290,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         });
       }
     } catch (error) {
-      console.warn('Error refreshing user:', error);
+      console.error('Error refreshing user:', error);
     }
   };
 
   const value = {
     ...state,
     login,
+    loginWithGoogle,
+    loginWithFacebook,
     register,
     logout,
     hasRole,
