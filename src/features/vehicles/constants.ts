@@ -1,0 +1,21 @@
+import type { VehicleStatus } from './types';
+
+export const VEHICLE_STATUS = {
+  DISPONIBLE: 'DISPONIBLE' as VehicleStatus,
+  EN_MAINTENANCE: 'EN_MAINTENANCE' as VehicleStatus,
+  INDISPONIBLE: 'INDISPONIBLE' as VehicleStatus,
+} as const;
+
+export const STATUS_LABELS: Record<VehicleStatus, string> = {
+  [VEHICLE_STATUS.DISPONIBLE]: 'Disponible',
+  [VEHICLE_STATUS.EN_MAINTENANCE]: 'En maintenance',
+  [VEHICLE_STATUS.INDISPONIBLE]: 'Indisponible',
+};
+
+export const STATUS_TABS = [
+  { key: VEHICLE_STATUS.DISPONIBLE, label: STATUS_LABELS[VEHICLE_STATUS.DISPONIBLE] },
+  { key: VEHICLE_STATUS.INDISPONIBLE, label: STATUS_LABELS[VEHICLE_STATUS.INDISPONIBLE] },
+  { key: VEHICLE_STATUS.EN_MAINTENANCE, label: STATUS_LABELS[VEHICLE_STATUS.EN_MAINTENANCE] },
+];
+
+export default { VEHICLE_STATUS, STATUS_LABELS, STATUS_TABS };

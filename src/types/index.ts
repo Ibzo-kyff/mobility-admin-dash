@@ -1,5 +1,7 @@
 // types/index.ts
 export type UserRole = 'CLIENT' | 'PARKING' | 'ADMIN';
+
+
 export type UserStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'BLOCKED';
 
 export interface User {

@@ -20,8 +20,8 @@ export default function FleetPage() {
           </p>
         </div>
       </div>
-
-      <ParkingVehicleTabs showDashboard={true} />
+   // ✅ APRÈS
+    <ParkingVehicleTabs />
     </div>
   );
 }

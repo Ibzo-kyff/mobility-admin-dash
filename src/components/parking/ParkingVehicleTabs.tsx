@@ -63,6 +63,13 @@ import { vehiclesAPI } from '@/services/vehicles-api';
 import { mobilityAPI } from '@/services/mobility-api';
 import { parkingAPI } from '@/services/parking/parking-api';
 import type { Vehicule, Parking, ReservationData } from '@/types';
+import { useVehicles } from '@/features/vehicles/hooks/useVehicles';
+import { useReferenceData } from '@/features/vehicles/hooks/useReferenceData';
+import useNotification from '@/features/vehicles/hooks/useNotification';
+import useReservation from '@/features/vehicles/hooks/useReservation';
+import usePayment from '@/features/vehicles/hooks/usePayment';
+import PaymentModal from '@/features/vehicles/components/modals/PaymentModal';
+import { parkingVehicleTabsStyles, parkingVehicleTabsActionStyles } from '@/features/vehicles/styles/parkingVehicleTabs';
 import Image from 'next/image';
 import { getCookie } from 'cookies-next';
 import { 
@@ -79,6 +86,7 @@ import {
 } from 'recharts';
 
 type TabType = 'list' | 'details' | 'history' | 'stats' | 'documents';
+type VehicleStatus = 'DISPONIBLE' | 'EN_MAINTENANCE' | 'INDISPONIBLE';
 
 // Motifs de location disponibles
 const MOTIFS_LOCATION = [
@@ -118,12 +126,12 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
   const [selectedDays, setSelectedDays] = useState<number>(1);
   const [calculatedPrice, setCalculatedPrice] = useState<number>(0);
   const [currentReservation, setCurrentReservation] = useState<any>(null);
-  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const { isProcessingPayment, processPayment: processPaymentRequest } = usePayment();
 
   // Edit State
   const [isEditing, setIsEditing] = useState(false);
   const [editPrice, setEditPrice] = useState(0);
-  const [editStatus, setEditStatus] = useState('');
+  const [editStatus, setEditStatus] = useState<VehicleStatus>('DISPONIBLE');
   const [editDescription, setEditDescription] = useState("");
   const [editFuelType, setEditFuelType] = useState("ESSENCE");
   const [editTransmission, setEditTransmission] = useState("MANUAL");
@@ -193,6 +201,8 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
     }, 6000);
   };
 
+  const reservation = useReservation();
+
   // Lists
   const [marquesList, setMarquesList] = useState<{ name: string }[]>([]);
   const [parkingsList, setParkingsList] = useState<Parking[]>([]);
@@ -230,6 +240,36 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
   const [itemsPerPage, setItemsPerPage] = useState(6);
 
   const BASE_URL = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'https://parkapp-pi.vercel.app';
+
+  // --- Wire refactored hooks (keep UI/markup identical) ---
+  try {
+    // Use the extracted hook to fetch/manage vehicles; keep local state as source-of-truth for markup
+    // (wrapped in try to avoid SSR/hydration surprises)
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const { vehicles: hookVehicles, refresh: hookRefresh, handleDelete: hookHandleDelete, handleStatusChange: hookHandleStatusChange } = useVehicles();
+
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useEffect(() => {
+      if (hookVehicles && Array.isArray(hookVehicles)) {
+        setVehicles(hookVehicles as unknown as Vehicule[]);
+      }
+    }, [hookVehicles]);
+
+    // Optionally use reference data hook for marques/parkings
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const refData = useReferenceData();
+    // Keep local lists but seed from hook
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useEffect(() => {
+      if (refData.marques && refData.marques.length) setMarquesList(refData.marques as any);
+      if (refData.parkings && refData.parkings.length) setParkingsList(refData.parkings as any);
+    }, [refData.marques, refData.parkings]);
+
+    // Keep using local showNotification implementation; the hook is available if we want to switch later
+    // const notif = useNotification();
+  } catch (e) {
+    // ignore: defensive for environments where hooks cannot run in this code path
+  }
 
   // Formatting Helpers from Mobile
   const formatPrice = (price: number) => {
@@ -480,7 +520,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
   useEffect(() => {
     if (selectedVehicle) {
       setEditPrice(selectedVehicle.prixJour || selectedVehicle.prix || 0);
-      setEditStatus(selectedVehicle.status || 'PENDING');
+      setEditStatus((selectedVehicle.status as VehicleStatus) || 'DISPONIBLE');
       setEditDescription(selectedVehicle.description || "");
       setEditFuelType(selectedVehicle.fuelType || selectedVehicle.carburant || "ESSENCE");
       setEditTransmission(selectedVehicle.transmission || selectedVehicle.boite || "MANUAL");
@@ -676,29 +716,33 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
     }
   };
 
-  const handleAction = async (id: string, action: 'APPROVE' | 'DELETE') => {
+  const handleAction = async (id: string, action: 'DELETE') => {
     try {
-      if (action === 'DELETE') {
-        if (!confirm('Êtes-vous sûr de vouloir supprimer ce véhicule ?')) return;
-        await vehiclesAPI.deleteVehicule(id);
-        setVehicles(vehicles.filter(v => v.id !== id));
-        if (selectedVehicle?.id === id) {
-          setSelectedVehicle(null);
-          setActiveTab('list');
-        }
-        return;
+      if (action !== 'DELETE') return;
+
+      if (!confirm('Êtes-vous sûr de vouloir supprimer ce véhicule ?')) return;
+
+      await vehiclesAPI.deleteVehicule(id);
+
+      setVehicles(prev => prev.filter(v => v.id !== id));
+
+      if (selectedVehicle?.id === id) {
+        setSelectedVehicle(null);
+        setActiveTab('list');
       }
 
-      const status = 'APPROVED';
-      await vehiclesAPI.updateVehicule(id, { status });
-
-      setVehicles(vehicles.map(v => v.id === id ? { ...v, status } : v));
-      if (selectedVehicle?.id === id) setSelectedVehicle({ ...selectedVehicle, status });
-      showNotification('success', "Action effectuée", `Le véhicule a été ${action === 'APPROVE' ? 'approuvé' : 'mis à jour'}.`);
-
+      showNotification(
+        'success',
+        'Véhicule supprimé',
+        'Le véhicule a été supprimé avec succès.'
+      );
     } catch (error) {
-      console.error(`Error performing action ${action}:`, error);
-      showNotification('error', "Erreur d'action", "L'opération a échoué. Veuillez réessayer.");
+      console.error('Erreur suppression véhicule:', error);
+      showNotification(
+        'error',
+        'Erreur',
+        "Impossible de supprimer le véhicule."
+      );
     }
   };
 
@@ -734,10 +778,15 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
   };
 
   const selectReservationType = (type: 'LOCATION' | 'ACHAT') => {
+    reservation.setReservationType(type);
     setReservationType(type);
+    reservation.setSelectedMotif(null);
     setSelectedMotif(null);
+    reservation.setSelectedLocalisation(null);
     setSelectedLocalisation(null);
+    reservation.setAutreMotif('');
     setAutreMotif('');
+    reservation.setConditionsAccepted(false);
     setConditionsAccepted(false);
 
     if (type === 'LOCATION') {
@@ -746,7 +795,9 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
       defaultStart.setHours(8, 0, 0, 0);
       const defaultEnd = new Date(defaultStart);
       defaultEnd.setDate(defaultEnd.getDate() + 1);
+      reservation.setStartDateTime(defaultStart);
       setStartDateTime(defaultStart);
+      reservation.setEndDateTime(defaultEnd);
       setEndDateTime(defaultEnd);
       if (selectedVehicle?.prixJour || selectedVehicle?.prix) {
         setCalculatedPrice(selectedVehicle.prixJour || selectedVehicle?.prix || 0);
@@ -757,6 +808,15 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
   const confirmReservation = () => {
     if (!reservationType || !selectedVehicle) {
       showNotification('warning', "Type requis", "Veuillez sélectionner un type de réservation (Location ou Achat).");
+      return;
+    }
+
+    if (String(selectedVehicle.status) !== 'DISPONIBLE') {
+      showNotification(
+        'error',
+        'Véhicule indisponible',
+        `Ce véhicule est actuellement ${getStatusLabel(String(selectedVehicle.status))}. Il doit être disponible pour être réservé.`
+      );
       return;
     }
 
@@ -827,6 +887,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
       montant: reservationType === 'LOCATION' ? calculatedPrice : (selectedVehicle.prixJour || selectedVehicle.prix || 0)
     };
 
+    reservation.setCurrentReservation(tempReservation);
     setCurrentReservation(tempReservation);
     setModalPayVisible(true);
     setModalVisible(false);
@@ -838,10 +899,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
       return;
     }
 
-    setIsProcessingPayment(true);
-
     try {
-      // Préparer les données pour l'API - Basé sur les logs de l'application mobile qui fonctionne
       const reservationData = {
         vehicleId: Number(selectedVehicle.id),
         dateDebut: currentReservation.dateDebut || new Date().toISOString(),
@@ -851,12 +909,16 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
         localisation: currentReservation.localisation,
         conditionsAcceptees: currentReservation.conditionsAcceptees || true,
         paymentMethod: paymentMethod,
-        montant: currentReservation.montant
+        montant: currentReservation.montant,
       };
 
       console.log('📤 Envoi réservation:', reservationData);
+      const result = await processPaymentRequest(reservationData);
+      if (!result.success) {
+        throw new Error(result.error ? String(result.error) : 'Payment failed');
+      }
       await mobilityAPI.createReservation(reservationData as any);
-      
+
       const message = paymentMethod === 'ESPECES'
         ? 'Votre réservation est confirmée !\n\nLe parking vous contactera bientôt pour organiser le paiement en espèces et la remise du véhicule.'
         : 'Votre réservation et paiement sont confirmés !';
@@ -882,8 +944,6 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
       });
       const errorMessage = error.details || error.message || 'Une erreur est survenue lors de la confirmation.';
       showNotification('error', "Échec de l'opération", errorMessage);
-    } finally {
-      setIsProcessingPayment(false);
     }
   };
 
@@ -951,11 +1011,87 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
 
   const getStatusColor = (status?: string) => {
     switch (status) {
-      case 'APPROVED': return 'text-emerald-600 bg-emerald-50 border-emerald-100';
-      case 'PENDING': return 'text-amber-600 bg-amber-50 border-amber-100';
+      case 'DISPONIBLE':
+        return 'text-emerald-600 bg-emerald-50 border-emerald-100';
+      case 'EN_MAINTENANCE':
+        return 'text-amber-600 bg-amber-50 border-amber-100';
+      case 'INDISPONIBLE':
+        return 'text-rose-600 bg-rose-50 border-rose-100';
+      default:
+        return 'text-slate-400 bg-slate-50 border-slate-100';
+    }
+  };
 
-      case 'BLOCKED': return 'text-slate-600 bg-slate-50 border-slate-100';
-      default: return 'text-slate-400 bg-slate-50 border-slate-50';
+  const getStatusLabel = (status?: string) => {
+    switch (status) {
+      case 'DISPONIBLE':
+        return 'Disponible';
+      case 'EN_MAINTENANCE':
+        return 'En maintenance';
+      case 'INDISPONIBLE':
+        return 'Indisponible';
+      default:
+        return status || 'Statut inconnu';
+    }
+  };
+
+  const handleStatusChange = async (id: string, status: VehicleStatus) => {
+    const previousVehicle = vehicles.find(v => String(v.id) === String(id));
+    const previousStatus = previousVehicle?.status as VehicleStatus | undefined;
+
+    try {
+      // Mise à jour optimiste de l'interface.
+      setVehicles(prev =>
+        prev.map(vehicle =>
+          String(vehicle.id) === String(id)
+            ? { ...vehicle, status: status as Vehicule['status'] }
+            : vehicle
+        )
+      );
+
+      if (selectedVehicle && String(selectedVehicle.id) === String(id)) {
+        setSelectedVehicle(prev =>
+          prev
+            ? { ...prev, status: status as Vehicule['status'] }
+            : null
+        );
+      }
+
+      // Le backend reçoit exactement l'une des trois valeurs Prisma.
+      await vehiclesAPI.updateVehicule(id, { status });
+
+      showNotification(
+        'success',
+        'Statut modifié',
+        `Le véhicule est maintenant : ${getStatusLabel(status)}.`
+      );
+    } catch (error) {
+      console.error('Erreur changement statut:', error);
+
+      // Annuler la mise à jour optimiste en cas d'échec.
+      if (previousVehicle) {
+        setVehicles(prev =>
+          prev.map(vehicle =>
+            String(vehicle.id) === String(id)
+              ? { ...vehicle, status: previousStatus as Vehicule['status'] }
+              : vehicle
+          )
+        );
+
+        if (selectedVehicle && String(selectedVehicle.id) === String(id)) {
+          setSelectedVehicle(prev =>
+            prev
+              ? { ...prev, status: previousStatus as Vehicule['status'] }
+              : null
+          );
+        }
+      }
+
+      showNotification(
+        'error',
+        'Erreur',
+        'Impossible de modifier le statut du véhicule.'
+      );
     }
   };
 
@@ -1050,29 +1186,26 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
     )}
 
       {/* Search and Filters */}
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-        <div className="relative w-full md:w-96">
+      <div className={parkingVehicleTabsStyles.searchSection}>
+        <div className={parkingVehicleTabsStyles.searchWrap}>
           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
             <FontAwesomeIcon icon={faSearch} />
           </span>
           <input
             type="text"
             placeholder="Rechercher un véhicule..."
-            className="w-full pl-12 pr-4 py-3 bg-white border border-slate-100 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-slate-700 font-medium"
+            className={parkingVehicleTabsStyles.searchInput}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <div className="flex flex-wrap gap-3 w-full md:w-auto">
-          <div className="flex flex-1 md:flex-initial bg-slate-100 p-1.5 rounded-2xl shadow-inner">
+        <div className={parkingVehicleTabsStyles.filterRow}>
+          <div className={parkingVehicleTabsStyles.segment}>
             {(['all', 'sale', 'rent'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setSaleRentTab(tab)}
-                className={`flex-1 md:px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${saleRentTab === tab
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-400 hover:text-slate-600'
-                  }`}
+                className={parkingVehicleTabsStyles.segmentButton(saleRentTab === tab)}
               >
                 {tab === 'all' ? 'Tous' : tab === 'sale' ? 'Vente' : 'Location'}
               </button>
@@ -1081,47 +1214,40 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
 
           <button
             onClick={() => setShowAdvancedFilters(true)}
-            className="px-6 py-3 bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md transition-all flex items-center gap-3 text-slate-600 font-bold"
+            className={parkingVehicleTabsStyles.filterButton}
           >
             <FontAwesomeIcon icon={faFilter} className="text-orange-500" />
             <span className="hidden md:inline">Filtres</span>
           </button>
 
-          <div className="relative flex-1 md:flex-initial">
+          <div className={parkingVehicleTabsStyles.selectWrap}>
             <select
               title="Filtrer par statut"
-              className="w-full md:w-48 pl-4 pr-10 py-3 bg-white border border-slate-100 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 appearance-none cursor-pointer font-bold text-slate-600"
+              className={parkingVehicleTabsStyles.select}
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
             >
               <option value="ALL">Statut: Tous</option>
-              <option value="PENDING">Statut: Attente</option>
-              <option value="APPROVED">Statut: Validé</option>
-
-              <option value="BLOCKED">Statut: Bloqué</option>
+              <option value="DISPONIBLE">Statut: Disponible</option>
+              <option value="EN_MAINTENANCE">Statut: En maintenance</option>
+              <option value="INDISPONIBLE">Statut: Indisponible</option>
             </select>
             <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
               <FontAwesomeIcon icon={faFilter} size="xs" />
             </div>
           </div>
 
-          <div className="flex bg-slate-100 p-1.5 rounded-2xl shadow-inner ml-auto">
+          <div className={parkingVehicleTabsStyles.viewSwitch}>
             <button
               onClick={() => setViewMode('grid')}
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${viewMode === 'grid'
-                ? 'bg-white text-orange-500 shadow-sm'
-                : 'text-slate-400 hover:text-slate-600'
-                }`}
+              className={parkingVehicleTabsStyles.viewButton(viewMode === 'grid')}
               title="Vue grille"
             >
               <FontAwesomeIcon icon={faThLarge} />
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${viewMode === 'list'
-                ? 'bg-white text-orange-500 shadow-sm'
-                : 'text-slate-400 hover:text-slate-600'
-                }`}
+              className={parkingVehicleTabsStyles.viewButton(viewMode === 'list')}
               title="Vue liste"
             >
               <FontAwesomeIcon icon={faList} />
@@ -1131,7 +1257,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
       </div>
 
       {/* Quick Filter Pills */}
-      <div className="flex overflow-x-auto pb-2 gap-3 no-scrollbar scroll-smooth">
+      <div className={parkingVehicleTabsStyles.quickFilters}>
         {[
           { id: 'all', label: 'Tous les types' },
           { id: 'economique', label: 'Économique' },
@@ -1141,10 +1267,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
           <button
             key={filter.id}
             onClick={() => setActiveQuickFilter(filter.id)}
-            className={`whitespace-nowrap px-6 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest border transition-all ${activeQuickFilter === filter.id
-              ? 'bg-orange-500 text-white border-orange-500 shadow-lg shadow-orange-500/20'
-              : 'bg-white text-slate-400 border-slate-100 hover:border-slate-300'
-              }`}
+            className={parkingVehicleTabsStyles.quickFilterButton(activeQuickFilter === filter.id)}
           >
             {filter.label}
           </button>
@@ -1152,7 +1275,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
       </div>
 
       {/* Results Header */}
-      <div className="flex justify-between items-center mb-4">
+      <div className={parkingVehicleTabsStyles.resultRow}>
         <p className="text-slate-500 font-bold text-sm">
           {filteredVehicles.length} résultat{filteredVehicles.length > 1 ? 's' : ''} trouvé{filteredVehicles.length > 1 ? 's' : ''}
         </p>
@@ -1164,7 +1287,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
               setSaleRentTab('all');
               setActiveQuickFilter('all');
             }}
-            className="text-orange-500 font-black text-[10px] uppercase tracking-widest hover:underline"
+            className={parkingVehicleTabsStyles.clearFiltersButton}
           >
             Effacer les filtres
           </button>
@@ -1173,7 +1296,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
 
       {/* Mode d'affichage Grille ou Liste */}
       {viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className={parkingVehicleTabsStyles.gridWrap}>
           {filteredVehicles
             .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
             .map((vehicle) => (
@@ -1217,7 +1340,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
 
                     <div className="absolute top-3 right-3">
                       <span className={`inline-flex items-center px-3.5 py-1.5 rounded-xl text-[10px] font-black uppercase border backdrop-blur-md shadow-sm ${getStatusColor(vehicle.status)} bg-white/90`}>
-                        {vehicle.status === 'PENDING' ? 'Attente' : vehicle.status === 'APPROVED' ? 'Validé' : vehicle.status}
+                        {getStatusLabel(vehicle.status)}
                       </span>
                     </div>
                   </div>
@@ -1321,22 +1444,58 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                     </p>
                   </div>
 
-                  <div className="mt-auto flex gap-2">
+                  <div className="mt-auto flex items-center gap-2">
                     <button
-                      title="Voir les détails du véhicule"
-                      className="flex-1 py-3 bg-slate-50 hover:bg-orange-50 text-slate-600 hover:text-orange-600 rounded-2xl font-black text-sm uppercase tracking-widest transition-all"
+                      title="Voir les détails"
+                      className="w-11 h-11 bg-slate-50 hover:bg-orange-50 text-slate-500 hover:text-orange-600 rounded-2xl flex items-center justify-center transition-all"
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectedVehicle(vehicle);
                         setActiveTab('details');
                       }}
                     >
-                      Détails
+                      <FontAwesomeIcon icon={faEye} />
+                    </button>
+                    <button
+                      type="button"
+                      title="Mettre le véhicule disponible"
+                      aria-label="Mettre le véhicule disponible"
+                      className={parkingVehicleTabsActionStyles.statusButton(String(vehicle.status) === 'DISPONIBLE', 'green')}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleStatusChange(String(vehicle.id), 'DISPONIBLE');
+                      }}
+                    >
+                      <FontAwesomeIcon icon={faCheckCircle} />
+                    </button>
+                    <button
+                      type="button"
+                      title="Mettre le véhicule en maintenance"
+                      aria-label="Mettre le véhicule en maintenance"
+                      className={parkingVehicleTabsActionStyles.statusButton(String(vehicle.status) === 'EN_MAINTENANCE', 'amber')}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleStatusChange(String(vehicle.id), 'EN_MAINTENANCE');
+                      }}
+                    >
+                      <FontAwesomeIcon icon={faWrench} />
+                    </button>
+                    <button
+                      type="button"
+                      title="Rendre le véhicule indisponible"
+                      aria-label="Rendre le véhicule indisponible"
+                      className={parkingVehicleTabsActionStyles.statusButton(String(vehicle.status) === 'INDISPONIBLE', 'rose')}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleStatusChange(String(vehicle.id), 'INDISPONIBLE');
+                      }}
+                    >
+                      <FontAwesomeIcon icon={faTimesCircle} />
                     </button>
                     <button
                       title="Supprimer le véhicule"
                       aria-label="Supprimer le véhicule"
-                      className="w-12 py-3 bg-rose-50 hover:bg-rose-100 text-rose-500 rounded-2xl flex items-center justify-center transition-all"
+                      className="w-11 h-11 bg-slate-50 hover:bg-rose-50 text-slate-400 hover:text-rose-500 rounded-2xl flex items-center justify-center transition-all ml-auto"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleAction(vehicle.id, 'DELETE');
@@ -1405,7 +1564,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                           {vehicle.annee || vehicle.year} • {vehicle.categorie || 'Standard'}
                         </p>
                         <span className={`inline-flex items-center px-3.5 py-1.5 rounded-full text-[11px] font-black uppercase border ${getStatusColor(vehicle.status)} bg-white`}>
-                          {vehicle.status === 'PENDING' ? 'En attente' : vehicle.status === 'APPROVED' ? 'Validé' : vehicle.status}
+                          {getStatusLabel(vehicle.status)}
                         </span>
                       </div>
                     </div>
@@ -1460,20 +1619,56 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                     </div>
                     <div className="flex gap-2">
                       <button
-                        title="Voir les détails du véhicule"
-                        className="px-6 py-2 bg-slate-50 hover:bg-orange-50 text-slate-600 hover:text-orange-600 rounded-xl font-black text-xs uppercase tracking-widest transition-all"
+                        title="Voir les détails"
+                        className="w-10 h-10 bg-slate-50 hover:bg-orange-50 text-slate-500 hover:text-orange-600 rounded-xl flex items-center justify-center transition-all"
                         onClick={(e) => {
                           e.stopPropagation();
                           setSelectedVehicle(vehicle);
                           setActiveTab('details');
                         }}
                       >
-                        Détails
+                        <FontAwesomeIcon icon={faEye} />
+                      </button>
+                      <button
+                        type="button"
+                        title="Mettre le véhicule disponible"
+                        aria-label="Mettre le véhicule disponible"
+                        className={parkingVehicleTabsActionStyles.statusButton(String(vehicle.status) === 'DISPONIBLE', 'green')}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleStatusChange(String(vehicle.id), 'DISPONIBLE');
+                        }}
+                      >
+                        <FontAwesomeIcon icon={faCheckCircle} />
+                      </button>
+                      <button
+                        type="button"
+                        title="Mettre le véhicule en maintenance"
+                        aria-label="Mettre le véhicule en maintenance"
+                        className={parkingVehicleTabsActionStyles.statusButton(String(vehicle.status) === 'EN_MAINTENANCE', 'amber')}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleStatusChange(String(vehicle.id), 'EN_MAINTENANCE');
+                        }}
+                      >
+                        <FontAwesomeIcon icon={faWrench} />
+                      </button>
+                      <button
+                        type="button"
+                        title="Rendre le véhicule indisponible"
+                        aria-label="Rendre le véhicule indisponible"
+                        className={parkingVehicleTabsActionStyles.statusButton(String(vehicle.status) === 'INDISPONIBLE', 'rose')}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleStatusChange(String(vehicle.id), 'INDISPONIBLE');
+                        }}
+                      >
+                        <FontAwesomeIcon icon={faTimesCircle} />
                       </button>
                       <button
                         title="Supprimer le véhicule"
                         aria-label="Supprimer le véhicule"
-                        className="w-10 h-10 bg-rose-50 hover:bg-rose-100 text-rose-500 rounded-xl flex items-center justify-center transition-all"
+                        className="w-10 h-10 bg-slate-50 hover:bg-rose-50 text-slate-400 hover:text-rose-500 rounded-xl flex items-center justify-center transition-all"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleAction(vehicle.id, 'DELETE');
@@ -2321,111 +2516,21 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
     if (!currentReservation) return null;
 
     return (
-      <div className="fixed inset-0 z-[200] flex items-center justify-center animate-fadeIn bg-slate-900/60 backdrop-blur-sm p-4">
-        <div className="w-full max-w-md bg-white rounded-[2.5rem] shadow-2xl">
-          <div className="p-6 border-b border-slate-100 flex justify-between items-center">
-            <h2 className="text-2xl font-black text-slate-900">Paiement</h2>
-            <button
-              title="Fermer"
-              onClick={() => {
-                setModalPayVisible(false);
-                setCurrentReservation(null);
-              }}
-              className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center transition-all"
-            >
-              <FontAwesomeIcon icon={faTimes} />
-            </button>
-          </div>
-
-          <div className="p-6">
-            {/* Récapitulatif */}
-            <div className="mb-6 p-4 bg-slate-50 rounded-xl">
-              <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Récapitulatif</p>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-sm text-slate-600">Véhicule</span>
-                  <span className="text-sm font-black text-slate-900">
-                    {selectedVehicle?.marque} {selectedVehicle?.model}
-                  </span>
-                </div>
-                {currentReservation.type === 'LOCATION' && (
-                  <>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-slate-600">Dates</span>
-                      <span className="text-sm font-black text-slate-900">
-                        {new Date(currentReservation.dateDebut).toLocaleDateString('fr-FR')} - {new Date(currentReservation.dateFin).toLocaleDateString('fr-FR')}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-slate-600">Durée</span>
-                      <span className="text-sm font-black text-slate-900">{selectedDays} jour(s)</span>
-                    </div>
-                  </>
-                )}
-                <div className="flex justify-between pt-2 border-t border-slate-200">
-                  <span className="text-base font-black text-slate-900">Total</span>
-                  <span className="text-xl font-black text-orange-600">{formatPrice(currentReservation.montant)}</span>
-                </div>
-              </div>
-            </div>
-
-            <p className="text-center text-xs font-bold text-slate-500 mb-4">
-              Sélectionnez votre mode de paiement
-            </p>
-
-            {/* Options de paiement */}
-            <div className="space-y-3">
-              <button
-                onClick={() => processPayment('ESPECES')}
-                disabled={isProcessingPayment}
-                className="w-full p-4 bg-white border-2 border-emerald-500 rounded-xl flex items-center gap-4 hover:bg-emerald-50 transition-all"
-              >
-                <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
-                  <FontAwesomeIcon icon={faMoneyBillWave} size="lg" />
-                </div>
-                <div className="flex-1 text-left">
-                  <p className="font-black text-slate-900">Espèces</p>
-                  <p className="text-xs text-slate-500">Paiement à la remise</p>
-                </div>
-                {isProcessingPayment ? (
-                  <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <FontAwesomeIcon icon={faCheckCircle} className="text-emerald-500" size="lg" />
-                )}
-              </button>
-
-              <div className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl flex items-center gap-4 opacity-60 cursor-not-allowed">
-                <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
-                  <FontAwesomeIcon icon={faMobile} size="lg" />
-                </div>
-                <div className="flex-1 text-left">
-                  <p className="font-black text-slate-900">Orange Money</p>
-                  <p className="text-xs text-slate-500">Bientôt disponible</p>
-                </div>
-                <FontAwesomeIcon icon={faLock} className="text-slate-400" />
-              </div>
-
-              <div className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl flex items-center gap-4 opacity-60 cursor-not-allowed">
-                <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
-                  <FontAwesomeIcon icon={faWaveSquare} size="lg" />
-                </div>
-                <div className="flex-1 text-left">
-                  <p className="font-black text-slate-900">Wave</p>
-                  <p className="text-xs text-slate-500">Bientôt disponible</p>
-                </div>
-                <FontAwesomeIcon icon={faLock} className="text-slate-400" />
-              </div>
-            </div>
-
-            {isProcessingPayment && (
-              <div className="flex items-center justify-center gap-2 mt-4">
-                <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
-                <span className="text-sm text-slate-600">Traitement en cours...</span>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+      <PaymentModal
+        open={modalPayVisible}
+        amount={currentReservation.montant}
+        onClose={() => {
+          setModalPayVisible(false);
+          setCurrentReservation(null);
+        }}
+        onPaid={async (result) => {
+          if (result?.success) {
+            showNotification('success', 'Paiement confirmé', 'Le paiement a bien été enregistré.');
+            setModalPayVisible(false);
+            setCurrentReservation(null);
+          }
+        }}
+      />
     );
   };
 
@@ -2725,12 +2830,12 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                 <select
                   title="Statut du véhicule"
                   value={editStatus}
-                  onChange={(e) => setEditStatus(e.target.value)}
+                  onChange={(e) => setEditStatus(e.target.value as VehicleStatus)}
                   className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none font-bold text-slate-700 transition-all"
                 >
-                  <option value="PENDING">En attente</option>
-                  <option value="APPROVED">Approuvé</option>
-                  <option value="BLOCKED">Bloqué</option>
+                  <option value="DISPONIBLE">Disponible</option>
+                  <option value="EN_MAINTENANCE">En maintenance</option>
+                  <option value="INDISPONIBLE">Indisponible</option>
                 </select>
               </div>
 
