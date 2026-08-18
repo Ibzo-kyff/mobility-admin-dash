@@ -29,6 +29,7 @@ export interface LoginResponse {
   prenom: string;
   id: number;
   parkingId?: number | null;
+  email?: string;
 }
 
 export interface RegisterResponse {
