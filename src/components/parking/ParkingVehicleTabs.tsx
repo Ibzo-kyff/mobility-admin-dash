@@ -522,7 +522,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
             data = myParking.vehicles;
           } else if (myParking && myParking.id) {
             // Si on a l'ID du parking, on tente un dernier filtrage sur l'API générale
-            const all = await vehiclesAPI.getVehicules({ parkingId: myParking.id });
+            const all = await vehiclesAPI.getVehicules({ parkingId: String(myParking.id) });
             data = all.filter(v => Number((v as any).parkingId || v.parking?.id) === Number(myParking.id));
           }
         } catch (e) {
