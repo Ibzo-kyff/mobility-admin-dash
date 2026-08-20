@@ -31,6 +31,7 @@ export interface LoginResponse {
   prenom: string;
   id: number;
   parkingId?: number | null;
+  email?: string;
 }
 
 export interface RegisterResponse {
@@ -73,4 +74,36 @@ export interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+}
+
+export interface Parking {
+  id: number;
+  name: string;
+  address: string;
+  city: string;
+  zipCode?: string | null;
+  email: string;
+  phone?: string | null;
+  capacity: number;
+  hoursOfOperation?: string | null;
+  description?: string | null;
+  status: string;
+  logo?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  vehicles?: import('./vehicle').Vehicule[];
+}
+
+export interface Reservation {
+  id: number | string;
+  vehiculeId: string;
+  userId?: number;
+  parkingId?: number;
+  dateDebut: string;
+  dateFin: string;
+  status: string;
+  options?: string[];
+  reason?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
