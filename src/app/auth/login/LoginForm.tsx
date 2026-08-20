@@ -9,12 +9,12 @@ import {
   faEnvelope,
   faLock,
   faArrowRight,
-  faArrowLeft,
   faEye,
   faEyeSlash,
   faSpinner
 } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
+import SocialLoginButtons from '@/components/auth/SocialLoginButtons';
 
 export default function LoginForm() {
   const router = useRouter();
@@ -67,11 +67,8 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white flex items-center justify-center p-4 relative">
-      <Link href="/" className="absolute top-6 left-6 sm:top-8 sm:left-8 w-10 h-10 sm:w-12 sm:h-12 bg-orange-500 flex items-center justify-center text-white hover:bg-orange-600 rounded-full shadow-md transition-all group z-10" title="Retour au site">
-        <FontAwesomeIcon icon={faArrowLeft} className="group-hover:-translate-x-1 transition-transform" />
-      </Link>
-      <div className="max-w-md w-full mt-12 sm:mt-0">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white flex items-center justify-center p-4">
+      <div className="max-w-md w-full">
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-500 rounded-2xl mb-4">
@@ -179,6 +176,7 @@ export default function LoginForm() {
                 </>
               )}
             </button>
+            <SocialLoginButtons />
           </form>
 
           <p className="text-center text-sm text-gray-600 mt-6">
