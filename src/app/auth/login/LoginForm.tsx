@@ -28,6 +28,9 @@ export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [localError, setLocalError] = useState('');
 
+  // Détecter si la session a expiré via le paramètre ?reason=session_expired
+  const sessionExpired = searchParams.get('reason') === 'session_expired';
+
   // Si déjà authentifié, rediriger immédiatement
   useEffect(() => {
     if (isAuthenticated && user) {
@@ -74,6 +77,19 @@ export default function LoginForm() {
           <h1 className="text-2xl font-bold text-gray-800">Mobility</h1>
           <p className="text-gray-600">Connectez-vous à votre compte</p>
         </div>
+
+        {/* Bandeau session expirée */}
+        {sessionExpired && (
+          <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
+            <span className="text-amber-500 text-lg mt-0.5">⏱️</span>
+            <div>
+              <p className="text-sm font-bold text-amber-800">Session expirée</p>
+              <p className="text-xs text-amber-600 mt-0.5">
+                Vous avez été déconnecté automatiquement. Veuillez vous reconnecter.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Formulaire */}
         <div className="bg-white rounded-2xl shadow-xl p-8">

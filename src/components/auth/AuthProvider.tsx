@@ -111,6 +111,52 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []); // Dépendances vides - NE PAS AJOUTER de dépendances
 
+  // =============================================
+  // Watcher : vérifie la session toutes les 5 min
+  // =============================================
+  useEffect(() => {
+    // Ne lancer le watcher que si l'utilisateur est authentifié
+    if (!state.isAuthenticated || state.isLoading) return;
+
+    const SESSION_CHECK_INTERVAL = 5 * 60 * 1000; // 5 minutes
+
+    const checkSession = async () => {
+      try {
+        const token = getCookie('accessToken') as string | undefined;
+        if (!token) {
+          // Token absent → déconnexion
+          setState({
+            user: null,
+            isAuthenticated: false,
+            isLoading: false,
+            error: 'Session expirée. Veuillez vous reconnecter.',
+          });
+          window.location.href = '/auth/login?reason=session_expired';
+          return;
+        }
+        // Vérifier que le token est encore valide côté serveur
+        await mobilityAPI.getCurrentUser();
+      } catch {
+        // Token expiré et refresh échoué → déconnexion propre
+        mobilityAPI.logout();
+        deleteCookie('user');
+        deleteCookie('accessToken');
+        deleteCookie('refreshToken');
+        setState({
+          user: null,
+          isAuthenticated: false,
+          isLoading: false,
+          error: 'Session expirée. Veuillez vous reconnecter.',
+        });
+        window.location.href = '/auth/login?reason=session_expired';
+      }
+    };
+
+    const interval = setInterval(checkSession, SESSION_CHECK_INTERVAL);
+
+    return () => clearInterval(interval);
+  }, [state.isAuthenticated, state.isLoading]);
+
   const login = async (email: string, password: string) => {
     setState(prev => ({ ...prev, isLoading: true, error: null }));
 
