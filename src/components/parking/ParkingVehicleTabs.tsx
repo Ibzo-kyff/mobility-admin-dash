@@ -63,12 +63,15 @@ import { vehiclesAPI } from '@/services/vehicles-api';
 import { mobilityAPI } from '@/services/mobility-api';
 import { parkingAPI } from '@/services/parking/parking-api';
 import type { Vehicule, Parking, ReservationData } from '@/types';
+import VehicleCard from '@/features/vehicles/components/VehicleList/VehicleCard';
+import { getPhotoUrl, getAllPhotoUrls } from '@/features/vehicles/utils/photos';
 import { useVehicles } from '@/features/vehicles/hooks/useVehicles';
 import { useReferenceData } from '@/features/vehicles/hooks/useReferenceData';
 import useNotification from '@/features/vehicles/hooks/useNotification';
 import useReservation from '@/features/vehicles/hooks/useReservation';
 import usePayment from '@/features/vehicles/hooks/usePayment';
 import PaymentModal from '@/features/vehicles/components/modals/PaymentModal';
+import { formatPrice, formatMileage, formatTransmissionForDisplay, normalizeTransmission, getStatusColor, getStatusLabel } from '@/features/vehicles/utils/format';
 import { parkingVehicleTabsStyles, parkingVehicleTabsActionStyles } from '@/features/vehicles/styles/parkingVehicleTabs';
 import Image from 'next/image';
 import { getCookie } from 'cookies-next';
@@ -271,69 +274,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
     // ignore: defensive for environments where hooks cannot run in this code path
   }
 
-  // Formatting Helpers from Mobile
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('fr-FR').format(price) + ' FCFA';
-  };
 
-  const formatMileage = (m: number) => {
-    if (m >= 1000) return `${(m / 1000).toFixed(1)}K km`;
-    return `${m} km`;
-  };
-
-  const normalizeTransmission = (t?: string) => {
-    if (!t) return null;
-    const trans = t.toUpperCase();
-    if (trans.includes('MANUAL') || trans.includes('MANUELLE')) return 'MANUELLE';
-    if (trans.includes('AUTOMATIC') || trans.includes('AUTOMATIQUE')) return 'AUTOMATIQUE';
-    if (trans.includes('SEMI')) return 'SEMI-AUTOMATIQUE';
-    return trans;
-  };
-
-  const formatTransmissionForDisplay = (t?: string) => {
-    const normalized = normalizeTransmission(t);
-    if (!normalized) return 'N/A';
-    if (normalized === 'MANUELLE') return 'Manuelle';
-    if (normalized === 'AUTOMATIQUE') return 'Automatique';
-    if (normalized === 'SEMI-AUTOMATIQUE') return 'Semi-Auto';
-    return normalized.charAt(0).toUpperCase() + normalized.slice(1).toLowerCase();
-  };
-
-  const getPhotoUrl = (photos: string[] | string | undefined) => {
-    if (!photos) return null;
-    const photo = Array.isArray(photos) ? photos[0] : photos;
-    if (typeof photo !== 'string' || !photo) return null;
-    if (photo.startsWith('http')) return photo;
-    return `${BASE_URL}${photo.startsWith('/') ? '' : '/'}${photo}`;
-  };
-
-  const getAllPhotoUrls = (photos: string[] | string | undefined): string[] => {
-    if (!photos) return [];
-
-    try {
-      if (Array.isArray(photos)) {
-        return photos
-          .filter(photo => photo && photo !== "" && photo !== null)
-          .map(photo => {
-            if (photo.startsWith('http')) return photo;
-            return `${BASE_URL}${photo.startsWith('/') ? '' : '/'}${photo}`;
-          });
-      }
-
-      if (typeof photos === 'string') {
-        const photoArray = photos.split(',').filter(p => p && p !== "");
-        return photoArray.map(photo => {
-          if (photo.startsWith('http')) return photo;
-          return `${BASE_URL}${photo.startsWith('/') ? '' : '/'}${photo}`;
-        });
-      }
-
-      return [];
-    } catch (error) {
-      console.error('Erreur formatage photos:', error);
-      return [];
-    }
-  };
 
   const availableFuelTypes = [...new Set(vehicles.map(v => v.fuelType || v.carburant).filter(Boolean))];
 
@@ -1009,31 +950,6 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
     return true;
   });
 
-  const getStatusColor = (status?: string) => {
-    switch (status) {
-      case 'DISPONIBLE':
-        return 'text-emerald-600 bg-emerald-50 border-emerald-100';
-      case 'EN_MAINTENANCE':
-        return 'text-amber-600 bg-amber-50 border-amber-100';
-      case 'INDISPONIBLE':
-        return 'text-rose-600 bg-rose-50 border-rose-100';
-      default:
-        return 'text-slate-400 bg-slate-50 border-slate-100';
-    }
-  };
-
-  const getStatusLabel = (status?: string) => {
-    switch (status) {
-      case 'DISPONIBLE':
-        return 'Disponible';
-      case 'EN_MAINTENANCE':
-        return 'En maintenance';
-      case 'INDISPONIBLE':
-        return 'Indisponible';
-      default:
-        return status || 'Statut inconnu';
-    }
-  };
 
   const handleStatusChange = async (id: string, status: VehicleStatus) => {
     const previousVehicle = vehicles.find(v => String(v.id) === String(id));
@@ -1294,395 +1210,24 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
         )}
       </div>
 
-      {/* Mode d'affichage Grille ou Liste */}
-      {viewMode === 'grid' ? (
-        <div className={parkingVehicleTabsStyles.gridWrap}>
-          {filteredVehicles
-            .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
-            .map((vehicle) => (
-              <div
-                key={vehicle.id}
-                className="group bg-white rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-500 overflow-hidden flex flex-col cursor-pointer"
-                onClick={() => {
-                  setSelectedVehicle(vehicle);
-                  setActiveTab('details');
-                }}
-              >
-                {/* Image Section */}
-                <div className="p-2">
-                  <div className="aspect-[16/9] relative rounded-[2rem] overflow-hidden bg-slate-100 shadow-inner border border-slate-50">
-                    {getPhotoUrl(vehicle.photos) ? (
-                      <Image
-                        src={getPhotoUrl(vehicle.photos)!}
-                        alt=""
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-700"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-slate-200">
-                        <FontAwesomeIcon icon={faCar} size="3x" />
-                      </div>
-                    )}
-
-                    {/* Badges sur l'image plus compacts */}
-                    <div className="absolute top-3 left-3 flex flex-row gap-1.5 flex-wrap">
-                      {vehicle.forSale && (
-                        <span className="px-3 py-1 bg-rose-500/90 backdrop-blur-sm text-white rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg flex items-center gap-1">
-                          Vente
-                        </span>
-                      )}
-                      {vehicle.forRent && (
-                        <span className="px-3 py-1 bg-emerald-500/90 backdrop-blur-sm text-white rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg flex items-center gap-1">
-                          Location
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="absolute top-3 right-3">
-                      <span className={`inline-flex items-center px-3.5 py-1.5 rounded-xl text-[10px] font-black uppercase border backdrop-blur-md shadow-sm ${getStatusColor(vehicle.status)} bg-white/90`}>
-                        {getStatusLabel(vehicle.status)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-6 pt-2 flex-1 flex flex-col">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="text-2xl font-black text-slate-800 tracking-tight leading-tight group-hover:text-orange-600 transition-colors">
-                        {vehicle.marque || vehicle.marqueRef?.name} {vehicle.model || vehicle.modele}
-                      </h3>
-                      <p className="text-slate-400 font-bold text-sm uppercase tracking-widest mt-1">
-                        {vehicle.annee || vehicle.year} • {vehicle.categorie || 'Standard'}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-3xl font-black text-orange-600 leading-none">
-                        {formatPrice(vehicle.prixJour || vehicle.prix || 0)}
-                      </p>
-                      <p className="text-xs font-black text-slate-400 uppercase tracking-widest mt-1">/jour</p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-                    <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl text-xs font-bold text-slate-500">
-                      <FontAwesomeIcon icon={faGasPump} className="text-orange-500/50" />
-                      <span className="truncate">{vehicle.fuelType || vehicle.carburant || 'N/A'}</span>
-                    </div>
-                    <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl text-xs font-bold text-slate-500">
-                      <FontAwesomeIcon icon={faCogs} className="text-indigo-500/50" />
-                      <span className="truncate">{formatTransmissionForDisplay(vehicle.transmission || vehicle.boite)}</span>
-                    </div>
-                    <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl text-xs font-bold text-slate-500">
-                      <FontAwesomeIcon icon={faCalendarAlt} className="text-rose-500/50" />
-                      <span className="truncate">{vehicle.annee || vehicle.year || 'N/A'}</span>
-                    </div>
-                    <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl text-xs font-bold text-slate-500">
-                      <FontAwesomeIcon icon={faTachometerAlt} className="text-emerald-500/50" />
-                      <span className="truncate">{formatMileage(vehicle.mileage || vehicle.kilometrage || 0)}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    {vehicle.garantie && (
-                      <span className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-600 rounded-lg text-[9px] font-black uppercase tracking-widest border border-emerald-100">
-                        <FontAwesomeIcon icon={faShieldAlt} size="xs" />
-                        Garantie
-                      </span>
-                    )}
-                    {vehicle.assurance && (
-                      <span className="flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-[9px] font-black uppercase tracking-widest border border-blue-100">
-                        <FontAwesomeIcon icon={faCheckCircle} size="xs" />
-                        Assurance
-                      </span>
-                    )}
-                    {vehicle.chauffeur && (
-                      <span className="flex items-center gap-1.5 px-3 py-1 bg-purple-50 text-purple-600 rounded-lg text-[9px] font-black uppercase tracking-widest border border-purple-100">
-                        <FontAwesomeIcon icon={faUserTie} size="xs" />
-                        Chauffeur
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Reservations Status Info (Inspiré du mobile) */}
-                  {(() => {
-                    const vehicleRes = allReservations.filter((r: any) => 
-                      Number(r.vehicleId || r.vehicle?.id) === Number(vehicle.id) && 
-                      (r.status === 'ACCEPTED' || r.status === 'PENDING')
-                    );
-                    
-                    if (vehicleRes.length === 0) return null;
-
-                    const nextRes = vehicleRes
-                      .filter((r: any) => new Date(r.dateDebut) > new Date())
-                      .sort((a: any, b: any) => new Date(a.dateDebut).getTime() - new Date(b.dateDebut).getTime())[0];
-
-                    return (
-                      <div className="space-y-2 mb-6">
-                        <div className="flex items-center gap-2 px-3 py-2 bg-orange-50 text-orange-600 rounded-xl border border-orange-100">
-                          <FontAwesomeIcon icon={faCalendarCheck} size="sm" />
-                          <span className="text-xs font-black uppercase tracking-tighter">
-                            {vehicleRes.length} réservation(s) active(s)
-                          </span>
-                        </div>
-                        {nextRes && (
-                          <div className="flex items-center gap-2 px-3 text-[10px] font-bold text-slate-400">
-                            <FontAwesomeIcon icon={faClock} size="xs" />
-                            <span>Prochaine: {new Date(nextRes.dateDebut).toLocaleDateString('fr-FR')}</span>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })()}
-
-                  <div className="flex items-center gap-2 mb-6 px-1">
-                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
-                      <FontAwesomeIcon icon={faMapMarkerAlt} size="sm" />
-                    </div>
-                    <p className="text-sm font-bold text-slate-500 truncate">
-                      {vehicle.parking?.name || 'Localisation non spécifiée'}
-                    </p>
-                  </div>
-
-                  <div className="mt-auto flex items-center gap-2">
-                    <button
-                      title="Voir les détails"
-                      className="w-11 h-11 bg-slate-50 hover:bg-orange-50 text-slate-500 hover:text-orange-600 rounded-2xl flex items-center justify-center transition-all"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedVehicle(vehicle);
-                        setActiveTab('details');
-                      }}
-                    >
-                      <FontAwesomeIcon icon={faEye} />
-                    </button>
-                    <button
-                      type="button"
-                      title="Mettre le véhicule disponible"
-                      aria-label="Mettre le véhicule disponible"
-                      className={parkingVehicleTabsActionStyles.statusButton(String(vehicle.status) === 'DISPONIBLE', 'green')}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleStatusChange(String(vehicle.id), 'DISPONIBLE');
-                      }}
-                    >
-                      <FontAwesomeIcon icon={faCheckCircle} />
-                    </button>
-                    <button
-                      type="button"
-                      title="Mettre le véhicule en maintenance"
-                      aria-label="Mettre le véhicule en maintenance"
-                      className={parkingVehicleTabsActionStyles.statusButton(String(vehicle.status) === 'EN_MAINTENANCE', 'amber')}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleStatusChange(String(vehicle.id), 'EN_MAINTENANCE');
-                      }}
-                    >
-                      <FontAwesomeIcon icon={faWrench} />
-                    </button>
-                    <button
-                      type="button"
-                      title="Rendre le véhicule indisponible"
-                      aria-label="Rendre le véhicule indisponible"
-                      className={parkingVehicleTabsActionStyles.statusButton(String(vehicle.status) === 'INDISPONIBLE', 'rose')}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleStatusChange(String(vehicle.id), 'INDISPONIBLE');
-                      }}
-                    >
-                      <FontAwesomeIcon icon={faTimesCircle} />
-                    </button>
-                    <button
-                      title="Supprimer le véhicule"
-                      aria-label="Supprimer le véhicule"
-                      className="w-11 h-11 bg-slate-50 hover:bg-rose-50 text-slate-400 hover:text-rose-500 rounded-2xl flex items-center justify-center transition-all ml-auto"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleAction(vehicle.id, 'DELETE');
-                      }}
-                    >
-                      <FontAwesomeIcon icon={faTrash} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {filteredVehicles
-            .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
-            .map((vehicle) => (
-              <div
-                key={vehicle.id}
-                className="group bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/40 transition-all duration-300 overflow-hidden flex flex-col md:flex-row cursor-pointer"
-                onClick={() => {
-                  setSelectedVehicle(vehicle);
-                  setActiveTab('details');
-                }}
-              >
-                {/* Image Section - Fixed width and flex-shrink-0 */}
-                <div className="w-full md:w-80 p-3 shrink-0">
-                  <div className="aspect-[16/10] md:h-full relative rounded-2xl overflow-hidden bg-slate-50 shadow-inner">
-                    {getPhotoUrl(vehicle.photos) ? (
-                      <Image
-                        src={getPhotoUrl(vehicle.photos)!}
-                        alt=""
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-700"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-slate-200">
-                        <FontAwesomeIcon icon={faCar} size="2x" />
-                      </div>
-                    )}
-
-                    <div className="absolute top-3 left-3 flex flex-row gap-1 flex-wrap">
-                      {vehicle.forSale && (
-                        <span className="px-3 py-1 bg-rose-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest shadow-lg">
-                          Vente
-                        </span>
-                      )}
-                      {vehicle.forRent && (
-                        <span className="px-3 py-1 bg-emerald-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest shadow-lg">
-                          Location
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Contenu - Espacement garanti par le padding et flex-1 */}
-                <div className="flex-1 p-6 flex flex-col justify-center min-w-0">
-                  <div className="flex flex-col lg:flex-row justify-between lg:items-start gap-4">
-                    <div className="min-w-0">
-                      <h3 className="text-3xl font-black text-slate-800 tracking-tight group-hover:text-orange-600 transition-colors truncate">
-                        {vehicle.marque || vehicle.marqueRef?.name} {vehicle.model || vehicle.modele}
-                      </h3>
-                      <div className="flex items-center gap-2 mt-1">
-                        <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">
-                          {vehicle.annee || vehicle.year} • {vehicle.categorie || 'Standard'}
-                        </p>
-                        <span className={`inline-flex items-center px-3.5 py-1.5 rounded-full text-[11px] font-black uppercase border ${getStatusColor(vehicle.status)} bg-white`}>
-                          {getStatusLabel(vehicle.status)}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="lg:text-right shrink-0">
-                      <p className="text-3xl font-black text-orange-600 leading-none">
-                        {formatPrice(vehicle.prixJour || vehicle.prix || 0)}
-                      </p>
-                      <p className="text-xs font-black text-slate-400 uppercase tracking-widest mt-1">/jour</p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                    <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
-                      <div className="w-6 h-6 rounded-lg bg-orange-50 flex items-center justify-center text-orange-500 shrink-0">
-                        <FontAwesomeIcon icon={faGasPump} size="xs" />
-                      </div>
-                      <span className="truncate">{vehicle.fuelType || vehicle.carburant || 'N/A'}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
-                      <div className="w-6 h-6 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-500 shrink-0">
-                        <FontAwesomeIcon icon={faCogs} size="xs" />
-                      </div>
-                      <span className="truncate">{formatTransmissionForDisplay(vehicle.transmission || vehicle.boite)}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
-                      <div className="w-6 h-6 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-500 shrink-0">
-                        <FontAwesomeIcon icon={faTachometerAlt} size="xs" />
-                      </div>
-                      <span className="truncate">{formatMileage(vehicle.mileage || vehicle.kilometrage || 0)}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
-                      <div className="w-6 h-6 rounded-lg bg-rose-50 flex items-center justify-center text-rose-500 shrink-0">
-                        <FontAwesomeIcon icon={faMapMarkerAlt} size="xs" />
-                      </div>
-                      <span className="truncate">{vehicle.parking?.name || 'Localisation'}</span>
-                    </div>
-                  </div>
-
-                  <div className="mt-auto pt-6 flex items-center justify-between border-t border-slate-50">
-                    <div className="flex gap-2">
-                      {vehicle.garantie && (
-                        <div className="w-8 h-8 rounded-lg border border-emerald-100 bg-emerald-50 flex items-center justify-center text-emerald-600" title="Garantie">
-                          <FontAwesomeIcon icon={faShieldAlt} size="xs" />
-                        </div>
-                      )}
-                      {vehicle.assurance && (
-                        <div className="w-8 h-8 rounded-lg border border-blue-100 bg-blue-50 flex items-center justify-center text-blue-600" title="Assurance">
-                          <FontAwesomeIcon icon={faCheckCircle} size="xs" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        title="Voir les détails"
-                        className="w-10 h-10 bg-slate-50 hover:bg-orange-50 text-slate-500 hover:text-orange-600 rounded-xl flex items-center justify-center transition-all"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedVehicle(vehicle);
-                          setActiveTab('details');
-                        }}
-                      >
-                        <FontAwesomeIcon icon={faEye} />
-                      </button>
-                      <button
-                        type="button"
-                        title="Mettre le véhicule disponible"
-                        aria-label="Mettre le véhicule disponible"
-                        className={parkingVehicleTabsActionStyles.statusButton(String(vehicle.status) === 'DISPONIBLE', 'green')}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleStatusChange(String(vehicle.id), 'DISPONIBLE');
-                        }}
-                      >
-                        <FontAwesomeIcon icon={faCheckCircle} />
-                      </button>
-                      <button
-                        type="button"
-                        title="Mettre le véhicule en maintenance"
-                        aria-label="Mettre le véhicule en maintenance"
-                        className={parkingVehicleTabsActionStyles.statusButton(String(vehicle.status) === 'EN_MAINTENANCE', 'amber')}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleStatusChange(String(vehicle.id), 'EN_MAINTENANCE');
-                        }}
-                      >
-                        <FontAwesomeIcon icon={faWrench} />
-                      </button>
-                      <button
-                        type="button"
-                        title="Rendre le véhicule indisponible"
-                        aria-label="Rendre le véhicule indisponible"
-                        className={parkingVehicleTabsActionStyles.statusButton(String(vehicle.status) === 'INDISPONIBLE', 'rose')}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleStatusChange(String(vehicle.id), 'INDISPONIBLE');
-                        }}
-                      >
-                        <FontAwesomeIcon icon={faTimesCircle} />
-                      </button>
-                      <button
-                        title="Supprimer le véhicule"
-                        aria-label="Supprimer le véhicule"
-                        className="w-10 h-10 bg-slate-50 hover:bg-rose-50 text-slate-400 hover:text-rose-500 rounded-xl flex items-center justify-center transition-all"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAction(vehicle.id, 'DELETE');
-                        }}
-                      >
-                        <FontAwesomeIcon icon={faTrash} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-        </div>
-      )}
+      <div className={viewMode === 'grid' ? parkingVehicleTabsStyles.gridWrap : "space-y-4"}>
+        {filteredVehicles
+          .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+          .map((vehicle) => (
+            <VehicleCard
+              key={vehicle.id}
+              vehicle={vehicle as any}
+              variant={viewMode}
+              allReservations={allReservations}
+              onView={(v) => {
+                setSelectedVehicle(v as any);
+                setActiveTab('details');
+              }}
+              onStatusChange={handleStatusChange as any}
+              onAction={handleAction as any}
+            />
+          ))}
+      </div>
 
       {/* Pagination Style Utilisateur - Harmonisation avec la page Users */}
       {filteredVehicles.length > 0 && (

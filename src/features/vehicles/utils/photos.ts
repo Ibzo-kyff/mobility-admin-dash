@@ -1,31 +1,39 @@
-type PhotoObject = { url?: string; path?: string; src?: string };
-export type PhotoInput = string | File | PhotoObject | Array<string | File | PhotoObject> | null | undefined;
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'https://parkapp-pi.vercel.app';
 
-export const getPhotoUrl = (input?: string | File | PhotoObject | null, fallback = '/images/placeholder.png'): string => {
-  if (!input) return fallback;
-  if (typeof input === 'string') return input;
-  if (input instanceof File) {
-    if (typeof window !== 'undefined' && typeof URL !== 'undefined') return URL.createObjectURL(input);
-    return fallback;
-  }
-  // object
-  const path = input.url || input.src || input.path;
-  if (!path) return fallback;
-  try {
-    const url = new URL(path);
-    return url.toString();
-  } catch (e) {
-    return path.startsWith('/') ? path : `/${path}`;
-  }
+export const getPhotoUrl = (photos: any) => {
+  if (!photos) return null;
+  const photo = Array.isArray(photos) ? photos[0] : photos;
+  if (typeof photo !== 'string' || !photo) return null;
+  if (photo.startsWith('http')) return photo;
+  return `${BASE_URL}${photo.startsWith('/') ? '' : '/'}${photo}`;
 };
 
-export const getAllPhotoUrls = (photos?: PhotoInput, fallback = '/images/placeholder.png'): string[] => {
-  if (!photos) return [fallback];
-  if (typeof photos === 'string' || photos instanceof File || !Array.isArray(photos)) {
-    return [getPhotoUrl(photos as any, fallback)];
+export const getAllPhotoUrls = (photos: any): string[] => {
+  if (!photos) return [];
+
+  try {
+    if (Array.isArray(photos)) {
+      return photos
+        .filter(photo => photo && photo !== "" && photo !== null)
+        .map(photo => {
+          if (photo.startsWith('http')) return photo;
+          return `${BASE_URL}${photo.startsWith('/') ? '' : '/'}${photo}`;
+        });
+    }
+
+    if (typeof photos === 'string') {
+      const photoArray = photos.split(',').filter(p => p && p !== "");
+      return photoArray.map(photo => {
+        if (photo.startsWith('http')) return photo;
+        return `${BASE_URL}${photo.startsWith('/') ? '' : '/'}${photo}`;
+      });
+    }
+
+    return [];
+  } catch (error) {
+    console.error('Erreur formatage photos:', error);
+    return [];
   }
-  // array
-  return photos.map(p => getPhotoUrl(p as any, fallback));
 };
 
 export default { getPhotoUrl, getAllPhotoUrls };
