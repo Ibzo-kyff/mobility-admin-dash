@@ -3041,6 +3041,7 @@ export default function AdminVehicleTabs() {
   return (
     <div className="pb-20">
       {/* Navigation Tabs */}
+      {selectedVehicle !== null && (
         <div className="sticky top-6 z-40 mb-12 flex flex-col sm:flex-row items-center justify-center gap-4 px-4 overflow-x-auto no-scrollbar scroll-smooth">
           <button
             title="Retour à l'inventaire"
@@ -3056,7 +3057,6 @@ export default function AdminVehicleTabs() {
           <div className="flex bg-white/80 backdrop-blur-3xl p-1.5 rounded-3xl border border-white/50 shadow-2xl shadow-slate-200/50 w-full sm:w-auto overflow-x-auto no-scrollbar">
             {[
               { id: 'details', label: 'Détails', icon: faEye },
-              { id: 'history', label: 'Journal', icon: faHistory },
               { id: 'stats', label: 'Stats', icon: faChartBar },
               { id: 'documents', label: 'Documents', icon: faShieldAlt },
             ].map((tab) => (
@@ -3074,6 +3074,7 @@ export default function AdminVehicleTabs() {
             ))}
           </div>
         </div>
+      )}
 
       {/* Main Content */}
       <div className="relative">

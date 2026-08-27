@@ -420,6 +420,17 @@ class MobilityAPI {
     return this.handleResponse<Parking[]>(response);
   }
 
+  async getMyParking(): Promise<Parking> {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/parkings/me`,
+      { 
+        headers: this.getHeaders() 
+      }
+    );
+    
+    return this.handleResponse<Parking>(response);
+  }
+
   async updateParking(parkingId: string | number | null, data: Record<string, unknown> | FormData): Promise<Parking> {
     const isFormData = data instanceof FormData;
     const headers = this.getHeaders();

@@ -116,8 +116,7 @@ export default function ParkingSettingsPage() {
       setParkingLoading(true);
 
       try {
-        const parkings = await mobilityAPI.getParkings();
-        const parking = parkings?.[0];
+        const parking = await mobilityAPI.getMyParking();
 
         if (parking) {
           setParkingData({
