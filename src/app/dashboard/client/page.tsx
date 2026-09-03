@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { redirect } from 'next/navigation';
+import PageLoader from "@/components/common/PageLoader";
 import { clientAPI } from '@/services/client/client-api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -137,9 +138,11 @@ export default function ClientDashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
-      </div>
+      <PageLoader
+        fullScreen={false}
+        text="Espace Client"
+        subtext="Chargement de vos véhicules et réservations..."
+      />
     );
   }
 

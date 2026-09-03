@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   fetchParkingData,
+  deleteParkingApi,
 } from "@/services/Parcking-api";
 import { mobilityAPI } from "@/services/mobility-api";
 import {
@@ -19,6 +20,8 @@ import {
   X,
   Upload,
   Loader2,
+  Trash2,
+  Filter,
 } from "lucide-react";
 import type { Parking } from "@/services/Parcking-api";
 
@@ -103,11 +106,19 @@ export default function ParkingsPage() {
     }
   };
 
+  const [statusFilter, setStatusFilter] = useState<string>("ALL");
+
+  // Filtered parkings list
+  const filteredParkings = parkings.filter((p) => {
+    if (statusFilter !== "ALL" && p.status !== statusFilter) return false;
+    return true;
+  });
+
   // Pagination
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentParkings = parkings.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(parkings.length / itemsPerPage);
+  const currentParkings = filteredParkings.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.max(1, Math.ceil(filteredParkings.length / itemsPerPage));
 
   const goToPage = (page: number) => {
     setCurrentPage(Math.max(1, Math.min(page, totalPages)));
@@ -118,28 +129,27 @@ export default function ParkingsPage() {
     setCurrentPage(1);
   };
 
-  // Gestion du formulaire d'ajout
+  // Form Handlers
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setNewParking(prev => ({ ...prev, [name]: value }));
+    setNewParking((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setNewParking(prev => ({ ...prev, [name]: parseInt(value) || 0 }));
+    setNewParking((prev) => ({ ...prev, [name]: parseInt(value) || 0 }));
   };
 
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setNewParking(prev => ({ ...prev, [name]: value as "ACTIVE" | "INACTIVE" }));
+    setNewParking((prev) => ({ ...prev, [name]: value as "ACTIVE" | "INACTIVE" }));
   };
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setNewParking(prev => ({ ...prev, [name]: value }));
+    setNewParking((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Gestion de la sélection de fichier
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -161,7 +171,6 @@ export default function ParkingsPage() {
 
       const token = mobilityAPI.getToken();
       
-      // Créer FormData pour l'envoi multipart/form-data
       const formData = new FormData();
       formData.append("name", newParking.name);
       formData.append("address", newParking.address);
@@ -174,12 +183,10 @@ export default function ParkingsPage() {
       formData.append("status", newParking.status);
       formData.append("userId", newParking.userId);
       
-      // Ajouter le logo si un fichier est sélectionné
       if (selectedFile) {
         formData.append("logo", selectedFile);
       }
       
-      // Envoyer la requête avec FormData (multipart/form-data)
       const response = await fetch(`${BASE_URL}/parkings`, {
         method: "POST",
         headers: {
@@ -195,7 +202,7 @@ export default function ParkingsPage() {
 
       const createdParking = await response.json();
       
-      setParkings(prev => [...prev, createdParking]);
+      setParkings((prev) => [...prev, createdParking]);
       
       setIsModalOpen(false);
       setNewParking({
@@ -214,28 +221,68 @@ export default function ParkingsPage() {
       setSelectedFile(null);
       setPreviewUrl("");
       
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Erreur création parking:", err);
-      setAddError(err.message || "Une erreur est survenue");
+      const msg = err instanceof Error ? err.message : "Une erreur est survenue";
+      setAddError(msg);
     } finally {
       setIsAdding(false);
     }
   };
 
-  const StatusBadge = ({ status }: { status: string }) => (
-    <span
-      className={`px-3 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1 ${
-        status === "ACTIVE"
-          ? "bg-green-100 text-green-600"
-          : status === "INACTIVE"
-          ? "bg-yellow-100 text-yellow-600"
-          : "bg-red-100 text-red-600"
-      }`}
-    >
-      {status === "ACTIVE" ? <CheckCircle size={12} /> : <XCircle size={12} />}
-      {status}
-    </span>
-  );
+  const handleDeleteParking = async (id: number, name: string) => {
+    if (!window.confirm(`Êtes-vous sûr de vouloir supprimer le parking "${name}" ? Cette action est définitive.`)) return;
+    try {
+      const token = mobilityAPI.getToken() || undefined;
+      const ok = await deleteParkingApi(id, token);
+      if (ok) {
+        setParkings((prev) => prev.filter((p) => p.id !== id));
+      } else {
+        alert("Échec de la suppression du parking");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Erreur lors de la suppression");
+    }
+  };
+
+  // Status Badge Component
+  const StatusBadge = ({ status }: { status: string }) => {
+    const getBadgeStyle = () => {
+      switch (status) {
+        case "ACTIVE":
+          return "bg-emerald-100 text-emerald-700 border-emerald-200";
+        case "INACTIVE":
+          return "bg-amber-100 text-amber-700 border-amber-200";
+        case "BLOCKED":
+          return "bg-red-100 text-red-700 border-red-200";
+        case "PENDING":
+          return "bg-blue-100 text-blue-700 border-blue-200";
+        case "REJECTED":
+          return "bg-slate-100 text-slate-700 border-slate-200";
+        default:
+          return "bg-gray-100 text-gray-700 border-gray-200";
+      }
+    };
+
+    const getLabel = () => {
+      switch (status) {
+        case "ACTIVE": return "Actif";
+        case "INACTIVE": return "Inactif";
+        case "BLOCKED": return "Bloqué";
+        case "PENDING": return "En attente";
+        case "REJECTED": return "Rejeté";
+        default: return status || "Inconnu";
+      }
+    };
+
+    return (
+      <span className={`px-2.5 py-1 rounded-full text-xs font-bold border inline-flex items-center gap-1 ${getBadgeStyle()}`}>
+        {status === "ACTIVE" ? <CheckCircle size={12} /> : <XCircle size={12} />}
+        {getLabel()}
+      </span>
+    );
+  };
 
   const Logo = ({ src, name }: { src?: string | null; name: string }) => {
     const [imageError, setImageError] = useState(false);
@@ -298,29 +345,50 @@ export default function ParkingsPage() {
 
       {/* Barre d'outils */}
       <div className="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setView("list")}
-            className={`p-2 rounded-lg ${
-              view === "list"
-                ? "bg-orange-100 text-orange-600"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-            }`}
-            title="Vue liste"
-          >
-            <Table size={20} />
-          </button>
-          <button
-            onClick={() => setView("grid")}
-            className={`p-2 rounded-lg ${
-              view === "grid"
-                ? "bg-orange-100 text-orange-600"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-            }`}
-            title="Vue grille"
-          >
-            <Grid3x3 size={20} />
-          </button>
+        <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+          {/* Filtre par Statut */}
+          <div className="flex items-center gap-2 bg-white border border-gray-300 rounded-lg px-3 py-1.5 shadow-sm">
+            <Filter size={16} className="text-gray-400" />
+            <select
+              value={statusFilter}
+              onChange={(e) => {
+                setStatusFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="bg-transparent text-sm font-medium text-gray-700 outline-none cursor-pointer"
+            >
+              <option value="ALL">Tous les statuts</option>
+              <option value="ACTIVE">Actifs</option>
+              <option value="INACTIVE">Inactifs</option>
+              <option value="BLOCKED">Bloqués</option>
+              <option value="PENDING">En attente</option>
+            </select>
+          </div>
+
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setView("list")}
+              className={`p-2 rounded-lg transition ${
+                view === "list"
+                  ? "bg-orange-100 text-orange-600"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+              title="Vue liste"
+            >
+              <Table size={18} />
+            </button>
+            <button
+              onClick={() => setView("grid")}
+              className={`p-2 rounded-lg transition ${
+                view === "grid"
+                  ? "bg-orange-100 text-orange-600"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+              title="Vue grille"
+            >
+              <Grid3x3 size={18} />
+            </button>
+          </div>
         </div>
 
         <div className="flex items-center gap-2">
@@ -328,7 +396,7 @@ export default function ParkingsPage() {
           <select
             value={itemsPerPage}
             onChange={handleItemsPerPageChange}
-            className="border border-gray-300 rounded-lg px-2 py-1 text-sm"
+            className="border border-gray-300 rounded-lg px-2 py-1 text-sm bg-white"
           >
             <option value={5}>5</option>
             <option value={10}>10</option>
@@ -341,9 +409,9 @@ export default function ParkingsPage() {
 
       {/* Contenu principal */}
       {view === "list" ? (
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
           <table className="w-full">
-            <thead className="bg-gray-100 text-gray-600 text-sm uppercase">
+            <thead className="bg-gray-100 text-gray-600 text-xs font-bold uppercase tracking-wider">
               <tr>
                 <th className="p-4 text-left">Logo</th>
                 <th className="p-4 text-left">Nom</th>
@@ -351,7 +419,7 @@ export default function ParkingsPage() {
                 <th className="p-4 text-left">Places</th>
                 <th className="p-4 text-left">Gestionnaire</th>
                 <th className="p-4 text-left">Statut</th>
-                <th className="p-4 text-left">Action</th>
+                <th className="p-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -359,63 +427,85 @@ export default function ParkingsPage() {
                 <tr key={parking.id} className="border-t hover:bg-gray-50 transition">
                   <td className="p-4">
                     <Logo src={parking.logo} name={parking.name} />
-                   </td>
-                  <td className="p-4 font-semibold text-gray-700">{parking.name}</td>
-                  <td className="p-4 text-gray-600">{parking.address}</td>
-                  <td className="p-4 text-gray-600">{parking.capacity}</td>
-                  <td className="p-4 text-gray-600">
+                  </td>
+                  <td className="p-4 font-bold text-gray-800">{parking.name}</td>
+                  <td className="p-4 text-gray-600 text-sm">{parking.address}</td>
+                  <td className="p-4 text-gray-600 text-sm font-semibold">{parking.capacity}</td>
+                  <td className="p-4 text-gray-600 text-sm">
                     {parking.user ? `${parking.user.prenom} ${parking.user.nom}` : "—"}
                   </td>
                   <td className="p-4">
                     <StatusBadge status={parking.status} />
                   </td>
-                  <td className="p-4">
-                    <Link
-                      href={`/dashboard/admin/parkings/${parking.id}`}
-                      className="text-orange-600 hover:text-orange-800 font-medium inline-flex items-center gap-1"
-                    >
-                      <Eye size={16} /> Voir détail
-                    </Link>
+                  <td className="p-4 text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <Link
+                        href={`/dashboard/admin/parkings/${parking.id}`}
+                        className="px-3 py-1.5 bg-orange-50 hover:bg-orange-100 text-orange-600 rounded-xl font-bold text-xs inline-flex items-center gap-1 transition"
+                      >
+                        <Eye size={14} /> Détail
+                      </Link>
+                      <button
+                        onClick={() => handleDeleteParking(parking.id, parking.name)}
+                        className="p-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl transition"
+                        title="Supprimer le parking"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
           {currentParkings.length === 0 && (
-            <div className="p-6 text-center text-gray-500">Aucun parking trouvé</div>
+            <div className="p-8 text-center text-gray-500 font-medium">
+              Aucun parking correspondant aux critères
+            </div>
           )}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {currentParkings.map((parking) => (
-            <div key={parking.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition">
-              <div className="p-4 border-b flex items-center justify-between">
-                <Logo src={parking.logo} name={parking.name} />
-                <StatusBadge status={parking.status} />
+            <div key={parking.id} className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition flex flex-col justify-between">
+              <div>
+                <div className="p-4 border-b flex items-center justify-between">
+                  <Logo src={parking.logo} name={parking.name} />
+                  <StatusBadge status={parking.status} />
+                </div>
+                <div className="p-4 space-y-2">
+                  <h3 className="font-bold text-lg text-gray-800">{parking.name}</h3>
+                  <p className="text-gray-600 text-sm">{parking.address}</p>
+                  <div className="pt-2 text-xs space-y-1 text-gray-600 border-t border-gray-100">
+                    <p>
+                      <span className="font-bold text-gray-700">Capacité :</span> {parking.capacity} places
+                    </p>
+                    <p>
+                      <span className="font-bold text-gray-700">Gestionnaire :</span>{" "}
+                      {parking.user ? `${parking.user.prenom} ${parking.user.nom}` : "—"}
+                    </p>
+                    {parking.city && (
+                      <p>
+                        <span className="font-bold text-gray-700">Ville :</span> {parking.city}
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>
-              <div className="p-4">
-                <h3 className="font-bold text-lg mb-1">{parking.name}</h3>
-                <p className="text-gray-600 text-sm mb-2">{parking.address}</p>
-                <p className="text-gray-700 text-sm">
-                  <span className="font-medium">Capacité :</span> {parking.capacity} places
-                </p>
-                <p className="text-gray-700 text-sm">
-                  <span className="font-medium">Gestionnaire :</span>{" "}
-                  {parking.user ? `${parking.user.prenom} ${parking.user.nom}` : "—"}
-                </p>
-                {parking.city && (
-                  <p className="text-gray-700 text-sm">
-                    <span className="font-medium">Ville :</span> {parking.city}
-                  </p>
-                )}
-              </div>
-              <div className="p-4 bg-gray-50 border-t">
+              <div className="p-4 bg-gray-50 border-t flex items-center justify-between">
                 <Link
                   href={`/dashboard/admin/parkings/${parking.id}`}
-                  className="text-orange-600 hover:text-orange-800 font-medium inline-flex items-center gap-1"
+                  className="px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl text-xs inline-flex items-center gap-1 transition"
                 >
-                  <Eye size={16} /> Voir détail
+                  <Eye size={14} /> Voir détail
                 </Link>
+                <button
+                  onClick={() => handleDeleteParking(parking.id, parking.name)}
+                  className="p-1.5 bg-red-100 text-red-600 hover:bg-red-200 rounded-xl transition"
+                  title="Supprimer le parking"
+                >
+                  <Trash2 size={14} />
+                </button>
               </div>
             </div>
           ))}

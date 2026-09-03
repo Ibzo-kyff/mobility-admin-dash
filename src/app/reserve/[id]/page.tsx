@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
+import PageLoader from '@/components/common/PageLoader';
 
 export default function ReserveRedirect() {
   const params = useParams();
@@ -13,8 +14,10 @@ export default function ReserveRedirect() {
   }, [params.id]);
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
-    </div>
+    <PageLoader
+      fullScreen
+      text="Redirection vers la réservation"
+      subtext="Préparation du véhicule..."
+    />
   );
 }

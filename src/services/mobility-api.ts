@@ -67,7 +67,7 @@ class MobilityAPI {
 
     if (this.token) {
       setCookie('accessToken', this.token, {
-        maxAge: 15 * 60,           // 15 minutes
+        maxAge: 30 * 60,           // 30 minutes (aligné avec le backend)
         secure: isProd,
         sameSite: 'strict',
         path: '/',

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { updateParkingInfo } from "@/services/Parcking-api";
+import { mobilityAPI } from "@/services/mobility-api";
 import { X, Save, Edit } from "lucide-react";
 
 interface Parking {
@@ -16,7 +17,13 @@ interface Parking {
   description?: string;
 }
 
-export default function EditParkingInline({ parking }: { parking: Parking }) {
+export default function EditParkingInline({
+  parking,
+  onUpdate,
+}: {
+  parking: Parking;
+  onUpdate?: () => void;
+}) {
   const [isEditing, setIsEditing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -48,11 +55,15 @@ export default function EditParkingInline({ parking }: { parking: Parking }) {
     setError(null);
 
     try {
-      const token = localStorage.getItem("token");
+      const token = mobilityAPI.getToken() || localStorage.getItem("token");
       const result = await updateParkingInfo(parking.id, formData, token || undefined);
       if (result.success) {
         setIsEditing(false);
-        router.refresh();
+        if (onUpdate) {
+          onUpdate();
+        } else {
+          router.refresh();
+        }
       } else {
         setError(result.error || "Une erreur est survenue");
       }
@@ -67,20 +78,22 @@ export default function EditParkingInline({ parking }: { parking: Parking }) {
     return (
       <button
         onClick={() => setIsEditing(true)}
-        className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center gap-2"
+        className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-xl text-sm font-bold flex items-center gap-2 transition shadow-sm active:scale-95"
       >
-        <Edit size={18} /> Modifier
+        <Edit size={16} /> Modifier les informations
       </button>
     );
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 border-2 border-orange-200 mt-4 w-full">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-gray-800">Modifier le parking</h2>
+    <div className="bg-white rounded-2xl shadow-sm border border-orange-200 p-4 sm:p-6 mt-4 w-full">
+      <div className="flex justify-between items-center mb-4 pb-3 border-b border-gray-100">
+        <h2 className="text-lg sm:text-xl font-bold text-gray-800 flex items-center gap-2">
+          <Edit size={18} className="text-orange-600" /> Modifier le parking
+        </h2>
         <button
           onClick={() => setIsEditing(false)}
-          className="p-2 hover:bg-gray-100 rounded-lg"
+          className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-gray-700 transition"
         >
           <X size={20} />
         </button>
