@@ -1,9 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 import { clientAPI } from '@/services/client/client-api';
 import { mobilityAPI } from '@/services/mobility-api';
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import type { ReservationData, Vehicule } from '@/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faArrowLeft, faMapMarkerAlt, faStar, faInfoCircle, 
@@ -11,24 +14,47 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
 
+interface ParkingDetail {
+  id: string | number;
+  name?: string;
+  nom?: string;
+  address?: string;
+  adresse?: string;
+  logo?: string;
+  photo?: string;
+  prixHeure?: number;
+  rating?: number;
+  capacite?: number;
+}
+
+type DetailEntity = Omit<Partial<Vehicule>, 'id'> & ParkingDetail;
+
 export default function ParkingDetailsPage() {
   const params = useParams();
   const router = useRouter();
-  const [entity, setEntity] = useState<any>(null);
+  const searchParams = useSearchParams();
+  const [entity, setEntity] = useState<DetailEntity | null>(null);
   const [type, setType] = useState<'parking' | 'vehicle'>('parking');
-  const [vehicles, setVehicles] = useState<any[]>([]);
+  const [vehicles, setVehicles] = useState<Vehicule[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (params.id) {
-      fetchData();
-    }
-  }, [params.id]);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      // Try to fetch as vehicle first
+      const requestedType = searchParams.get('type');
+
+      if (requestedType === 'parking') {
+        const parkingData = await clientAPI.getParkingById(params.id as string);
+        if (!parkingData) return;
+
+        setEntity(parkingData);
+        setType('parking');
+        const parkingVehicles = await clientAPI.getVehiclesByParking(params.id as string);
+        setVehicles(Array.isArray(parkingVehicles) ? parkingVehicles : []);
+        return;
+      }
+
+      // Vehicle links identify their type explicitly. Keep the fallback for old bookmarks.
       const vehicleData = await mobilityAPI.getVehiculeById(params.id as string);
       if (vehicleData) {
         setEntity(vehicleData);
@@ -63,7 +89,13 @@ export default function ParkingDetailsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [params.id, searchParams]);
+
+  useEffect(() => {
+    if (params.id) {
+      fetchData();
+    }
+  }, [fetchData, params.id]);
 
   const [resType, setResType] = useState<'LOCATION' | 'ACHAT'>('LOCATION');
   const [startDate, setStartDate] = useState('');
@@ -99,23 +131,25 @@ export default function ParkingDetailsPage() {
         montant: entity.prix || entity.prixJour || 0
       };
 
-      await clientAPI.createReservation(reservationData as any);
+      await clientAPI.createReservation(reservationData as unknown as ReservationData);
       alert('Réservation confirmée avec succès !');
       router.push('/dashboard/client/reservations');
-    } catch (err: any) {
-      if (err?.message?.includes('token manquant') || err?.message?.includes('Token invalide') || err?.status === 401) {
+    } catch (err: unknown) {
+      const apiError = typeof err === 'object' && err !== null ? err as { message?: unknown; status?: unknown } : {};
+      const errorMessage = typeof apiError.message === 'string' ? apiError.message : String(err);
+      if (errorMessage.includes('token manquant') || errorMessage.includes('Token invalide') || apiError.status === 401) {
         console.warn('Session expirée. Redirection ou reconnexion requise.');
         alert('Votre session a expiré ou le jeton de sécurité est manquant. Veuillez vous déconnecter puis vous reconnecter pour réserver.');
       } else {
-        console.warn('Erreur lors de la création de la réservation:', err?.message || err);
-        alert(`Erreur: ${err?.message || 'Impossible de créer la réservation'}`);
+        console.warn('Erreur lors de la création de la réservation:', errorMessage);
+        alert(`Erreur: ${errorMessage || 'Impossible de créer la réservation'}`);
       }
     } finally {
       setProcessing(false);
     }
   };
 
-  const getImageUrl = (data: any) => {
+  const getImageUrl = (data: DetailEntity) => {
     const photo = type === 'parking' ? (data.logo || data.photo) : (Array.isArray(data.photos) ? data.photos[0] : data.photos);
     if (!photo) return 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b';
     if (photo.startsWith('http')) return photo;
@@ -138,10 +172,13 @@ export default function ParkingDetailsPage() {
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="h-80 bg-gray-200 relative">
-              <img 
+              <Image 
                 src={getImageUrl(entity)} 
+                fill
+                unoptimized
                 className="w-full h-full object-cover"
-                alt={type === 'parking' ? (entity.nom || entity.name) : `${entity.marque} ${entity.model}`}
+                alt={type === 'parking' ? (entity.nom || entity.name || 'Parking') : `${entity.marque || ''} ${entity.model || 'Véhicule'}`}
+                sizes="(max-width: 1024px) 100vw, 66vw"
               />
               {type === 'vehicle' && (
                 <div className="absolute top-4 left-4 flex gap-2">
@@ -159,7 +196,7 @@ export default function ParkingDetailsPage() {
                   </h1>
                   <p className="text-gray-500 flex items-center gap-2 mt-2">
                     <FontAwesomeIcon icon={faMapMarkerAlt} className="text-orange-500" />
-                    {type === 'parking' ? (entity.adresse || entity.address || 'Dakar, Sénégal') : (entity.parking?.adresse || entity.parking?.address || 'Dakar, Sénégal')}
+                    {type === 'parking' ? (entity.adresse || entity.address || 'Dakar, Sénégal') : (entity.parking?.address || 'Dakar, Sénégal')}
                   </p>
                 </div>
                 <div className="text-right">
@@ -207,7 +244,7 @@ export default function ParkingDetailsPage() {
                 {vehicles.map((v) => (
                   <Link key={v.id} href={`/dashboard/client/search/${v.id}`} className="bg-white p-4 rounded-2xl border border-gray-100 flex gap-4 hover:shadow-md transition-all group">
                     <div className="w-24 h-24 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0">
-                      <img src={(Array.isArray(v.photos) ? v.photos[0] : v.photos) || 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b'} className="w-full h-full object-cover" />
+                      <Image src={(Array.isArray(v.photos) ? v.photos[0] : v.photos) || 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b'} width={96} height={96} unoptimized className="w-full h-full object-cover" alt="Véhicule disponible" />
                     </div>
                     <div className="flex-1 flex flex-col justify-between">
                       <div>
@@ -260,7 +297,7 @@ export default function ParkingDetailsPage() {
                 <>
                   <div className="grid grid-cols-1 gap-4">
                     <div>
-                      <label className="block text-[10px] font-black uppercase text-gray-400 mb-2 tracking-widest">Date d'arrivée</label>
+                        <label className="block text-[10px] font-black uppercase text-gray-400 mb-2 tracking-widest">Date d&apos;arrivée</label>
                       <input 
                         type="datetime-local" 
                         value={startDate}
@@ -371,7 +408,7 @@ export default function ParkingDetailsPage() {
               {processing ? 'Traitement...' : 'Confirmer la réservation'}
             </button>
             <p className="text-[10px] text-center text-gray-400 font-medium px-4">
-              En cliquant sur confirmer, vous acceptez nos conditions d'utilisation et de stationnement.
+              En cliquant sur confirmer, vous acceptez nos conditions d&apos;utilisation et de stationnement.
             </p>
           </div>
         </div>
@@ -380,7 +417,7 @@ export default function ParkingDetailsPage() {
   );
 }
 
-function InfoBadge({ icon, label, value }: { icon: any, label: string, value: string }) {
+function InfoBadge({ icon, label, value }: { icon: IconDefinition, label: string, value: string }) {
   return (
     <div className="text-center md:text-left">
       <div className="flex items-center justify-center md:justify-start gap-2 text-gray-400 mb-1">
