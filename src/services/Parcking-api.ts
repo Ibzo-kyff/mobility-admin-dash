@@ -1,4 +1,4 @@
-const BASE_URL = "https://parkapp-pi.vercel.app/api";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://parkapp-pi.vercel.app/api";
 
 // ===== TYPES =====
 export interface User {
@@ -21,35 +21,53 @@ export interface Reservation {
 }
 
 export interface Vehicle {
-  id: number;
-  prix: number;
-  description: string;
-  photos: string[];
-  garantie: boolean;
-  dureeGarantie: number;
-  chauffeur: boolean;
-  status: string;
-  fuelType: string;
-  mileage: number;
-  model: string;
-  year: number | null;
-  transmission: string;
-  forRent: boolean;
-  forSale: boolean;
+  id: number | string;
+  marque?: string;
+  marqueRef?: { name?: string };
+  brand?: string;
+  model?: string;
+  modele?: string;
+  prix?: number;
+  prixJour?: number;
+  description?: string;
+  photos?: string[] | string;
+  garantie?: boolean;
+  dureeGarantie?: number;
+  chauffeur?: boolean;
+  status?: string;
+  fuelType?: string;
+  carburant?: string;
+  mileage?: number;
+  kilometrage?: number;
+  year?: number | null;
+  annee?: number | null;
+  transmission?: string;
+  boite?: string;
+  immatriculation?: string;
+  plate?: string;
+  forRent?: boolean;
+  forSale?: boolean;
+  parkingId?: number | string;
+  parking?: { id?: number | string; name?: string };
   reservations?: Reservation[];
 }
+
+export type ParkingStatusType = "ACTIVE" | "INACTIVE" | "BLOCKED" | "PENDING" | "REJECTED";
 
 export interface Parking {
   id: number;
   name: string;
   address: string;
   capacity: number;
-  status: "ACTIVE" | "INACTIVE" | "BLOCKED";
+  status: ParkingStatusType | string;
   city?: string;
+  zipCode?: string | null;
   phone?: string;
   email?: string;
   description?: string;
+  hoursOfOperation?: string | null;
   logo?: string;
+  userId?: number;
   user?: User;
   vehicles?: Vehicle[];
 }
@@ -126,10 +144,10 @@ export async function getVehicleById(
   }
 }
 
-// ===== ACTIVER / DÉSACTIVER =====
+// ===== ACTIVER / DÉSACTIVER / MODIFIER STATUT =====
 export async function updateParkingStatus(
   id: number,
-  status: "ACTIVE" | "INACTIVE",
+  status: ParkingStatusType | string,
   token?: string
 ): Promise<boolean> {
   try {
@@ -138,7 +156,7 @@ export async function updateParkingStatus(
       headers["Authorization"] = `Bearer ${token}`;
     }
 
-    const res = await fetch(`${BASE_URL}/parkings/${id}/status`, {
+    const res = await fetch(`${BASE_URL}/parkings/${id}`, {
       method: "PUT",
       headers,
       body: JSON.stringify({ status }),
@@ -188,20 +206,27 @@ export async function blockParking(
   id: number,
   token?: string
 ): Promise<boolean> {
+  return updateParkingStatus(id, "BLOCKED", token);
+}
+
+// ===== SUPPRIMER PARKING =====
+export async function deleteParkingApi(
+  id: number,
+  token?: string
+): Promise<boolean> {
   try {
-    const headers: HeadersInit = { "Content-Type": "application/json" };
+    const headers: HeadersInit = {};
     if (token) {
       headers["Authorization"] = `Bearer ${token}`;
     }
 
-    const res = await fetch(`${BASE_URL}/parkings/${id}/block`, {
-      method: "PUT",
+    const res = await fetch(`${BASE_URL}/parkings/${id}`, {
+      method: "DELETE",
       headers,
-      body: JSON.stringify({ status: "BLOCKED" }),
     });
     return res.ok;
   } catch (error) {
-    console.error("Erreur block parking:", error);
+    console.error("Erreur suppression parking:", error);
     return false;
   }
 }

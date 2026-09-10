@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import PageLoader from "@/components/common/PageLoader";
 import { parkingDashboardService } from '@/services/parking/dashboard';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -112,9 +113,11 @@ export default function ParkingDashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
-      </div>
+      <PageLoader
+        fullScreen={false}
+        text="Espace Parking"
+        subtext="Chargement des données de votre parking..."
+      />
     );
   }
 
