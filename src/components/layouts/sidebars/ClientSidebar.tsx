@@ -59,11 +59,11 @@ export default function ClientSidebar({
       icon: faUser,
       href: '/dashboard/client/profile',
     },
-    {
-      title: 'Paramètres',
-      icon: faCog,
-      href: '/dashboard/client/settings',
-    },
+    // {
+    //   title: 'Paramètres',
+    //   icon: faCog,
+    //   href: '/dashboard/client/settings',
+    // },
     {
       title: 'Aide',
       icon: faQuestionCircle,

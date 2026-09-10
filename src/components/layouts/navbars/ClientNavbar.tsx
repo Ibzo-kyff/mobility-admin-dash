@@ -193,8 +193,8 @@ export default function ClientNavbar({ onMenuClick }: { onMenuClick?: () => void
                   className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                   onClick={() => setShowUserMenu(false)}
                 >
-                  <FontAwesomeIcon icon={faCog} className="w-4 h-4 text-gray-400" />
-                  Paramètres
+                  {/* <FontAwesomeIcon icon={faCog} className="w-4 h-4 text-gray-400" />
+                  Paramètres */}
                 </Link>
                 
                 <hr className="my-2 border-gray-200" />

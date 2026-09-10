@@ -462,7 +462,7 @@ function ParkingCard({ parking }: { parking: any }) {
 
       <div className="px-5 py-4 bg-gray-50 border-t border-gray-100">
         <Link 
-          href={`/dashboard/client/search/${parking.id}`}
+          href={`/dashboard/client/search/${parking.id}?type=parking`}
           className="w-full py-2.5 bg-orange-500 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-orange-600 transition-colors shadow-sm"
         >
           Voir les détails
@@ -563,7 +563,7 @@ function VehicleCard({ vehicle, viewMode = 'grid' }: { vehicle: any, viewMode?: 
               <p className="text-[10px] text-gray-400 uppercase font-bold tracking-widest">{vehicle.forRent ? 'Par jour' : 'Prix total'}</p>
             </div>
             <Link 
-              href={`/dashboard/client/search/${vehicle.id}`}
+              href={`/dashboard/client/search/${vehicle.id}?type=vehicle`}
               className="px-6 py-2 bg-gray-900 text-white rounded-xl font-bold text-xs flex items-center gap-2 hover:bg-orange-500 transition-colors shadow-sm"
             >
               Réserver
@@ -642,7 +642,7 @@ function VehicleCard({ vehicle, viewMode = 'grid' }: { vehicle: any, viewMode?: 
 
       <div className="px-5 py-4 bg-gray-50 border-t border-gray-100">
         <Link 
-          href={`/dashboard/client/search/${vehicle.id}`}
+            href={`/dashboard/client/search/${vehicle.id}?type=vehicle`}
           className="w-full py-2.5 bg-gray-900 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-orange-500 transition-colors shadow-sm active:scale-95"
         >
           Réserver
