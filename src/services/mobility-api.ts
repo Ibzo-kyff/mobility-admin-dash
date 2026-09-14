@@ -694,16 +694,75 @@ class MobilityAPI {
 
   async updateReservationStatus(reservationId: string, status: string, reason?: string): Promise<Reservation> {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api';
-    const response = await fetch(
-      `${baseUrl}/reservations/${reservationId}/status`,
-      {
-        method: 'PUT',
-        headers: this.getHeaders(),
-        body: JSON.stringify(reason ? { status, reason } : { status }),
+    const headers = this.getHeaders();
+
+    // Mapping des alternatives de statut selon la casse et l'enum Prisma
+    const statusAlternatives: Record<string, string[]> = {
+      'REJECTED': ['REJECTED', 'CANCELED', 'CANCELLED', 'REFUSED'],
+      'CANCELED': ['CANCELED', 'CANCELLED', 'REJECTED'],
+      'CANCELLED': ['CANCELLED', 'CANCELED', 'REJECTED'],
+      'ACCEPTED': ['ACCEPTED', 'APPROVED', 'CONFIRMED'],
+      'COMPLETED': ['COMPLETED'],
+    };
+
+    const candidateStatuses = statusAlternatives[status] || [status];
+
+    let lastError: any = null;
+
+    for (const candStatus of candidateStatuses) {
+      const payload = reason ? { status: candStatus, reason } : { status: candStatus };
+      const body = JSON.stringify(payload);
+
+      const endpoints = [
+        { url: `${baseUrl}/reservations/${reservationId}/status`, method: 'PUT' },
+        { url: `${baseUrl}/reservations/${reservationId}/status`, method: 'PATCH' },
+        { url: `${baseUrl}/reservations/${reservationId}`, method: 'PUT' },
+        { url: `${baseUrl}/reservations/admin/${reservationId}`, method: 'PUT' },
+      ];
+
+      for (const ep of endpoints) {
+        try {
+          const response = await fetch(ep.url, {
+            method: ep.method,
+            headers,
+            body,
+          });
+
+          if (response.ok) {
+            return await this.handleResponse<Reservation>(response);
+          }
+
+          if (response.status === 403) {
+            let errorMsg = "Action non autorisée (403). L'administrateur n'a pas les droits nécessaires sur cette réservation dans le backend.";
+            try {
+              const data = await response.json();
+              if (data.error || data.message) {
+                errorMsg = data.error || data.message;
+              }
+            } catch {}
+            throw new Error(`Non autorisé (403): ${errorMsg}`);
+          }
+
+          if (response.status !== 404 && response.status !== 405) {
+            let detail = '';
+            try {
+              const data = await response.json();
+              detail = data.error || data.message || data.details || '';
+            } catch {
+              detail = await response.text();
+            }
+            lastError = new Error(`Erreur ${response.status}: ${detail}`);
+          }
+        } catch (e: any) {
+          if (e.message?.startsWith('Non autorisé (403)')) {
+            throw e;
+          }
+          lastError = e;
+        }
       }
-    );
-    
-    return this.handleResponse(response);
+    }
+
+    throw lastError || new Error('Impossible de modifier le statut de la réservation.');
   }
 
   async deleteVehicule(vehicleId: string): Promise<void> {
@@ -757,15 +816,31 @@ class MobilityAPI {
   }
 
   async updateReservation(id: number | string, data: Partial<Reservation>): Promise<Reservation> {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api'}/reservations/admin/${id}`,
-      {
-        method: 'PUT',
-        headers: this.getHeaders(),
-        body: JSON.stringify(data),
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api';
+    const endpoints = [
+      `${baseUrl}/reservations/admin/${id}`,
+      `${baseUrl}/reservations/${id}`,
+    ];
+
+    let lastErr: any = null;
+    for (const url of endpoints) {
+      try {
+        const response = await fetch(url, {
+          method: 'PUT',
+          headers: this.getHeaders(),
+          body: JSON.stringify(data),
+        });
+        if (response.ok) {
+          return await this.handleResponse(response);
+        }
+        if (response.status !== 404) {
+          return await this.handleResponse(response);
+        }
+      } catch (e) {
+        lastErr = e;
       }
-    );
-    return this.handleResponse(response);
+    }
+    throw lastErr || new Error('Erreur lors de la mise à jour de la réservation');
   }
 }
 

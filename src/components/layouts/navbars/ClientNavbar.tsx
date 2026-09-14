@@ -196,7 +196,7 @@ export default function ClientNavbar({ onMenuClick }: { onMenuClick?: () => void
                   {/* <FontAwesomeIcon icon={faCog} className="w-4 h-4 text-gray-400" />
                   Paramètres */}
                 </Link>
-                
+                 
                 <hr className="my-2 border-gray-200" />
                 
                 <button
