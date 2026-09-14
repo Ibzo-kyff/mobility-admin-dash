@@ -46,7 +46,7 @@ import { faClock as faClockRegular } from '@fortawesome/free-regular-svg-icons';
 import { mobilityAPI } from '@/services/mobility-api';
 import Image from 'next/image';
 
-export type ReservationStatus = "PENDING" | "ACCEPTED" | "COMPLETED" | "CANCELED";
+export type ReservationStatus = "PENDING" | "ACCEPTED" | "COMPLETED" | "CANCELED" | "CANCELLED" | "REJECTED" | "APPROVED" | "CONFIRMED";
 export type ReservationType = "ACHAT" | "LOCATION";
 
 const MOTIFS_LOCATION = [
@@ -241,44 +241,31 @@ export default function AdminReservationTabs() {
     return () => clearInterval(interval);
   }, [selectedReservation, isGalleryHovered, viewModeTab]);
 
-  const handleStatusChange = async (id: number, newStatus: ReservationStatus, reason?: string) => {
+  const handleStatusChange = async (id: number | string, newStatus: ReservationStatus, reason?: string) => {
     const finalReason = reason || statusReason;
 
     setUpdating(true);
     try {
-      await mobilityAPI.updateReservation(id, {
-        status: newStatus,
-        ...(finalReason ? { reason: finalReason } : {})
-      });
+      await mobilityAPI.updateReservationStatus(id.toString(), newStatus, finalReason);
 
-      setReservations(prev => prev.map(res => res.id === id ? { ...res, status: newStatus } : res));
-      if (selectedReservation?.id === id) {
+      setReservations(prev => prev.map(res => res.id.toString() === id.toString() ? { ...res, status: newStatus } : res));
+      if (selectedReservation && selectedReservation.id.toString() === id.toString()) {
         setSelectedReservation(prev => prev ? ({ ...prev, status: newStatus }) : null);
       }
       setIsStatusModalOpen(false);
       setStatusReason('');
-    } catch (firstError: unknown) {
-      console.warn('Endpoint admin échoué, essai de l\'endpoint status:', (firstError as Error)?.message);
-      try {
-        await mobilityAPI.updateReservationStatus(id.toString(), newStatus, finalReason);
-        setReservations(prev => prev.map(res => res.id === id ? { ...res, status: newStatus } : res));
-        if (selectedReservation?.id === id) {
-          setSelectedReservation(prev => prev ? ({ ...prev, status: newStatus }) : null);
-        }
-        setIsStatusModalOpen(false);
-        setStatusReason('');
-      } catch (secondError: unknown) {
-        console.error('Erreur lors du changement de statut', secondError);
-        const msg = (secondError as { details?: string })?.details || (secondError as Error)?.message || 'Impossible de modifier le statut.';
-        alert(msg);
-      }
+      alert(`Statut de la réservation #${id} mis à jour avec succès.`);
+    } catch (error: unknown) {
+      console.error('Erreur lors du changement de statut', error);
+      const msg = (error as { details?: string })?.details || (error as Error)?.message || 'Impossible de modifier le statut de la réservation.';
+      alert(msg);
     } finally {
       setUpdating(false);
     }
   };
 
   const openStatusModal = (id: number | string, newStatus: ReservationStatus) => {
-    const reservation = reservations.find(r => r.id === id);
+    const reservation = reservations.find(r => r.id.toString() === id.toString());
     if (!reservation) return;
 
     setSelectedReservation(reservation);
@@ -313,7 +300,18 @@ export default function AdminReservationTabs() {
           color: 'blue'
         };
         break;
+      case 'REJECTED':
+        config = {
+          ...config,
+          title: 'Refuser la demande',
+          message: `Vous êtes sur le point de refuser la demande de réservation #${id}. Veuillez indiquer le motif du refus.`,
+          showReasonField: true,
+          icon: faTimes,
+          color: 'rose'
+        };
+        break;
       case 'CANCELED':
+      case 'CANCELLED':
         config = {
           ...config,
           title: 'Annuler la réservation',
@@ -414,7 +412,7 @@ export default function AdminReservationTabs() {
     if (activeTab === 'pending') {
       result = result.filter(r => r.status === 'PENDING');
     } else if (activeTab === 'ongoing') {
-      result = result.filter(r => r.status === 'ACCEPTED');
+      result = result.filter(r => ['ACCEPTED', 'APPROVED', 'CONFIRMED'].includes(r.status));
     } else if (activeTab === 'history') {
       result = reservations;
     }
@@ -583,7 +581,7 @@ export default function AdminReservationTabs() {
         >
           Locations en cours
           <span className="ml-2 bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-xs">
-            {reservations.filter(r => r.status === 'ACCEPTED').length}
+            {reservations.filter(r => ['ACCEPTED', 'APPROVED', 'CONFIRMED'].includes(r.status)).length}
           </span>
         </button>
         <button
@@ -646,7 +644,7 @@ export default function AdminReservationTabs() {
             >
               Locations en cours
               <span className="ml-2 bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-xs">
-                {reservations.filter(r => r.status === 'ACCEPTED').length}
+                {reservations.filter(r => ['ACCEPTED', 'APPROVED', 'CONFIRMED'].includes(r.status)).length}
               </span>
             </button>
             <button
@@ -1202,7 +1200,7 @@ export default function AdminReservationTabs() {
                       <span className="sm:hidden">Accepter</span>
                     </button>
                     <button
-                      onClick={() => openStatusModal(selectedReservation.id, 'CANCELED')}
+                      onClick={() => openStatusModal(selectedReservation.id, 'REJECTED')}
                       className="flex-1 min-w-[120px] sm:min-w-[150px] py-3 sm:py-4 bg-rose-500 text-white rounded-xl sm:rounded-2xl font-black text-[10px] sm:text-xs uppercase tracking-widest shadow-xl shadow-rose-500/20 hover:bg-rose-600 transition-all flex items-center justify-center gap-2 active:scale-95"
                     >
                       <FontAwesomeIcon icon={faTimes} />
@@ -1212,25 +1210,25 @@ export default function AdminReservationTabs() {
                   </>
                 )}
 
-                {selectedReservation.status === 'ACCEPTED' && (
-                  <button
-                    onClick={() => openStatusModal(selectedReservation.id, 'COMPLETED')}
-                    className="flex-1 py-3 sm:py-4 bg-blue-500 text-white rounded-xl sm:rounded-2xl font-black text-[10px] sm:text-xs uppercase tracking-widest shadow-xl shadow-blue-500/20 hover:bg-blue-600 transition-all flex items-center justify-center gap-2 active:scale-95"
-                  >
-                    <FontAwesomeIcon icon={faCheckCircle} />
-                    <span className="hidden sm:inline">Marquer comme terminée</span>
-                    <span className="sm:hidden">Terminer</span>
-                  </button>
-                )}
-
-                {(selectedReservation.status === 'ACCEPTED' || selectedReservation.status === 'PENDING') && (
-                  <button
-                    onClick={() => openStatusModal(selectedReservation.id, 'CANCELED')}
-                    className="px-4 sm:px-8 py-3 sm:py-4 bg-slate-100 text-slate-600 rounded-xl sm:rounded-2xl font-black text-[10px] sm:text-xs uppercase tracking-widest hover:bg-slate-200 transition-all flex items-center justify-center gap-2 active:scale-95"
-                  >
-                    <FontAwesomeIcon icon={faBan} />
-                    <span className="hidden sm:inline">Annuler</span>
-                  </button>
+                {['ACCEPTED', 'APPROVED', 'CONFIRMED'].includes(selectedReservation.status) && (
+                  <>
+                    <button
+                      onClick={() => openStatusModal(selectedReservation.id, 'COMPLETED')}
+                      className="flex-1 min-w-[120px] sm:min-w-[150px] py-3 sm:py-4 bg-blue-500 text-white rounded-xl sm:rounded-2xl font-black text-[10px] sm:text-xs uppercase tracking-widest shadow-xl shadow-blue-500/20 hover:bg-blue-600 transition-all flex items-center justify-center gap-2 active:scale-95"
+                    >
+                      <FontAwesomeIcon icon={faCheckCircle} />
+                      <span className="hidden sm:inline">Marquer comme terminée</span>
+                      <span className="sm:hidden">Terminer</span>
+                    </button>
+                    <button
+                      onClick={() => openStatusModal(selectedReservation.id, 'CANCELED')}
+                      className="px-4 sm:px-8 py-3 sm:py-4 bg-rose-50 text-rose-600 border border-rose-200 rounded-xl sm:rounded-2xl font-black text-[10px] sm:text-xs uppercase tracking-widest hover:bg-rose-100 transition-all flex items-center justify-center gap-2 active:scale-95"
+                    >
+                      <FontAwesomeIcon icon={faBan} />
+                      <span className="hidden sm:inline">Annuler la réservation</span>
+                      <span className="sm:hidden">Annuler</span>
+                    </button>
+                  </>
                 )}
 
                 <button
@@ -1490,16 +1488,19 @@ export default function AdminReservationTabs() {
                     <td className="py-2 sm:py-3 px-3 sm:px-6 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${
                         res.status === 'PENDING' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
-                        res.status === 'ACCEPTED' ? 'bg-green-50 text-green-700 border-green-200' :
+                        ['ACCEPTED', 'APPROVED', 'CONFIRMED'].includes(res.status) ? 'bg-green-50 text-green-700 border-green-200' :
                         res.status === 'COMPLETED' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                        res.status === 'REJECTED' ? 'bg-rose-50 text-rose-700 border-rose-200' :
                         'bg-red-50 text-red-700 border-red-200'
                       }`}>
                         {res.status === 'PENDING' && 'En attente'}
-                        {res.status === 'ACCEPTED' && 'En cours'}
+                        {['ACCEPTED', 'APPROVED', 'CONFIRMED'].includes(res.status) && 'En cours'}
                         {res.status === 'COMPLETED' && 'Terminée'}
-                        {res.status === 'CANCELED' && 'Annulée'}
+                        {res.status === 'REJECTED' && 'Refusée'}
+                        {['CANCELED', 'CANCELLED'].includes(res.status) && 'Annulée'}
+                        {!['PENDING', 'ACCEPTED', 'APPROVED', 'CONFIRMED', 'COMPLETED', 'REJECTED', 'CANCELED', 'CANCELLED'].includes(res.status) && res.status}
                       </span>
-                     </td>
+                    </td>
                     <td className="py-2 sm:py-3 px-3 sm:px-6 whitespace-nowrap text-right">
                       <div className="flex items-center justify-end gap-1 sm:gap-2">
                         <button
@@ -1513,7 +1514,7 @@ export default function AdminReservationTabs() {
                         >
                           <FontAwesomeIcon icon={faEye} />
                         </button>
-                        {res.status !== 'ACCEPTED' && res.status !== 'COMPLETED' && (
+                        {!['ACCEPTED', 'COMPLETED', 'APPROVED', 'CONFIRMED'].includes(res.status) && !['CANCELED', 'CANCELLED', 'REJECTED'].includes(res.status) && (
                           <button
                             title="Accepter"
                             onClick={() => openStatusModal(res.id, 'ACCEPTED')}
@@ -1522,22 +1523,31 @@ export default function AdminReservationTabs() {
                             <FontAwesomeIcon icon={faCheck} />
                           </button>
                         )}
-                        {res.status === 'ACCEPTED' && (
+                        {['ACCEPTED', 'APPROVED', 'CONFIRMED'].includes(res.status) && (
                           <button
                             title="Terminer"
                             onClick={() => openStatusModal(res.id, 'COMPLETED')}
                             className="p-1.5 text-blue-500 hover:bg-blue-50 rounded transition-colors"
                           >
-                            <FontAwesomeIcon icon={faCheck} />
+                            <FontAwesomeIcon icon={faCheckCircle} />
                           </button>
                         )}
-                        {res.status !== 'COMPLETED' && res.status !== 'CANCELED' && (
+                        {res.status === 'PENDING' && (
                           <button
-                            title={res.status === 'PENDING' ? 'Refuser' : 'Annuler'}
+                            title="Refuser"
+                            onClick={() => openStatusModal(res.id, 'REJECTED')}
+                            className="p-1.5 text-red-500 hover:bg-red-50 rounded transition-colors"
+                          >
+                            <FontAwesomeIcon icon={faTimes} />
+                          </button>
+                        )}
+                        {['ACCEPTED', 'APPROVED', 'CONFIRMED'].includes(res.status) && (
+                          <button
+                            title="Annuler"
                             onClick={() => openStatusModal(res.id, 'CANCELED')}
                             className="p-1.5 text-red-500 hover:bg-red-50 rounded transition-colors"
                           >
-                            <FontAwesomeIcon icon={res.status === 'PENDING' ? faTimes : faBan} />
+                            <FontAwesomeIcon icon={faBan} />
                           </button>
                         )}
                         <button
@@ -1599,15 +1609,18 @@ export default function AdminReservationTabs() {
                       </span>
                     </div>
                     <div className="absolute top-2 sm:top-4 right-2 sm:right-4">
-                      <span className={`inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-[8px] sm:text-[10px] font-black uppercase shadow-sm bg-white/95 text-[#8fa3b0] backdrop-blur-sm ${
+                      <span className={`inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-[8px] sm:text-[10px] font-black uppercase shadow-sm bg-white/95 backdrop-blur-sm ${
                         res.status === 'PENDING' ? 'text-yellow-600' :
-                        res.status === 'ACCEPTED' ? 'text-green-600' :
-                        res.status === 'COMPLETED' ? 'text-blue-600' : 'text-red-600'
+                        ['ACCEPTED', 'APPROVED', 'CONFIRMED'].includes(res.status) ? 'text-green-600' :
+                        res.status === 'COMPLETED' ? 'text-blue-600' :
+                        res.status === 'REJECTED' ? 'text-rose-600' : 'text-red-600'
                       }`}>
                         {res.status === 'PENDING' && 'ATTENTE'}
-                        {res.status === 'ACCEPTED' && 'ACTIF'}
+                        {['ACCEPTED', 'APPROVED', 'CONFIRMED'].includes(res.status) && 'ACTIF'}
                         {res.status === 'COMPLETED' && 'TERMINÉ'}
-                        {res.status === 'CANCELED' && 'ANNULÉ'}
+                        {res.status === 'REJECTED' && 'REFUSÉ'}
+                        {['CANCELED', 'CANCELLED'].includes(res.status) && 'ANNULÉ'}
+                        {!['PENDING', 'ACCEPTED', 'APPROVED', 'CONFIRMED', 'COMPLETED', 'REJECTED', 'CANCELED', 'CANCELLED'].includes(res.status) && res.status}
                       </span>
                     </div>
                   </div>
