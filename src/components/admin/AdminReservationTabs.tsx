@@ -406,15 +406,28 @@ export default function AdminReservationTabs() {
     }
   };
 
+  const isReservationExpired = (r: Reservation) => {
+    if (['COMPLETED', 'CANCELED', 'CANCELLED', 'REJECTED'].includes(r.status)) {
+      return true;
+    }
+    if (r.dateFin) {
+      const end = new Date(r.dateFin).getTime();
+      if (!isNaN(end) && end < Date.now()) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   const filteredReservations = useMemo(() => {
     let result = reservations;
 
     if (activeTab === 'pending') {
-      result = result.filter(r => r.status === 'PENDING');
+      result = result.filter(r => r.status === 'PENDING' && !isReservationExpired(r));
     } else if (activeTab === 'ongoing') {
-      result = result.filter(r => ['ACCEPTED', 'APPROVED', 'CONFIRMED'].includes(r.status));
+      result = result.filter(r => ['ACCEPTED', 'APPROVED', 'CONFIRMED'].includes(r.status) && !isReservationExpired(r));
     } else if (activeTab === 'history') {
-      result = reservations;
+      result = result.filter(r => isReservationExpired(r));
     }
 
     if (search) {
@@ -568,7 +581,7 @@ export default function AdminReservationTabs() {
         >
           Réservations en attente
           <span className="ml-2 bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-xs">
-            {reservations.filter(r => r.status === 'PENDING').length}
+            {reservations.filter(r => r.status === 'PENDING' && !isReservationExpired(r)).length}
           </span>
         </button>
         <button
@@ -581,7 +594,7 @@ export default function AdminReservationTabs() {
         >
           Locations en cours
           <span className="ml-2 bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-xs">
-            {reservations.filter(r => ['ACCEPTED', 'APPROVED', 'CONFIRMED'].includes(r.status)).length}
+            {reservations.filter(r => ['ACCEPTED', 'APPROVED', 'CONFIRMED'].includes(r.status) && !isReservationExpired(r)).length}
           </span>
         </button>
         <button
@@ -594,7 +607,7 @@ export default function AdminReservationTabs() {
         >
           Historique
           <span className="ml-2 bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-xs">
-            {reservations.length}
+            {reservations.filter(r => isReservationExpired(r)).length}
           </span>
         </button>
       </div>
@@ -628,7 +641,7 @@ export default function AdminReservationTabs() {
             >
               Réservations en attente
               <span className="ml-2 bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-xs">
-                {reservations.filter(r => r.status === 'PENDING').length}
+                {reservations.filter(r => r.status === 'PENDING' && !isReservationExpired(r)).length}
               </span>
             </button>
             <button
@@ -644,7 +657,7 @@ export default function AdminReservationTabs() {
             >
               Locations en cours
               <span className="ml-2 bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-xs">
-                {reservations.filter(r => ['ACCEPTED', 'APPROVED', 'CONFIRMED'].includes(r.status)).length}
+                {reservations.filter(r => ['ACCEPTED', 'APPROVED', 'CONFIRMED'].includes(r.status) && !isReservationExpired(r)).length}
               </span>
             </button>
             <button
@@ -660,7 +673,7 @@ export default function AdminReservationTabs() {
             >
               Historique
               <span className="ml-2 bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-xs">
-                {reservations.length}
+                {reservations.filter(r => isReservationExpired(r)).length}
               </span>
             </button>
           </div>

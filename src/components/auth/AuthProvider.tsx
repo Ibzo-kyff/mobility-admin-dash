@@ -6,6 +6,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { mobilityAPI } from '@/services/mobility-api';
 import { getCookie, setCookie, deleteCookie } from 'cookies-next';
 import type { User, AuthState, UserRole } from '@/types';
+import { requestNotificationPermissionAndToken, listenToForegroundMessages } from '@/libs/firebase';
 
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>;
@@ -110,6 +111,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isMounted = false;
     };
   }, []); // Dépendances vides - NE PAS AJOUTER de dépendances
+
+  // =============================================
+  // Push Notifications : Enregistrement FCM & Listener
+  // =============================================
+  useEffect(() => {
+    if (state.isAuthenticated && state.user) {
+      // Demander la permission et enregistrer le token sur le serveur
+      requestNotificationPermissionAndToken();
+
+      // Écouter les notifications en avant-plan
+      const unsubscribe = listenToForegroundMessages((payload) => {
+        console.log('Notification reçue en premier plan:', payload);
+      });
+
+      return () => {
+        if (typeof unsubscribe === 'function') unsubscribe();
+      };
+    }
+  }, [state.isAuthenticated, state.user?.id]);
 
   // =============================================
   // Watcher : vérifie la session toutes les 5 min
