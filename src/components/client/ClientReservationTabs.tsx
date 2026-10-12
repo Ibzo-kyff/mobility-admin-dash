@@ -29,7 +29,9 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { clientAPI } from '@/services/client/client-api';
 import { useAuth } from '@/components/auth/AuthProvider';
+import { getPhotoUrl as getVehiclePhotoUrl } from '@/features/vehicles/utils/photos';
 import Image from 'next/image';
+
 
 export type ReservationStatus = "PENDING" | "ACCEPTED" | "APPROVED" | "CONFIRMED" | "REJECTED" | "CANCELLED" | "CANCELED" | "COMPLETED";
 export type ReservationType = "ACHAT" | "LOCATION";
@@ -142,17 +144,30 @@ export default function ClientReservationTabs() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  const isReservationExpired = (r: Reservation) => {
+    if (['COMPLETED', 'CANCELED', 'CANCELLED', 'REJECTED'].includes(r.status)) {
+      return true;
+    }
+    if (r.dateFin) {
+      const end = new Date(r.dateFin).getTime();
+      if (!isNaN(end) && end < Date.now()) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   const filteredReservations = useMemo(() => {
     let result = reservations;
 
     if (activeTab === 'pending') {
-      result = result.filter(r => r.status === 'PENDING');
+      result = result.filter(r => r.status === 'PENDING' && !isReservationExpired(r));
     } else if (activeTab === 'confirmed') {
-      result = result.filter(r => ['APPROVED', 'CONFIRMED', 'ACCEPTED'].includes(r.status));
+      result = result.filter(r => ['APPROVED', 'CONFIRMED', 'ACCEPTED'].includes(r.status) && !isReservationExpired(r));
     } else if (activeTab === 'canceled') {
       result = result.filter(r => ['REJECTED', 'CANCELLED', 'CANCELED'].includes(r.status));
     } else if (activeTab === 'history') {
-      result = result.filter(r => ['COMPLETED'].includes(r.status));
+      result = result.filter(r => isReservationExpired(r));
     }
 
     if (search) {
@@ -191,13 +206,9 @@ export default function ClientReservationTabs() {
   };
 
   const getPhotoUrl = (photos: string[] | string | undefined) => {
-    if (!photos) return 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b';
-    const photo = Array.isArray(photos) ? photos[0] : photos;
-    if (typeof photo !== 'string' || !photo) return 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b';
-    if (photo.startsWith('http')) return photo;
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'https://parkapp-pi.vercel.app';
-    return `${baseUrl}${photo.startsWith('/') ? '' : '/'}${photo}`;
+    return getVehiclePhotoUrl(photos) || 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b';
   };
+
 
   const getStatusBadge = (status: ReservationStatus) => {
     const configs: Record<string, { bg: string, text: string, label: string, icon: any }> = {
