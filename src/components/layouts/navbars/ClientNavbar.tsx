@@ -11,7 +11,6 @@ import {
   faChevronDown,
   faSearch,
   faBars,
-  faCog,
   faHeart,
   faHistory
 } from '@fortawesome/free-solid-svg-icons';
@@ -19,11 +18,20 @@ import Link from 'next/link';
 import { notificationAPI } from '@/services/notification-api';
 import { useEffect } from 'react';
 
+interface ClientNotification {
+  id: number;
+  title?: string;
+  message?: string;
+  type?: string;
+  read?: boolean;
+  createdAt?: string;
+}
+
 export default function ClientNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
   const { user, logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [notifications, setNotifications] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<ClientNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
@@ -31,9 +39,10 @@ export default function ClientNavbar({ onMenuClick }: { onMenuClick?: () => void
       try {
         if (!user) return;
         const data = await notificationAPI.getNotifications({ userId: user.id });
-        const formatted = (Array.isArray(data) ? data : []).filter((n: any) => n.type !== "MESSAGE");
+        const list = Array.isArray(data) ? (data as unknown as ClientNotification[]) : [];
+        const formatted = list.filter((n) => n.type !== "MESSAGE");
         setNotifications(formatted);
-        const unread = formatted.filter((n: any) => !n.read).length;
+        const unread = formatted.filter((n) => !n.read).length;
         setUnreadCount(unread);
       } catch (err) {
         console.warn('Failed to check notifications:', err);
@@ -102,7 +111,7 @@ export default function ClientNavbar({ onMenuClick }: { onMenuClick?: () => void
                           if (!n.read) {
                             try {
                               await notificationAPI.markNotificationAsRead(n.id);
-                            } catch (e) {}
+                            } catch {}
                           }
                           setShowNotifications(false);
                         }}
@@ -196,7 +205,7 @@ export default function ClientNavbar({ onMenuClick }: { onMenuClick?: () => void
                   {/* <FontAwesomeIcon icon={faCog} className="w-4 h-4 text-gray-400" />
                   Paramètres */}
                 </Link>
-                
+                 
                 <hr className="my-2 border-gray-200" />
                 
                 <button

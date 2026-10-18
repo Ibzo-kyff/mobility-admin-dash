@@ -10,7 +10,10 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { clientAPI } from '@/services/client/client-api';
 import { useAuth } from '@/components/auth/AuthProvider';
+import { getPhotoUrl as getVehiclePhotoUrl } from '@/features/vehicles/utils/photos';
 import Link from 'next/link';
+
+
 
 export default function HistoryPage() {
   const { user } = useAuth();
@@ -189,14 +192,8 @@ function FilterButton({ active, label, onClick }: { active: boolean, label: stri
 }
 
 function HistoryItem({ item }: { item: any }) {
-  const getPhotoUrl = (photos: any) => {
-    if (!photos) return 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b';
-    const photo = Array.isArray(photos) ? photos[0] : photos;
-    if (typeof photo !== 'string') return 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b';
-    if (photo.startsWith('http')) return photo;
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'https://parkapp-pi.vercel.app';
-    return `${baseUrl}${photo.startsWith('/') ? '' : '/'}${photo}`;
-  };
+  const photoUrl = getVehiclePhotoUrl(item.vehicle?.photos) || 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b';
+
 
   const getStatusConfig = (status: string) => {
     switch (status) {
@@ -224,7 +221,8 @@ function HistoryItem({ item }: { item: any }) {
   return (
     <div className="bg-white rounded-[2.5rem] p-4 sm:p-6 shadow-lg shadow-slate-200/40 border border-slate-100 flex flex-col md:flex-row items-center gap-6 group hover:shadow-2xl transition-all">
       <div className="w-full md:w-32 h-24 rounded-[1.5rem] overflow-hidden shadow-inner flex-shrink-0">
-        <img src={getPhotoUrl(item.vehicle?.photos)} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="Vehicle" />
+        <img src={photoUrl} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="Vehicle" />
+
       </div>
 
       <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-6 w-full">

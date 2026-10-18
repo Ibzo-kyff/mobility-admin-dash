@@ -5,7 +5,9 @@ import PageLoader from "@/components/common/PageLoader";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faCar, faMapMarkerAlt, faGasPump, faCalendarAlt, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { favorisService, FavorisVehicule } from '@/services/client/favoris-service';
+import { getPhotoUrl } from '@/features/vehicles/utils/photos';
 import Link from 'next/link';
+
 
 export default function FavoritesPage() {
   const [favorites, setFavorites] = useState<FavorisVehicule[]>([]);
@@ -69,17 +71,8 @@ export default function FavoritesPage() {
       {favorites.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {favorites.map((fav) => {
-            // Extraction image
-            const vehPhotos = fav.photos;
-            let vehImage = null;
-            if (Array.isArray(vehPhotos) && vehPhotos.length > 0) vehImage = vehPhotos[0];
-            else if (typeof vehPhotos === 'string' && vehPhotos.trim().startsWith('[')) {
-              try { const parsed = JSON.parse(vehPhotos); if (parsed.length) vehImage = parsed[0]; } catch(e) {}
-            } else if (typeof vehPhotos === 'string' && vehPhotos.trim().length > 0) vehImage = vehPhotos;
-            
-            const imageUrl = vehImage
-              ? (vehImage.startsWith('http') ? vehImage : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'https://parkapp-pi.vercel.app'}${vehImage.startsWith('/') ? '' : '/'}${vehImage}`)
-              : null;
+            const imageUrl = getPhotoUrl(fav.photos);
+
 
             return (
               <div key={fav.id} className="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all group flex flex-col">

@@ -44,7 +44,7 @@ export default function SocialLoginButtons() {
     const initGoogle = () => {
       if ((window as any).google?.accounts?.id) {
         (window as any).google.accounts.id.initialize({
-          client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '1035541999990-fakeclientid.apps.googleusercontent.com',
+          client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '1006124670193-oacdgjstedi210vb4gmvsf2udladq5f6.apps.googleusercontent.com',
           callback: async (response: any) => {
             setIsLoading(true);
             setError('');
