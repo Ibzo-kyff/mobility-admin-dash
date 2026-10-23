@@ -1,4 +1,4 @@
-﻿importScripts('https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging-compat.js');
 
 firebase.initializeApp({
@@ -32,11 +32,14 @@ messaging.onBackgroundMessage((payload) => {
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const urlToOpen = event.notification.data?.url || '/dashboard/admin/notifications';
+  const urlToOpen = event.notification.data?.url || '/dashboard';
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
       for (let client of windowClients) {
         if (client.url.includes('/dashboard') && 'focus' in client) {
+          if ('navigate' in client && urlToOpen) {
+            client.navigate(urlToOpen);
+          }
           return client.focus();
         }
       }
