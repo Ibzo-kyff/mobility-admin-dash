@@ -1,10 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 
 export default function SocialLoginButtons() {
   const { loginWithGoogle, loginWithFacebook } = useAuth();
+  const loginWithGoogleRef = useRef(loginWithGoogle);
+  loginWithGoogleRef.current = loginWithGoogle;
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -41,44 +44,57 @@ export default function SocialLoginButtons() {
 
   // 2. Initialisation et rendu du bouton Google
   useEffect(() => {
-    const initGoogle = () => {
-      if ((window as any).google?.accounts?.id) {
-        (window as any).google.accounts.id.initialize({
-          client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '1006124670193-oacdgjstedi210vb4gmvsf2udladq5f6.apps.googleusercontent.com',
-          callback: async (response: any) => {
-            setIsLoading(true);
-            setError('');
-            try {
-              await loginWithGoogle(response.credential);
-            } catch (err: any) {
-              setError(err.message || 'Échec de la connexion Google');
-            } finally {
-              setIsLoading(false);
-            }
-          },
-        });
+    let isCancelled = false;
+    let timer: NodeJS.Timeout;
 
-        const container = document.getElementById('google-btn-container');
-        if (container) {
-          container.innerHTML = ''; // Clear previous button if any
-          (window as any).google.accounts.id.renderButton(
-            container,
-            { 
-              theme: 'outline', 
-              size: 'large', 
-              shape: 'rectangular',
-              width: 220
-            }
-          );
+    const initGoogle = () => {
+      if (isCancelled) return;
+
+      if ((window as any).google?.accounts?.id) {
+        try {
+          (window as any).google.accounts.id.initialize({
+            client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '1006124670193-oacdgjstedi210vb4gmvsf2udladq5f6.apps.googleusercontent.com',
+            callback: async (response: any) => {
+              setIsLoading(true);
+              setError('');
+              try {
+                await loginWithGoogleRef.current(response.credential);
+              } catch (err: any) {
+                setError(err.message || 'Échec de la connexion Google');
+              } finally {
+                setIsLoading(false);
+              }
+            },
+          });
+
+          const container = document.getElementById('google-btn-container');
+          if (container && !isCancelled) {
+            container.innerHTML = ''; // Nettoyer le conteneur
+            (window as any).google.accounts.id.renderButton(
+              container,
+              { 
+                theme: 'outline', 
+                size: 'large', 
+                shape: 'rectangular',
+                width: 220
+              }
+            );
+          }
+        } catch (e) {
+          console.warn('Erreur initialisation Google Sign-In:', e);
         }
-      } else {
-        setTimeout(initGoogle, 500);
+      } else if (!isCancelled) {
+        timer = setTimeout(initGoogle, 300);
       }
     };
 
-    const timer = setTimeout(initGoogle, 100);
-    return () => clearTimeout(timer);
-  }, [loginWithGoogle]);
+    timer = setTimeout(initGoogle, 100);
+
+    return () => {
+      isCancelled = true;
+      if (timer) clearTimeout(timer);
+    };
+  }, []);
 
   const triggerFacebookLogin = () => {
     if (!(window as any).FB) {

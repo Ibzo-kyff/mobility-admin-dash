@@ -117,8 +117,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // =============================================
   useEffect(() => {
     if (state.isAuthenticated && state.user) {
+      const token = (getCookie('accessToken') as string | undefined) || (typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null) || undefined;
       // Demander la permission et enregistrer le token sur le serveur
-      requestNotificationPermissionAndToken();
+      requestNotificationPermissionAndToken(token);
 
       // Écouter les notifications en avant-plan
       const unsubscribe = listenToForegroundMessages((payload) => {

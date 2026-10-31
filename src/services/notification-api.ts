@@ -123,6 +123,15 @@ class NotificationAPI {
     });
     return this.handleResponse(response);
   }
+
+  async testPushNotification(): Promise<{ success: boolean; message: string; tokenType?: string; error?: string }> {
+    const url = `${this.baseUrl}/notifications/test`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: this.getHeaders(),
+    });
+    return this.handleResponse(response);
+  }
 }
 
 export const notificationAPI = new NotificationAPI();

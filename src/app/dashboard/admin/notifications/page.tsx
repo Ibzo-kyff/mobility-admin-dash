@@ -51,6 +51,72 @@ export default function NotificationsPage() {
   const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
   const [usersMap, setUsersMap] = useState<Record<number, string>>({});
   const [parkingsMap, setParkingsMap] = useState<Record<number, string>>({});
+  const [testingPush, setTestingPush] = useState(false);
+  const [testPushStatus, setTestPushStatus] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  const handleTestPush = async () => {
+    setTestingPush(true);
+    setTestPushStatus(null);
+    try {
+      const res = await notificationAPI.testPushNotification();
+      if (res.success) {
+        setTestPushStatus({
+          message: res.message || 'Notification push envoyée avec succès !',
+          type: 'success',
+        });
+        fetchNotifications(true);
+      } else {
+        setTestPushStatus({
+          message: res.error || 'Erreur lors de l\'envoi du push.',
+          type: 'error',
+        });
+      }
+    } catch (err: any) {
+      // Si le backend Vercel répond 404 (car le code backend n'est pas encore pushé sur Vercel)
+      if (err.status === 404 || err.message?.includes('404')) {
+        if (typeof window !== 'undefined' && 'Notification' in window) {
+          if (Notification.permission === 'granted') {
+            try {
+              if ('serviceWorker' in navigator) {
+                const reg = await navigator.serviceWorker.ready;
+                await reg.showNotification('🔔 Test Mobility Push', {
+                  body: 'Félicitations ! Les notifications de votre navigateur fonctionnent parfaitement avec le logo Mobility !',
+                  icon: '/images/logo.jpg',
+                  badge: '/images/logo.jpg',
+                  data: { url: '/dashboard/admin/notifications' },
+                });
+              } else {
+                new Notification('🔔 Test Mobility Push', {
+                  body: 'Félicitations ! Les notifications fonctionnent avec succès !',
+                  icon: '/images/logo.jpg',
+                });
+              }
+              setTestPushStatus({
+                message: 'Notification test affichée avec succès sur votre écran ! (Pensez à faire git push dans parking__app pour déployer l\'endpoint distant sur Vercel).',
+                type: 'success',
+              });
+              return;
+            } catch (e: any) {
+              console.error('Erreur affichage notification locale:', e);
+            }
+          } else {
+            setTestPushStatus({
+              message: 'Veuillez autoriser les notifications dans votre navigateur pour recevoir les alertes.',
+              type: 'error',
+            });
+            return;
+          }
+        }
+      }
+
+      setTestPushStatus({
+        message: err.message || 'Erreur lors du test de push notification.',
+        type: 'error',
+      });
+    } finally {
+      setTestingPush(false);
+    }
+  };
 
   useEffect(() => {
     const fetchNames = async () => {
@@ -306,7 +372,20 @@ export default function NotificationsPage() {
             <p className="text-gray-500 mt-1">Gérez vos alertes et communications système.</p>
           </div>
           
-          <div className="flex gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={handleTestPush}
+              disabled={testingPush}
+              className={`px-4 py-2.5 rounded-2xl text-sm font-bold transition-all flex items-center gap-2 ${
+                testingPush 
+                  ? 'bg-orange-100 text-orange-400 cursor-not-allowed' 
+                  : 'bg-orange-500 text-white hover:bg-orange-600 shadow-md shadow-orange-200 active:scale-95'
+              }`}
+            >
+              <FontAwesomeIcon icon={testingPush ? faSync : faBell} className={testingPush ? 'animate-spin' : ''} />
+              {testingPush ? 'Envoi en cours...' : 'Tester Push Notification'}
+            </button>
+
             {notifications.filter(n => !n.read).length > 0 && (
               <button
                 onClick={handleMarkAllAsRead}
@@ -327,6 +406,25 @@ export default function NotificationsPage() {
             )}
           </div>
         </div>
+
+        {/* Bannière de feedback Test Push */}
+        {testPushStatus && (
+          <div
+            className={`p-4 rounded-2xl mb-6 text-sm font-semibold flex items-center justify-between border ${
+              testPushStatus.type === 'success'
+                ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                : 'bg-red-50 text-red-800 border-red-200'
+            }`}
+          >
+            <span>{testPushStatus.message}</span>
+            <button
+              onClick={() => setTestPushStatus(null)}
+              className="text-xs uppercase font-bold underline ml-4 hover:opacity-75"
+            >
+              Fermer
+            </button>
+          </div>
+        )}
 
         {/* Tabs */}
         <div className="flex gap-2 mb-8">

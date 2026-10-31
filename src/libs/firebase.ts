@@ -1,6 +1,7 @@
-﻿import { initializeApp, getApps, getApp } from 'firebase/app';
+import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getMessaging, getToken, onMessage, Messaging } from 'firebase/messaging';
 import { mobilityAPI } from '@/services/mobility-api';
+import { getCookie } from 'cookies-next';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyB4a_kus9-BsU-MoFeRoA4YHVS8CO9jYX0",
@@ -28,7 +29,7 @@ export const getFirebaseMessaging = () => {
   return messaging;
 };
 
-export const requestNotificationPermissionAndToken = async (): Promise<string | null> => {
+export const requestNotificationPermissionAndToken = async (explicitAuthToken?: string): Promise<string | null> => {
   if (typeof window === 'undefined' || !('Notification' in window) || !('serviceWorker' in navigator)) {
     console.log('Les notifications ou les Service Workers ne sont pas supportes par ce navigateur.');
     return null;
@@ -37,12 +38,12 @@ export const requestNotificationPermissionAndToken = async (): Promise<string | 
   try {
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') {
-      console.log('Permission de notification refusee.');
+      console.log('Permission de notification non accordee:', permission);
       return null;
     }
 
     // Enregistrer le Service Worker et attendre qu'il soit ACTIF
-    await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+    await navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' });
     const registration = await navigator.serviceWorker.ready;
     console.log('Service Worker Firebase pret et actif:', registration);
 
@@ -56,7 +57,7 @@ export const requestNotificationPermissionAndToken = async (): Promise<string | 
 
     if (currentToken) {
       console.log('FCM Token obtenu:', currentToken);
-      await saveFCMTokenToBackend(currentToken);
+      await saveFCMTokenToBackend(currentToken, explicitAuthToken);
       return currentToken;
     } else {
       console.warn('Aucun token de notification retourne.');
@@ -68,13 +69,16 @@ export const requestNotificationPermissionAndToken = async (): Promise<string | 
   }
 };
 
-const saveFCMTokenToBackend = async (token: string) => {
+export const saveFCMTokenToBackend = async (token: string, explicitAuthToken?: string) => {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api';
-    const authToken = mobilityAPI.getToken();
-    if (!authToken) return;
+    const authToken = explicitAuthToken || mobilityAPI.getToken() || (typeof window !== 'undefined' ? (getCookie('accessToken') as string | null || localStorage.getItem('accessToken')) : null);
+    if (!authToken) {
+      console.warn('Aucun jeton d\'authentification disponible pour enregistrer le token FCM.');
+      return;
+    }
 
-    await fetch(`${baseUrl}/auth/users/push-token`, {
+    const res = await fetch(`${baseUrl}/auth/users/push-token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -82,6 +86,13 @@ const saveFCMTokenToBackend = async (token: string) => {
       },
       body: JSON.stringify({ token })
     });
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      console.error(`Erreur enregistrement token FCM sur le backend (HTTP ${res.status}):`, errData);
+      return;
+    }
+
     console.log('Token FCM enregistre sur le backend avec succes');
   } catch (err) {
     console.error('Erreur enregistrement token FCM sur le backend:', err);
