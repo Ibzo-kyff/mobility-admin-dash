@@ -49,7 +49,7 @@ export default function RootLayout({
         <link rel="icon" href="/icon.png" type="image/png" />
         <link rel="apple-touch-icon" href="/apple-icon.png" />
       </head>
-      <body className="font-sans">
+      <body className="font-sans antialiased">
         <AuthProvider>
           {children}
         </AuthProvider>
