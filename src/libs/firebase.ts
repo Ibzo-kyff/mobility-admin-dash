@@ -1,5 +1,5 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getMessaging, getToken, onMessage, Messaging } from 'firebase/messaging';
+import type { Messaging, MessagePayload } from 'firebase/messaging';
 import { mobilityAPI } from '@/services/mobility-api';
 import { getCookie } from 'cookies-next';
 
@@ -18,10 +18,17 @@ export const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfi
 
 let messaging: Messaging | null = null;
 
-export const getFirebaseMessaging = () => {
-  if (typeof window !== 'undefined' && 'Notification' in window && !messaging) {
+export const getFirebaseMessaging = async (): Promise<Messaging | null> => {
+  if (typeof window === 'undefined' || !('Notification' in window) || !('serviceWorker' in navigator)) {
+    return null;
+  }
+  if (!messaging) {
     try {
-      messaging = getMessaging(app);
+      const { getMessaging, isSupported } = await import('firebase/messaging');
+      const supported = await isSupported();
+      if (supported) {
+        messaging = getMessaging(app);
+      }
     } catch (e) {
       console.warn('Firebase Messaging non supporte dans cet environnement:', e);
     }
@@ -36,6 +43,13 @@ export const requestNotificationPermissionAndToken = async (explicitAuthToken?: 
   }
 
   try {
+    const { getMessaging, getToken, isSupported } = await import('firebase/messaging');
+    const supported = await isSupported();
+    if (!supported) {
+      console.warn('Firebase Messaging non supporte sur ce navigateur/plateforme.');
+      return null;
+    }
+
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') {
       console.log('Permission de notification non accordee:', permission);
@@ -47,7 +61,7 @@ export const requestNotificationPermissionAndToken = async (explicitAuthToken?: 
     const registration = await navigator.serviceWorker.ready;
     console.log('Service Worker Firebase pret et actif:', registration);
 
-    const msg = getFirebaseMessaging();
+    const msg = getMessaging(app);
     if (!msg) return null;
 
     const currentToken = await getToken(msg, {
@@ -99,25 +113,44 @@ export const saveFCMTokenToBackend = async (token: string, explicitAuthToken?: s
   }
 };
 
-export const listenToForegroundMessages = (callback: (payload: any) => void) => {
-  const msg = getFirebaseMessaging();
-  if (!msg) return () => {};
+export const listenToForegroundMessages = (callback: (payload: MessagePayload) => void) => {
+  if (typeof window === 'undefined' || !('Notification' in window) || !('serviceWorker' in navigator)) {
+    return () => {};
+  }
 
-  return onMessage(msg, (payload) => {
-    console.log('Message FCM recu au premier plan:', payload);
-    callback(payload);
+  let unsubscribe: (() => void) | undefined;
 
-    // Afficher une notification HTML5 native personnalisee avec le logo Mobility
-    if (Notification.permission === 'granted') {
-      const title = payload.notification?.title || payload.data?.title || 'Mobility';
-      const options: NotificationOptions = {
-        body: payload.notification?.body || payload.data?.message || payload.data?.body || '',
-        icon: '/images/logo.jpg',
-        badge: '/images/logo.jpg',
-        data: payload.data,
-        tag: payload.data?.notificationId || 'mobility-notification',
-      };
-      new Notification(title, options);
+  import('firebase/messaging').then(async ({ getMessaging, onMessage, isSupported }) => {
+    try {
+      const supported = await isSupported();
+      if (!supported) return;
+
+      const msg = getMessaging(app);
+      unsubscribe = onMessage(msg, (payload: MessagePayload) => {
+        console.log('Message FCM recu au premier plan:', payload);
+        callback(payload);
+
+        // Afficher une notification HTML5 native personnalisee avec le logo Mobility
+        if (Notification.permission === 'granted') {
+          const title = payload.notification?.title || payload.data?.title || 'Mobility';
+          const options: NotificationOptions = {
+            body: payload.notification?.body || payload.data?.message || payload.data?.body || '',
+            icon: '/images/logo.jpg',
+            badge: '/images/logo.jpg',
+            data: payload.data,
+            tag: payload.data?.notificationId || 'mobility-notification',
+          };
+          new Notification(title, options);
+        }
+      });
+    } catch (e) {
+      console.warn('Impossible d\'ecouter les messages en premier plan:', e);
     }
+  }).catch((err) => {
+    console.warn('Erreur chargement firebase/messaging:', err);
   });
+
+  return () => {
+    if (unsubscribe) unsubscribe();
+  };
 };

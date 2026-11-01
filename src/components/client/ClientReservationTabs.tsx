@@ -1,15 +1,14 @@
 
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faEye,
   faTimes,
   faBan,
   faSearch,
-  faFilter,
-  faTh,
   faList,
   faCar,
   faChevronLeft,
@@ -17,12 +16,9 @@ import {
   faCalendarAlt,
   faCheckCircle,
   faMapMarkerAlt,
-  faGasPump,
-  faCogs,
   faInfoCircle,
   faHistory,
   faClock,
-  faMoneyBillWave,
   faThLarge,
   faXmark,
   faBars,
@@ -37,6 +33,31 @@ import Image from 'next/image';
 export type ReservationStatus = "PENDING" | "ACCEPTED" | "APPROVED" | "CONFIRMED" | "REJECTED" | "CANCELLED" | "CANCELED" | "COMPLETED";
 export type ReservationType = "ACHAT" | "LOCATION";
 
+export interface ParkingItem {
+  id?: number;
+  nom?: string;
+  name?: string;
+  adresse?: string;
+  address?: string;
+  logo?: string;
+}
+
+export interface ReservationVehicle {
+  id: number;
+  marque: string;
+  model: string;
+  modele?: string;
+  photos?: string[] | string;
+  prix: number;
+  prixJour?: number;
+  fuelType?: string;
+  carburant?: string;
+  transmission?: string;
+  boite?: string;
+  parking?: ParkingItem;
+  parkingId?: number;
+}
+
 export interface Reservation {
   id: number;
   status: ReservationStatus;
@@ -47,48 +68,28 @@ export interface Reservation {
   localisation?: 'BAMAKO' | 'HORS_BAMAKO' | null;
   montant?: number;
   prix?: number;
-  vehicle: {
-    id: number;
-    marque: string;
-    model: string;
-    modele?: string;
-    photos?: string[] | string;
-    prix: number;
-    prixJour?: number;
-    fuelType?: string;
-    carburant?: string;
-    transmission?: string;
-    boite?: string;
-    parking?: {
-      nom?: string;
-      name?: string;
-      adresse?: string;
-      address?: string;
-      logo?: string;
-    };
-  };
-  parking?: {
-    nom?: string;
-    name?: string;
-    adresse?: string;
-    address?: string;
-    logo?: string;
-  };
+  vehicle: ReservationVehicle;
+  vehicule?: ReservationVehicle;
+  parking?: ParkingItem;
+  parkingId?: number;
 }
 
-const getVehicle = (res: any) => res?.vehicle || res?.vehicule;
+const getVehicle = (res?: Partial<Reservation> | null): ReservationVehicle | undefined => res?.vehicle || res?.vehicule;
 
-const getParkingName = (res: any, parkings: any[] = []) => {
+const getParkingName = (res?: Partial<Reservation> | null, parkings: ParkingItem[] = []): string => {
   if (!res) return 'Parking Privé';
   const p1 = res.parking?.nom || res.parking?.name;
+  if (p1) return p1;
+
   const veh = getVehicle(res);
   const p2 = veh?.parking?.nom || veh?.parking?.name;
-  if (p1 || p2) return p1 || p2;
+  if (p2) return p2;
   
   const parkingId = res.parkingId || veh?.parkingId;
   if (parkingId && parkings.length > 0) {
-    const found = parkings.find((p: any) => p.id === parkingId || p.id === Number(parkingId));
-    if (found) return found.nom || found.name || 'Parking Privé';
+    const found = parkings.find((p) => p.id === parkingId || p.id === Number(parkingId));
+    if (found?.nom) return found.nom;
+    if (found?.name) return found.name;
   }
   
   return 'Parking Privé';
@@ -106,9 +107,9 @@ export default function ClientReservationTabs() {
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
   const [viewModeTab, setViewModeTab] = useState<'list' | 'details'>('list');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [parkings, setParkings] = useState<any[]>([]);
+  const [parkings, setParkings] = useState<ParkingItem[]>([]);
 
-  const fetchReservations = async () => {
+  const fetchReservations = useCallback(async () => {
     if (!user) return;
     setLoading(true);
     try {
@@ -117,22 +118,23 @@ export default function ClientReservationTabs() {
         clientAPI.getParkings()
       ]);
       setReservations(data as Reservation[]);
-      setParkings(parkingsData || []);
-    } catch (error: any) {
-      if (error?.message?.includes('Token invalide') || error?.status === 401) {
+      setParkings((parkingsData as ParkingItem[]) || []);
+    } catch (error: unknown) {
+      const err = error as { message?: string; status?: number };
+      if (err?.message?.includes('Token invalide') || err?.status === 401) {
         console.warn('Session expirée ou token invalide. Veuillez vous reconnecter.');
       } else {
-        console.warn('Erreur lors de la récupération des réservations:', error?.message || error);
+        console.warn('Erreur lors de la récupération des réservations:', err?.message || error);
       }
       setReservations([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     fetchReservations();
-  }, [user]);
+  }, [fetchReservations]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -173,13 +175,13 @@ export default function ClientReservationTabs() {
 
     if (search) {
       const lowerSearch = search.toLowerCase();
-      result = result.filter((r: any) => {
+      result = result.filter((r) => {
         const veh = getVehicle(r);
         const parkingName = getParkingName(r, parkings);
         return (
-          veh?.marque?.toLowerCase().includes(lowerSearch) ||
-          veh?.model?.toLowerCase().includes(lowerSearch) ||
-          veh?.modele?.toLowerCase().includes(lowerSearch) ||
+          Boolean(veh?.marque?.toLowerCase().includes(lowerSearch)) ||
+          Boolean(veh?.model?.toLowerCase().includes(lowerSearch)) ||
+          Boolean(veh?.modele?.toLowerCase().includes(lowerSearch)) ||
           parkingName.toLowerCase().includes(lowerSearch) ||
           r.id.toString().includes(lowerSearch)
         );
@@ -187,7 +189,7 @@ export default function ClientReservationTabs() {
     }
 
     return result;
-  }, [reservations, activeTab, search]);
+  }, [reservations, activeTab, search, parkings]);
 
   const totalPages = Math.ceil(filteredReservations.length / itemsPerPage) || 1;
   const paginatedReservations = useMemo(() => {
@@ -212,7 +214,7 @@ export default function ClientReservationTabs() {
 
 
   const getStatusBadge = (status: ReservationStatus) => {
-    const configs: Record<string, { bg: string, text: string, label: string, icon: any }> = {
+    const configs: Record<string, { bg: string, text: string, label: string, icon: IconDefinition }> = {
       PENDING: { bg: 'bg-amber-50', text: 'text-amber-600', label: 'En attente', icon: faClock },
       ACCEPTED: { bg: 'bg-emerald-50', text: 'text-emerald-600', label: 'Confirmée', icon: faCheckCircle },
       APPROVED: { bg: 'bg-emerald-50', text: 'text-emerald-600', label: 'Approuvée', icon: faCheckCircle },
@@ -345,12 +347,14 @@ export default function ClientReservationTabs() {
           {paginatedReservations.map((res) => (
             <div key={res.id} className="bg-white rounded-[2rem] border border-slate-100 shadow-lg shadow-slate-200/40 overflow-hidden group hover:shadow-xl transition-all">
               <div className="h-40 bg-slate-100 relative overflow-hidden">
-                <img 
+                <Image 
                   src={getPhotoUrl(getVehicle(res)?.photos)} 
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   alt="Vehicule"
+                  fill
+                  unoptimized
                 />
-                <div className="absolute top-4 left-4">
+                <div className="absolute top-4 left-4 z-10">
                   {getStatusBadge(res.status)}
                 </div>
                 <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur px-3 py-1.5 rounded-xl font-black text-[10px] uppercase tracking-widest text-slate-900 shadow-sm">
@@ -423,8 +427,8 @@ export default function ClientReservationTabs() {
                     <td className="px-6 py-5 font-black text-xs text-slate-400">#{res.id}</td>
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-100 shadow-inner">
-                          <img src={getPhotoUrl(getVehicle(res)?.photos)} className="w-full h-full object-cover" alt="Photo du véhicule" />
+                        <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-100 shadow-inner relative">
+                          <Image src={getPhotoUrl(getVehicle(res)?.photos)} className="w-full h-full object-cover" alt="Photo du véhicule" fill unoptimized />
                         </div>
                         <div className="font-black text-sm text-slate-900 group-hover:text-orange-500 transition-colors">
                           {getVehicle(res)?.marque} {getVehicle(res)?.model || getVehicle(res)?.modele}
@@ -511,17 +515,17 @@ export default function ClientReservationTabs() {
 
             <div className="px-4 py-2 bg-gray-50 rounded-lg border border-gray-100">
               <span className="text-sm font-bold text-gray-700">
-                Page <span className="text-orange-600">{currentPage}</span> sur {Math.ceil(filteredReservations.length / itemsPerPage) || 1}
+                Page <span className="text-orange-600">{currentPage}</span> sur {totalPages}
               </span>
             </div>
 
             <button
               title="Page suivante"
               onClick={() => {
-                setCurrentPage(prev => Math.min(prev + 1, Math.ceil(filteredReservations.length / itemsPerPage)));
+                setCurrentPage(prev => Math.min(prev + 1, totalPages));
                 window.scrollTo({ top: 300, behavior: 'smooth' });
               }}
-              disabled={currentPage === Math.ceil(filteredReservations.length / itemsPerPage) || filteredReservations.length === 0}
+              disabled={currentPage === totalPages || filteredReservations.length === 0}
               className="w-10 h-10 border border-gray-200 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-50 hover:text-orange-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
               <FontAwesomeIcon icon={faChevronRight} />
@@ -554,12 +558,14 @@ export default function ClientReservationTabs() {
                 {/* Visual Section */}
                 <div className="space-y-6">
                   <div className="aspect-video rounded-[2rem] bg-slate-100 overflow-hidden shadow-2xl relative group">
-                    <img 
+                    <Image 
                       src={getPhotoUrl(getVehicle(selectedReservation)?.photos)} 
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                       alt="Photo du véhicule"
+                      fill
+                      unoptimized
                     />
-                    <div className="absolute top-6 right-6">
+                    <div className="absolute top-6 right-6 z-10">
                       {getStatusBadge(selectedReservation.status)}
                     </div>
                   </div>
@@ -622,7 +628,7 @@ export default function ClientReservationTabs() {
   );
 }
 
-function DetailBlock({ icon, label, value }: { icon: any, label: string, value: string }) {
+function DetailBlock({ icon, label, value }: { icon: IconDefinition, label: string, value: string }) {
   return (
     <div className="p-5 bg-white rounded-2xl border border-slate-50 shadow-sm space-y-1">
       <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest flex items-center gap-1.5">
