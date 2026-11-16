@@ -81,7 +81,7 @@ export default function FavoritesPage() {
                     <img 
                       src={imageUrl} 
                       alt={fav.model} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-contain"
                       onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                     />
                   ) : (

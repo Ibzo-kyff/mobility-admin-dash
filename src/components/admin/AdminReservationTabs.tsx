@@ -995,7 +995,7 @@ export default function AdminReservationTabs() {
                           src={photo}
                           alt={`${v.marque} ${v.model}`}
                           fill
-                          className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                          className="object-contain"
                         />
                       </div>
                     ))}
@@ -1061,7 +1061,7 @@ export default function AdminReservationTabs() {
                         idx === currentImageIndex ? 'border-orange-500 scale-105 shadow-lg' : 'border-transparent opacity-60 hover:opacity-100'
                       }`}
                     >
-                      <Image src={photo} alt="" fill className="object-cover" />
+                      <Image src={photo} alt="" fill className="object-contain" />
                     </button>
                   ))}
                 </div>
@@ -1609,7 +1609,7 @@ export default function AdminReservationTabs() {
                         src={getPhotoUrl(res.vehicle?.photos)!}
                         alt={res.vehicle?.marque || 'Véhicule'}
                         fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-700"
+                        className="object-contain"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-slate-200">

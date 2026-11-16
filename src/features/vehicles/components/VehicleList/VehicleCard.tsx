@@ -127,7 +127,7 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({
                 src={getPhotoUrl(vehicle.photos)!}
                 alt={`${vehicle.marque ?? ''} ${vehicle.model ?? ''}`}
                 fill
-                className="object-cover group-hover:scale-105 transition-transform duration-700"
+                className="object-contain"
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-slate-200">
@@ -423,7 +423,7 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({
               src={getPhotoUrl(vehicle.photos)!}
               alt={`${vehicle.marque ?? ''} ${vehicle.model ?? ''}`}
               fill
-              className="object-cover group-hover:scale-105 transition-transform duration-700"
+              className="object-contain"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-slate-200">

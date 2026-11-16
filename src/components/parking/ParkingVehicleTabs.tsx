@@ -1544,12 +1544,20 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                     className="gallery-track absolute inset-0 flex transition-transform duration-700 ease-in-out"
                   >
                     {photos.map((photo, idx) => (
-                      <div key={idx} className="relative min-w-full h-full">
+                      <div key={idx} className="relative min-w-full h-full overflow-hidden bg-slate-200">
+                        <Image
+                          src={photo}
+                          alt=""
+                          fill
+                          className="scale-110 object-cover blur-2xl opacity-40"
+                          aria-hidden="true"
+                        />
+                        <div className="absolute inset-0 bg-slate-900/10" />
                         <Image
                           src={photo}
                           alt={`${selectedVehicle.marque} ${selectedVehicle.model}`}
                           fill
-                          className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                          className="object-contain drop-shadow-xl"
                           priority={idx === currentImageIndex}
                         />
                       </div>
@@ -1620,7 +1628,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                       : 'border-transparent opacity-60 hover:opacity-100'
                       }`}
                   >
-                    <Image src={photo} alt="" fill className="object-cover" />
+                    <Image src={photo} alt="" fill className="object-contain" />
                   </button>
                 ))}
               </div>
@@ -2267,7 +2275,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
               <div className="flex flex-wrap gap-3">
                 {photos.map((photo, index) => (
                   <div key={`existing-${index}`} className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden group/photo shadow-sm">
-                    <Image src={photo} alt="" fill className="object-cover" />
+                    <Image src={photo} alt="" fill className="object-contain" />
                     <button
                       title="Supprimer la photo"
                       onClick={() => setEditExistingPhotos(prev => prev.filter((_, i) => i !== index))}
@@ -2281,7 +2289,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
 
                 {editNewPhotos.map((file, index) => (
                   <div key={`new-${index}`} className="relative w-24 h-24 rounded-xl overflow-hidden group/photo border-2 border-orange-500 shadow-sm">
-                    <Image src={URL.createObjectURL(file)} alt="" fill className="object-cover" />
+                    <Image src={URL.createObjectURL(file)} alt="" fill className="object-contain" />
                     <button
                       title="Supprimer la photo"
                       onClick={() => setEditNewPhotos(prev => prev.filter((_, i) => i !== index))}
@@ -2544,7 +2552,7 @@ export default function ParkingVehicleTabs({ showDashboard = false }: { showDash
                   <div className="flex flex-wrap gap-4">
                     {addPhotos.map((file, index) => (
                       <div key={index} className="relative w-28 h-28 rounded-2xl overflow-hidden group/photo border-2 border-white shadow-lg">
-                        <Image src={URL.createObjectURL(file)} alt="" fill className="object-cover" />
+                        <Image src={URL.createObjectURL(file)} alt="" fill className="object-contain" />
                         <button
                           title="Supprimer la photo"
                           onClick={() => setAddPhotos(prev => prev.filter((_, i) => i !== index))}
