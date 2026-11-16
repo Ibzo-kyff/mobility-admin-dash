@@ -43,16 +43,19 @@ export const requestNotificationPermissionAndToken = async (explicitAuthToken?: 
   }
 
   try {
+    const permissionRequest = Notification.permission === 'default'
+      ? Notification.requestPermission()
+      : Promise.resolve(Notification.permission);
+    const permission = await permissionRequest;
+    if (permission !== 'granted') {
+      console.info('Permission de notification non accordée:', permission);
+      return null;
+    }
+
     const { getMessaging, getToken, isSupported } = await import('firebase/messaging');
     const supported = await isSupported();
     if (!supported) {
       console.warn('Firebase Messaging non supporte sur ce navigateur/plateforme.');
-      return null;
-    }
-
-    const permission = await Notification.requestPermission();
-    if (permission !== 'granted') {
-      console.log('Permission de notification non accordee:', permission);
       return null;
     }
 
@@ -70,9 +73,8 @@ export const requestNotificationPermissionAndToken = async (explicitAuthToken?: 
     });
 
     if (currentToken) {
-      console.log('FCM Token obtenu:', currentToken);
-      await saveFCMTokenToBackend(currentToken, explicitAuthToken);
-      return currentToken;
+      const saved = await saveFCMTokenToBackend(currentToken, explicitAuthToken);
+      return saved ? currentToken : null;
     } else {
       console.warn('Aucun token de notification retourne.');
       return null;
@@ -83,13 +85,13 @@ export const requestNotificationPermissionAndToken = async (explicitAuthToken?: 
   }
 };
 
-export const saveFCMTokenToBackend = async (token: string, explicitAuthToken?: string) => {
+export const saveFCMTokenToBackend = async (token: string, explicitAuthToken?: string): Promise<boolean> => {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://parkapp-pi.vercel.app/api';
     const authToken = explicitAuthToken || mobilityAPI.getToken() || (typeof window !== 'undefined' ? (getCookie('accessToken') as string | null || localStorage.getItem('accessToken')) : null);
     if (!authToken) {
       console.warn('Aucun jeton d\'authentification disponible pour enregistrer le token FCM.');
-      return;
+      return false;
     }
 
     const res = await fetch(`${baseUrl}/auth/users/push-token`, {
@@ -104,12 +106,14 @@ export const saveFCMTokenToBackend = async (token: string, explicitAuthToken?: s
     if (!res.ok) {
       const errData = await res.json().catch(() => ({}));
       console.error(`Erreur enregistrement token FCM sur le backend (HTTP ${res.status}):`, errData);
-      return;
+      return false;
     }
 
     console.log('Token FCM enregistre sur le backend avec succes');
+    return true;
   } catch (err) {
     console.error('Erreur enregistrement token FCM sur le backend:', err);
+    return false;
   }
 };
 
@@ -130,17 +134,30 @@ export const listenToForegroundMessages = (callback: (payload: MessagePayload) =
         console.log('Message FCM recu au premier plan:', payload);
         callback(payload);
 
-        // Afficher une notification HTML5 native personnalisee avec le logo Mobility
         if (Notification.permission === 'granted') {
           const title = payload.notification?.title || payload.data?.title || 'Mobility';
+          const targetUrl = payload.data?.url || '/dashboard';
           const options: NotificationOptions = {
             body: payload.notification?.body || payload.data?.message || payload.data?.body || '',
-            icon: '/images/logo.jpg',
-            badge: '/images/logo.jpg',
-            data: payload.data,
+            icon: '/icon-192.png',
+            badge: '/icon-192.png',
+            data: { ...payload.data, url: targetUrl },
             tag: payload.data?.notificationId || 'mobility-notification',
           };
-          new Notification(title, options);
+
+          navigator.serviceWorker.ready
+            .then((registration) => registration.showNotification(title, options))
+            .catch((error: unknown) => {
+              console.error('Impossible d’afficher la notification via le Service Worker:', error);
+              const notification = new Notification(title, options);
+              notification.onclick = () => {
+                const destination = new URL(targetUrl, window.location.origin);
+                if (destination.origin === window.location.origin) {
+                  window.location.assign(destination.href);
+                }
+                notification.close();
+              };
+            });
         }
       });
     } catch (e) {

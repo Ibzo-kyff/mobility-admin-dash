@@ -330,7 +330,7 @@ const Home: React.FC = () => {
       <div className="car-card max-w-md mx-auto">
         <div className="car-image-container relative h-64 overflow-hidden rounded-lg">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={photoUrl} alt={`${marque} ${modele}`} className="w-full h-full object-cover" />
+          <img src={photoUrl} alt={`${marque} ${modele}`} className="w-full h-full object-contain" />
           <div className="absolute top-4 right-4 px-3 py-1 bg-orange-600 text-white rounded-full text-sm font-semibold">
             POPULAIRE
           </div>
@@ -381,7 +381,7 @@ const Home: React.FC = () => {
       <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:border-orange-500 hover:shadow-xl transition-all duration-300">
         <div className="h-48 w-full overflow-hidden relative">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={photoUrl} alt={`${marque} ${modele}`} className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" />
+          <img src={photoUrl} alt={`${marque} ${modele}`} className="w-full h-full object-contain" />
           <div className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold ${disponible ? 'bg-green-500' : 'bg-red-500'} text-white`}>
             {disponible ? 'DISPONIBLE' : 'INDISPONIBLE'}
           </div>
@@ -1041,7 +1041,7 @@ footer {
                 <div className="car-card p-1">
                   <div className="car-image-container rounded-xl">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src="https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1025&q=80" alt="Volkswagen Golf" className="car-image w-full h-full object-cover" />
+                    <img src="https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1025&q=80" alt="Volkswagen Golf" className="car-image w-full h-full object-contain" />
                   </div>
                 </div>
               

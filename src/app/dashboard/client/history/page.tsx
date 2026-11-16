@@ -221,7 +221,7 @@ function HistoryItem({ item }: { item: any }) {
   return (
     <div className="bg-white rounded-[2.5rem] p-4 sm:p-6 shadow-lg shadow-slate-200/40 border border-slate-100 flex flex-col md:flex-row items-center gap-6 group hover:shadow-2xl transition-all">
       <div className="w-full md:w-32 h-24 rounded-[1.5rem] overflow-hidden shadow-inner flex-shrink-0">
-        <img src={photoUrl} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="Vehicle" />
+        <img src={photoUrl} className="w-full h-full object-contain" alt="Vehicle" />
 
       </div>
 

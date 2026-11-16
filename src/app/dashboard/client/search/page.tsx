@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { mobilityAPI } from '@/services/mobility-api';
 import { clientAPI } from '@/services/client/client-api';
+import { getPhotoUrl } from '@/features/vehicles/utils/photos';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faSearch, faMapMarkerAlt, faStar, faCar, faFilter, 
@@ -149,7 +150,7 @@ export default function SearchPage() {
       {/* Tab Switcher & View Toggle */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="flex p-1 bg-gray-100 rounded-2xl w-fit">
-          <button 
+          <button
             onClick={() => setActiveTab('vehicles')}
             className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${
               activeTab === 'vehicles' ? 'bg-white text-orange-500 shadow-sm' : 'text-gray-500 hover:text-gray-700'
@@ -171,7 +172,7 @@ export default function SearchPage() {
 
         {activeTab === 'vehicles' && (
           <div className="flex p-1 bg-gray-100 rounded-xl">
-            <button 
+            <button
               onClick={() => setViewMode('grid')}
               className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all ${
                 viewMode === 'grid' ? 'bg-white text-orange-500 shadow-sm' : 'text-gray-400 hover:text-gray-600'
@@ -424,7 +425,7 @@ function ParkingCard({ parking }: { parking: any }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col group">
       <div className="h-40 bg-gray-200 relative overflow-hidden">
-        <img 
+        <img
           src={getLogoUrl(parking.logo || parking.photo)} 
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
           alt={parking.nom || parking.name}
@@ -442,7 +443,6 @@ function ParkingCard({ parking }: { parking: any }) {
             {parking.rating || '4.5'}
           </div>
         </div>
-        
         <p className="text-sm text-gray-500 flex items-center gap-2">
           <FontAwesomeIcon icon={faMapMarkerAlt} className="text-orange-500" />
           {parking.adresse || parking.address || 'Dakar, Sénégal'}
@@ -461,7 +461,7 @@ function ParkingCard({ parking }: { parking: any }) {
       </div>
 
       <div className="px-5 py-4 bg-gray-50 border-t border-gray-100">
-        <Link 
+        <Link
           href={`/dashboard/client/search/${parking.id}?type=parking`}
           className="w-full py-2.5 bg-orange-500 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-orange-600 transition-colors shadow-sm"
         >
@@ -501,29 +501,24 @@ function VehicleCard({ vehicle, viewMode = 'grid' }: { vehicle: any, viewMode?: 
     }
   };
 
-  const photoUrl = Array.isArray(vehicle.photos) ? vehicle.photos[0] : vehicle.photos;
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'https://parkapp-pi.vercel.app';
-  let cleanUrl = photoUrl;
-  if (typeof photoUrl === 'string' && photoUrl.trim().startsWith('[')) {
-    try { const parsed = JSON.parse(photoUrl); if (parsed.length) cleanUrl = parsed[0]; } catch(e) {}
-  }
-  const fullPhotoUrl = cleanUrl?.startsWith('http') ? cleanUrl : `${baseUrl}${cleanUrl?.startsWith('/') ? '' : '/'}${cleanUrl}`;
+  const fullPhotoUrl = getPhotoUrl(vehicle.photos);
+  const vehicleName = `${vehicle.marque || vehicle.marqueRef?.name || ''} ${vehicle.model || vehicle.modele || ''}`.trim();
 
   if (viewMode === 'list') {
     return (
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all overflow-hidden flex items-center p-3 gap-6 group relative">
-        <div className="w-24 h-20 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0 shadow-inner relative">
-          <img 
-            src={cleanUrl ? fullPhotoUrl : 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b'} 
+        <div className="w-28 h-24 bg-gray-200 rounded-xl overflow-hidden flex-shrink-0 shadow-inner relative">
+          <img
+            src={fullPhotoUrl || 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b'}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-            alt={`${vehicle.marque} ${vehicle.model}`}
+            alt={vehicleName || 'Véhicule'}
             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
           />
         </div>
         
-        <button 
+        <button
           onClick={toggleFavorite}
-          className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all z-10 shadow-sm ${isFav ? 'bg-rose-50 text-rose-500' : 'bg-gray-50 text-gray-400 hover:text-rose-400 hover:bg-rose-50'}`}
+          className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all z-10 shadow-sm ${isFav ? 'bg-rose-50 text-rose-500' : 'bg-white/90 text-gray-400 hover:text-rose-400 hover:bg-rose-50'}`}
           title={isFav ? "Retirer des favoris" : "Ajouter aux favoris"}
         >
           <FontAwesomeIcon icon={faStar} className={isFav ? 'text-rose-500' : ''} />
@@ -531,8 +526,8 @@ function VehicleCard({ vehicle, viewMode = 'grid' }: { vehicle: any, viewMode?: 
         
         <div className="flex-1 flex flex-col md:flex-row md:items-center justify-between gap-4 pr-8">
           <div className="space-y-1">
-            <h3 className="font-bold text-gray-900 group-hover:text-orange-500 transition-colors">
-              {vehicle.marque || vehicle.marqueRef?.name} {vehicle.model || vehicle.modele}
+            <h3 className="font-bold text-lg text-gray-900 leading-tight group-hover:text-orange-500 transition-colors">
+              {vehicleName || 'Véhicule'}
             </h3>
             <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest flex items-center gap-1.5">
                <FontAwesomeIcon icon={faParking} className="text-orange-500 text-[8px]" />
@@ -564,9 +559,10 @@ function VehicleCard({ vehicle, viewMode = 'grid' }: { vehicle: any, viewMode?: 
             </div>
             <Link 
               href={`/dashboard/client/search/${vehicle.id}?type=vehicle`}
-              className="px-6 py-2 bg-gray-900 text-white rounded-xl font-bold text-xs flex items-center gap-2 hover:bg-orange-500 transition-colors shadow-sm"
+              className="px-6 py-2 bg-orange-500 text-white rounded-xl font-bold text-xs flex items-center gap-2 hover:bg-orange-600 transition-colors shadow-sm"
             >
-              Réserver
+              Voir les détails
+              <FontAwesomeIcon icon={faChevronRight} className="text-[10px]" />
             </Link>
           </div>
         </div>
@@ -576,76 +572,67 @@ function VehicleCard({ vehicle, viewMode = 'grid' }: { vehicle: any, viewMode?: 
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col group relative">
-      <div className="h-44 bg-gray-100 relative overflow-hidden">
-        <img 
-          src={cleanUrl ? fullPhotoUrl : 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b'} 
-          className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
-          alt={`${vehicle.marque} ${vehicle.model}`}
+      <div className="h-40 bg-gray-200 relative overflow-hidden">
+        <img
+          src={fullPhotoUrl || 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b'}
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+          alt={vehicleName || 'Véhicule'}
           onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
         />
-        <div className="absolute top-3 left-3 px-3 py-1 bg-white/90 backdrop-blur rounded-full text-[10px] font-black text-gray-900 shadow-sm uppercase tracking-widest">
+        <div className="absolute top-3 left-3 px-3 py-1 bg-white/90 backdrop-blur rounded-full text-xs font-bold text-orange-600 shadow-sm">
           {vehicle.forRent ? 'À Louer' : 'À Vendre'}
         </div>
-        <div className="absolute top-3 right-3 px-3 py-1 bg-orange-500 rounded-full text-xs font-bold text-white shadow-sm">
-          {(vehicle.prix || vehicle.prixJour || 0).toLocaleString()} F
+        <div className="absolute top-3 right-3 flex items-center gap-2">
+          <div className="px-3 py-1 bg-white/90 backdrop-blur rounded-full text-xs font-bold text-orange-600 shadow-sm">
+            {(vehicle.prix || vehicle.prixJour || 0).toLocaleString()} F{vehicle.forRent ? ' / j' : ''}
+          </div>
+          <button
+            onClick={toggleFavorite}
+            className={`w-8 h-8 rounded-full flex items-center justify-center transition-all shadow-sm ${isFav ? 'bg-rose-50 text-rose-500' : 'bg-white/90 text-gray-400 hover:text-rose-500'}`}
+            title={isFav ? "Retirer des favoris" : "Ajouter aux favoris"}
+          >
+            <FontAwesomeIcon icon={faStar} />
+          </button>
         </div>
       </div>
       
-      <div className="p-5 flex-1 space-y-4">
+      <div className="p-5 flex-1 space-y-3">
         <div>
           <div className="flex justify-between items-start gap-2">
-            <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-lg text-gray-900 leading-tight truncate group-hover:text-orange-500 transition-colors">
-                {vehicle.marque || vehicle.marqueRef?.name} {vehicle.model || vehicle.modele}
-              </h3>
-              {vehicle.stats?.reservations > 0 && (
-                <span className="text-[8px] bg-orange-50 text-orange-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest mt-1 inline-block">
-                  Populaire
-                </span>
-              )}
+            <h3 className="font-bold text-lg text-gray-900 leading-tight group-hover:text-orange-500 transition-colors">{vehicleName || 'Véhicule'}</h3>
+            <div className="flex items-center text-amber-500 text-sm font-bold bg-amber-50 px-2 py-0.5 rounded-lg shrink-0">
+              <FontAwesomeIcon icon={faStar} className="mr-1" />
+              {vehicle.rating || '4.8'}
             </div>
-            <button 
-              onClick={toggleFavorite}
-              className={`w-8 h-8 rounded-full flex items-center justify-center transition-all flex-shrink-0 ${isFav ? 'bg-rose-50 text-rose-500 shadow-sm' : 'bg-gray-50 text-gray-400 hover:text-rose-500 hover:bg-rose-50'}`}
-              title={isFav ? "Retirer des favoris" : "Ajouter aux favoris"}
-            >
-              <FontAwesomeIcon icon={faStar} />
-            </button>
-          </div>
-          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1 flex items-center gap-1.5">
-            <FontAwesomeIcon icon={faParking} className="text-orange-500 text-[8px]" />
-            {vehicle.parking?.nom || vehicle.parking?.name || 'Vendeur particulier'}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3 py-3 border-y border-gray-50">
-          <div className="flex items-center gap-2 text-xs font-medium text-gray-600">
-            <FontAwesomeIcon icon={faGasPump} className="text-gray-400 w-3" />
-            {vehicle.fuelType || vehicle.carburant || '---'}
-          </div>
-          <div className="flex items-center gap-2 text-xs font-medium text-gray-600">
-            <FontAwesomeIcon icon={faCogs} className="text-gray-400 w-3" />
-            {vehicle.transmission || vehicle.boite || '---'}
           </div>
         </div>
+        <p className="text-sm text-gray-500 flex items-center gap-2">
+          <FontAwesomeIcon icon={faMapMarkerAlt} className="text-orange-500" />
+          <span className="truncate">{vehicle.parking?.nom || vehicle.parking?.name || 'Vendeur particulier'}</span>
+        </p>
 
-        <div className="flex items-center justify-between pt-1">
-          <div className="flex items-center text-amber-500 text-xs font-bold bg-amber-50 px-2 py-0.5 rounded-lg">
-            <FontAwesomeIcon icon={faStar} className="mr-1" />
-            4.8
+        <div className="flex items-center gap-4 pt-2 border-t border-gray-100 mt-2">
+          <div className="text-[10px] font-bold text-gray-400 flex items-center gap-1.5 uppercase tracking-wider">
+            <FontAwesomeIcon icon={faGasPump} className="text-gray-300" />
+            {vehicle.fuelType || vehicle.carburant || 'Non précisé'}
           </div>
-          <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-50 px-2 py-0.5 rounded-lg">
-            {vehicle.annee || vehicle.year || '2023'}
+          <div className="text-[10px] font-bold text-gray-400 flex items-center gap-1.5 uppercase tracking-wider">
+            <FontAwesomeIcon icon={faCogs} className="text-gray-300" />
+            {vehicle.transmission || vehicle.boite || 'Non précisée'}
           </div>
+        </div>
+        <div className="text-[10px] font-bold text-gray-400 flex items-center gap-1.5 uppercase tracking-wider">
+          <FontAwesomeIcon icon={faCar} className="text-gray-300" />
+          {vehicle.annee || vehicle.year || 'Année non précisée'}
         </div>
       </div>
 
       <div className="px-5 py-4 bg-gray-50 border-t border-gray-100">
         <Link 
-            href={`/dashboard/client/search/${vehicle.id}?type=vehicle`}
-          className="w-full py-2.5 bg-gray-900 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-orange-500 transition-colors shadow-sm active:scale-95"
+          href={`/dashboard/client/search/${vehicle.id}?type=vehicle`}
+          className="w-full py-2.5 bg-orange-500 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-orange-600 transition-colors shadow-sm"
         >
-          Réserver
+          Voir les détails
           <FontAwesomeIcon icon={faChevronRight} className="text-[10px]" />
         </Link>
       </div>

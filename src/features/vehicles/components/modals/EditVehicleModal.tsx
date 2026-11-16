@@ -46,7 +46,7 @@ const EditVehicleModal: React.FC<Props> = ({ open, vehicle, onClose, onSaved }) 
             <div className="mt-2 flex gap-2 flex-wrap">
               {form.photos.map((p, idx) => (
                 <div key={idx} className="w-20 h-20 border rounded overflow-hidden">
-                  {typeof p === 'string' ? <img src={p} className="w-full h-full object-cover" alt={`photo-${idx}`} /> : <div className="p-2 text-xs">Fichier: {p.name}</div>}
+                  {typeof p === 'string' ? <img src={p} className="w-full h-full object-contain" alt={`photo-${idx}`} /> : <div className="p-2 text-xs">Fichier: {p.name}</div>}
                   <button onClick={() => removePhotoAt(idx)} className="w-full text-xs text-red-600">Suppr</button>
                 </div>
               ))}

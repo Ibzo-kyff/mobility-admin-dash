@@ -202,7 +202,7 @@ export default function PremiumVehicleForm({ onSuccess, hideHeader = false }: { 
                     const previewUrl = typeof window !== 'undefined' ? URL.createObjectURL(file) : '';
                     return (
                       <div key={index} className="relative aspect-square rounded-3xl overflow-hidden group/photo border-4 border-white shadow-xl hover:-translate-y-1 transition-all duration-300">
-                        {previewUrl && <Image src={previewUrl} alt="" fill className="object-cover" unoptimized />}
+                        {previewUrl && <Image src={previewUrl} alt="" fill className="object-contain" unoptimized />}
                         <button
                           title="Supprimer"
                           onClick={() => setPhotos(prev => prev.filter((_, i) => i !== index))}

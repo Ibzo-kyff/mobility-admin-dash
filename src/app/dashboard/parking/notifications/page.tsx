@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { notificationAPI } from '@/services/notification-api';
 import { mobilityAPI } from '@/services/mobility-api';
+import PushNotificationButton from '@/components/notifications/PushNotificationButton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faBell,
@@ -249,6 +250,9 @@ export default function ParkingNotificationsPage() {
         <div>
           <h1 className="text-3xl font-black text-gray-900 tracking-tight">Notifications</h1>
           <p className="text-gray-500">Alertes et mises à jour de votre parking.</p>
+          <div className="mt-3">
+            <PushNotificationButton />
+          </div>
         </div>
         <div className="flex gap-2">
           <button
