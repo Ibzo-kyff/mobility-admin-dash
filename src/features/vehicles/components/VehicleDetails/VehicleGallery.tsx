@@ -19,14 +19,14 @@ const VehicleGallery: React.FC<Props> = ({ vehicle, className }) => {
   return (
     <div className={className}>
       <div className="w-full h-64 bg-gray-100 relative">
-        <img src={photos[index]} alt={`photo-${index}`} className="w-full h-64 object-cover" />
+        <img src={photos[index]} alt={`photo-${index}`} className="w-full h-64 object-contain" />
         <button onClick={prev} className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded">‹</button>
         <button onClick={next} className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded">›</button>
       </div>
       <div className="mt-2 flex gap-2 overflow-x-auto">
         {photos.map((p, idx) => (
           <button key={idx} onClick={() => setIndex(idx)} className={`w-20 h-14 overflow-hidden rounded ${idx === index ? 'ring-2 ring-blue-500' : ''}`}>
-            <img src={p} className="w-full h-full object-cover" alt={`thumb-${idx}`} />
+            <img src={p} className="w-full h-full object-contain" alt={`thumb-${idx}`} />
           </button>
         ))}
       </div>

@@ -349,7 +349,7 @@ export default function ClientReservationTabs() {
               <div className="h-40 bg-slate-100 relative overflow-hidden">
                 <Image 
                   src={getPhotoUrl(getVehicle(res)?.photos)} 
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  className="w-full h-full object-contain"
                   alt="Vehicule"
                   fill
                   unoptimized
@@ -428,7 +428,7 @@ export default function ClientReservationTabs() {
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-100 shadow-inner relative">
-                          <Image src={getPhotoUrl(getVehicle(res)?.photos)} className="w-full h-full object-cover" alt="Photo du véhicule" fill unoptimized />
+                          <Image src={getPhotoUrl(getVehicle(res)?.photos)} className="w-full h-full object-contain" alt="Photo du véhicule" fill unoptimized />
                         </div>
                         <div className="font-black text-sm text-slate-900 group-hover:text-orange-500 transition-colors">
                           {getVehicle(res)?.marque} {getVehicle(res)?.model || getVehicle(res)?.modele}
@@ -560,7 +560,7 @@ export default function ClientReservationTabs() {
                   <div className="aspect-video rounded-[2rem] bg-slate-100 overflow-hidden shadow-2xl relative group">
                     <Image 
                       src={getPhotoUrl(getVehicle(selectedReservation)?.photos)} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      className="w-full h-full object-contain"
                       alt="Photo du véhicule"
                       fill
                       unoptimized
@@ -639,4 +639,3 @@ function DetailBlock({ icon, label, value }: { icon: IconDefinition, label: stri
     </div>
   );
 }
-

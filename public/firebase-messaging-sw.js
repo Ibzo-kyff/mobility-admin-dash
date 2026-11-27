@@ -18,10 +18,13 @@ messaging.onBackgroundMessage((payload) => {
   const notificationTitle = payload.notification?.title || payload.data?.title || 'Mobility';
   const notificationOptions = {
     body: payload.notification?.body || payload.data?.message || payload.data?.body || '',
-    icon: payload.notification?.icon || '/images/logo.jpg',
-    badge: '/images/logo.jpg',
+    icon: payload.notification?.icon || '/icon-192.png',
+    badge: '/icon-192.png',
     image: payload.notification?.image || payload.data?.image || undefined,
-    data: payload.data || {},
+    data: {
+      ...(payload.data || {}),
+      url: payload.data?.url || payload.fcmOptions?.link || '/dashboard'
+    },
     vibrate: [200, 100, 200],
     tag: payload.data?.notificationId || 'mobility-notification',
     renotify: true
@@ -32,13 +35,19 @@ messaging.onBackgroundMessage((payload) => {
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const urlToOpen = event.notification.data?.url || '/dashboard';
+  const destination = new URL(
+    event.notification.data?.url || '/dashboard/notifications',
+    self.location.origin
+  );
+  const urlToOpen = destination.origin === self.location.origin
+    ? destination.href
+    : new URL('/dashboard/notifications', self.location.origin).href;
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
       for (let client of windowClients) {
         if (client.url.includes('/dashboard') && 'focus' in client) {
-          if ('navigate' in client && urlToOpen) {
-            client.navigate(urlToOpen);
+          if ('navigate' in client) {
+            return client.navigate(urlToOpen).then(() => client.focus());
           }
           return client.focus();
         }

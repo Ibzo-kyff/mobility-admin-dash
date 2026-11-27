@@ -72,45 +72,10 @@ export default function NotificationsPage() {
         });
       }
     } catch (err: any) {
-      // Si le backend Vercel répond 404 (car le code backend n'est pas encore pushé sur Vercel)
-      if (err.status === 404 || err.message?.includes('404')) {
-        if (typeof window !== 'undefined' && 'Notification' in window) {
-          if (Notification.permission === 'granted') {
-            try {
-              if ('serviceWorker' in navigator) {
-                const reg = await navigator.serviceWorker.ready;
-                await reg.showNotification('🔔 Test Mobility Push', {
-                  body: 'Félicitations ! Les notifications de votre navigateur fonctionnent parfaitement avec le logo Mobility !',
-                  icon: '/images/logo.jpg',
-                  badge: '/images/logo.jpg',
-                  data: { url: '/dashboard/admin/notifications' },
-                });
-              } else {
-                new Notification('🔔 Test Mobility Push', {
-                  body: 'Félicitations ! Les notifications fonctionnent avec succès !',
-                  icon: '/images/logo.jpg',
-                });
-              }
-              setTestPushStatus({
-                message: 'Notification test affichée avec succès sur votre écran ! (Pensez à faire git push dans parking__app pour déployer l\'endpoint distant sur Vercel).',
-                type: 'success',
-              });
-              return;
-            } catch (e: any) {
-              console.error('Erreur affichage notification locale:', e);
-            }
-          } else {
-            setTestPushStatus({
-              message: 'Veuillez autoriser les notifications dans votre navigateur pour recevoir les alertes.',
-              type: 'error',
-            });
-            return;
-          }
-        }
-      }
-
       setTestPushStatus({
-        message: err.message || 'Erreur lors du test de push notification.',
+        message: err.status === 404
+          ? 'Endpoint de test push introuvable sur le backend (404). Aucune notification push n’a été envoyée.'
+          : err.message || 'Erreur lors du test de push notification.',
         type: 'error',
       });
     } finally {

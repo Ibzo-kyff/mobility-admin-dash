@@ -5,12 +5,13 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { clientAPI } from '@/services/client/client-api';
 import { mobilityAPI } from '@/services/mobility-api';
+import { getAllPhotoUrls } from '@/features/vehicles/utils/photos';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import type { ReservationData, Vehicule } from '@/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faArrowLeft, faMapMarkerAlt, faStar, faInfoCircle, 
-  faCar, faGasPump, faCogs, faUsers, faCheckCircle 
+  faCar, faGasPump, faCogs, faUsers, faCheckCircle, faChevronLeft, faChevronRight
 } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
 
@@ -37,6 +38,19 @@ export default function ParkingDetailsPage() {
   const [type, setType] = useState<'parking' | 'vehicle'>('parking');
   const [vehicles, setVehicles] = useState<Vehicule[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isGalleryHovered, setIsGalleryHovered] = useState(false);
+
+  useEffect(() => {
+    if (type !== 'vehicle' || !entity || isGalleryHovered) return;
+    const photos = getAllPhotoUrls(entity.photos);
+    if (photos.length < 2) return;
+
+    const interval = window.setInterval(() => {
+      setCurrentImageIndex((index) => (index + 1) % photos.length);
+    }, 3000);
+    return () => window.clearInterval(interval);
+  }, [entity, isGalleryHovered, type]);
 
   const fetchData = useCallback(async () => {
     try {
@@ -59,6 +73,7 @@ export default function ParkingDetailsPage() {
       if (vehicleData) {
         setEntity(vehicleData);
         setType('vehicle');
+        setCurrentImageIndex(0);
         if (vehicleData.forRent === false && vehicleData.forSale === true) {
           setResType('ACHAT');
         }
@@ -157,6 +172,9 @@ export default function ParkingDetailsPage() {
     return `${baseUrl}${photo.startsWith('/') ? '' : '/'}${photo}`;
   };
 
+  const vehiclePhotos = type === 'vehicle' ? getAllPhotoUrls(entity.photos) : [];
+  const displayedImage = vehiclePhotos[currentImageIndex] || getImageUrl(entity);
+
   return (
     <div className="space-y-6">
       <button 
@@ -167,19 +185,53 @@ export default function ParkingDetailsPage() {
         Retour à la recherche
       </button>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column: Details */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-5">
           <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-            <div className="h-80 bg-gray-200 relative">
-              <Image 
-                src={getImageUrl(entity)} 
-                fill
-                unoptimized
-                className="w-full h-full object-cover"
-                alt={type === 'parking' ? (entity.nom || entity.name || 'Parking') : `${entity.marque || ''} ${entity.model || 'Véhicule'}`}
-                sizes="(max-width: 1024px) 100vw, 66vw"
-              />
+            <div
+              className={`relative overflow-hidden ${type === 'vehicle' ? 'aspect-[4/3] sm:aspect-[21/9] bg-slate-100' : 'h-80 bg-gray-100'}`}
+              onMouseEnter={() => type === 'vehicle' && setIsGalleryHovered(true)}
+              onMouseLeave={() => setIsGalleryHovered(false)}
+            >
+              {type === 'vehicle' && vehiclePhotos.length > 0 ? (
+                <>
+                  <div
+                    className="absolute inset-0 flex transition-transform duration-700 ease-in-out"
+                    style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}
+                  >
+                    {vehiclePhotos.map((photo, index) => (
+                      <div key={`${photo}-${index}`} className="relative min-w-full h-full overflow-hidden bg-slate-200">
+                        <Image src={photo} alt="" fill unoptimized className="scale-110 object-cover blur-2xl opacity-40" aria-hidden="true" />
+                        <div className="absolute inset-0 bg-slate-900/10" />
+                        <Image
+                          src={photo}
+                          alt={`${entity.marque || ''} ${entity.model || 'Véhicule'}`}
+                          fill
+                          unoptimized
+                          className="object-contain drop-shadow-xl"
+                          sizes="(max-width: 1024px) 100vw, 66vw"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20 pointer-events-none z-10" />
+                  {vehiclePhotos.length > 1 && <>
+                    <button type="button" onClick={() => setCurrentImageIndex((index) => (index - 1 + vehiclePhotos.length) % vehiclePhotos.length)} aria-label="Photo précédente" className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 sm:h-12 sm:w-12 items-center justify-center rounded-xl sm:rounded-2xl bg-white/20 text-white backdrop-blur-md border border-white/30 hover:bg-white/40 transition-all"><FontAwesomeIcon icon={faChevronLeft} /></button>
+                    <button type="button" onClick={() => setCurrentImageIndex((index) => (index + 1) % vehiclePhotos.length)} aria-label="Photo suivante" className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 sm:h-12 sm:w-12 items-center justify-center rounded-xl sm:rounded-2xl bg-white/20 text-white backdrop-blur-md border border-white/30 hover:bg-white/40 transition-all"><FontAwesomeIcon icon={faChevronRight} /></button>
+                    <span className="absolute top-2 right-2 sm:top-6 sm:right-6 z-20 rounded-xl sm:rounded-2xl bg-black/30 px-3 py-1.5 sm:px-4 sm:py-2 text-[10px] font-black uppercase tracking-widest text-white backdrop-blur-md">Photo {currentImageIndex + 1} / {vehiclePhotos.length}</span>
+                  </>}
+                </>
+              ) : (
+                <Image
+                  src={displayedImage}
+                  fill
+                  unoptimized
+                  className={type === 'parking' ? 'h-full w-full object-cover' : 'h-full w-full object-contain'}
+                  alt={type === 'parking' ? (entity.nom || entity.name || 'Parking') : `${entity.marque || ''} ${entity.model || 'Véhicule'}`}
+                  sizes="(max-width: 1024px) 100vw, 66vw"
+                />
+              )}
               {type === 'vehicle' && (
                 <div className="absolute top-4 left-4 flex gap-2">
                   <span className="px-4 py-2 bg-orange-500 text-white rounded-full text-xs font-bold shadow-lg">
@@ -188,7 +240,7 @@ export default function ParkingDetailsPage() {
                 </div>
               )}
             </div>
-            <div className="p-8">
+            <div className="p-6">
               <div className="flex justify-between items-start mb-6">
                 <div>
                   <h1 className="text-3xl font-bold text-gray-900">
@@ -244,7 +296,7 @@ export default function ParkingDetailsPage() {
                 {vehicles.map((v) => (
                   <Link key={v.id} href={`/dashboard/client/search/${v.id}`} className="bg-white p-4 rounded-2xl border border-gray-100 flex gap-4 hover:shadow-md transition-all group">
                     <div className="w-24 h-24 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0">
-                      <Image src={(Array.isArray(v.photos) ? v.photos[0] : v.photos) || 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b'} width={96} height={96} unoptimized className="w-full h-full object-cover" alt="Véhicule disponible" />
+                      <Image src={(Array.isArray(v.photos) ? v.photos[0] : v.photos) || 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b'} width={96} height={96} unoptimized className="w-full h-full object-contain" alt="Véhicule disponible" />
                     </div>
                     <div className="flex-1 flex flex-col justify-between">
                       <div>
@@ -268,7 +320,7 @@ export default function ParkingDetailsPage() {
 
         {/* Right Column: Booking Widget */}
         <div className="lg:col-span-1">
-          <div className="sticky top-24 bg-white rounded-3xl shadow-xl border border-orange-100 p-8 space-y-6">
+          <div className="sticky top-6 bg-white rounded-3xl shadow-xl border border-orange-100 p-6 space-y-5">
             <h3 className="text-xl font-bold text-gray-900">
               {type === 'parking' ? 'Réserver une place' : 'Réserver ce véhicule'}
             </h3>

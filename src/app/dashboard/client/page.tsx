@@ -237,7 +237,7 @@ export default function ClientDashboard() {
                               <img 
                                 src={fullImg} 
                                 alt="Image" 
-                                className="w-full h-full object-cover"
+                                className={`w-full h-full ${vehImage ? 'object-contain' : 'object-cover'}`}
                                 onError={(e) => {
                                    const target = e.target as HTMLImageElement;
                                    target.style.display = 'none';

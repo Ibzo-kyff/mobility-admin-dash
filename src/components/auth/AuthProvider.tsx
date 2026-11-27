@@ -17,6 +17,7 @@ interface AuthContextType extends AuthState {
   hasRole: (roles: UserRole | UserRole[]) => boolean;
   isVerified: boolean;
   refreshUser: () => Promise<void>;
+  enablePushNotifications: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -31,6 +32,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   
   const router = useRouter();
   const pathname = usePathname();
+
+  const enablePushNotifications = async (): Promise<boolean> => {
+    const token = (getCookie('accessToken') as string | undefined)
+      || (typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null)
+      || undefined;
+
+    return Boolean(await requestNotificationPermissionAndToken(token));
+  };
 
   // IMPORTANT: Ne vérifier l'auth qu'une seule fois au chargement
   useEffect(() => {
@@ -117,9 +126,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // =============================================
   useEffect(() => {
     if (state.isAuthenticated && state.user) {
-      const token = (getCookie('accessToken') as string | undefined) || (typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null) || undefined;
-      // Demander la permission et enregistrer le token sur le serveur
-      requestNotificationPermissionAndToken(token);
+      const token = (getCookie('accessToken') as string | undefined)
+        || (typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null)
+        || undefined;
+
+      if (typeof Notification !== 'undefined') {
+        if (Notification.permission === 'granted') {
+          requestNotificationPermissionAndToken(token);
+        } else if (
+          Notification.permission === 'default'
+          && !localStorage.getItem('mobility-push-permission-requested')
+        ) {
+          localStorage.setItem('mobility-push-permission-requested', 'true');
+          requestNotificationPermissionAndToken(token);
+        }
+      }
 
       // Écouter les notifications en avant-plan
       const unsubscribe = listenToForegroundMessages((payload) => {
@@ -371,6 +392,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     hasRole,
     isVerified: state.user?.emailVerified || false,
     refreshUser,
+    enablePushNotifications,
   };
 
   return (

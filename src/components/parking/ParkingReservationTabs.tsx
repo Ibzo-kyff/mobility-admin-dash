@@ -918,13 +918,13 @@ export default function ParkingReservationTabs() {
                     <img
                       src={getPhotoUrl(selectedVehicleForModal.photos) || '/placeholder-car.jpg'}
                       alt=""
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                     />
                   </div>
                   <div className="grid grid-cols-4 gap-2">
                     {getAllPhotoUrls(selectedVehicleForModal.photos).slice(0, 4).map((p, i) => (
                       <div key={i} className="aspect-square rounded-xl overflow-hidden border border-slate-100">
-                        <img src={p} className="w-full h-full object-cover" alt="" />
+                        <img src={p} className="w-full h-full object-contain" alt="" />
                       </div>
                     ))}
                   </div>
@@ -1050,7 +1050,7 @@ export default function ParkingReservationTabs() {
                           src={photo}
                           alt={`${v.marque} ${v.model}`}
                           fill
-                          className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                          className="object-contain"
                         />
                       </div>
                     ))}
@@ -1116,7 +1116,7 @@ export default function ParkingReservationTabs() {
                         idx === currentImageIndex ? 'border-orange-500 scale-105 shadow-lg' : 'border-transparent opacity-60 hover:opacity-100'
                       }`}
                     >
-                      <Image src={photo} alt="" fill className="object-cover" />
+                      <Image src={photo} alt="" fill className="object-contain" />
                     </button>
                   ))}
                 </div>
@@ -1647,7 +1647,7 @@ export default function ParkingReservationTabs() {
                         src={getPhotoUrl(res.vehicle?.photos)!}
                         alt={res.vehicle?.marque || 'Véhicule'}
                         fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-700"
+                        className="object-contain"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-slate-200">

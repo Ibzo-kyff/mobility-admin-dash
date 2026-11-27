@@ -187,7 +187,6 @@ export default function ClientsTable() {
                 <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Statut</th>
                 <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Inscrit le</th>
                 <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Dépenses</th>
-                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
@@ -243,11 +242,6 @@ export default function ClientsTable() {
                     <div className="text-sm font-bold text-gray-900">
                       {client.totalSpent ? client.totalSpent.toLocaleString('fr-FR') : '0'} FCFA
                     </div>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <button className="p-2 hover:bg-white rounded-lg border border-transparent hover:border-gray-200 transition-all text-gray-400 hover:text-gray-600">
-                      <MoreHorizontal className="w-5 h-5" />
-                    </button>
                   </td>
                 </tr>
               ))}
